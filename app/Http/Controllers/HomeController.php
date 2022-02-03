@@ -25,7 +25,7 @@ class HomeController extends Controller
     { 
       
         if (auth()->user()->perfil === 'vendedor') {
-            return view('home');
+            return redirect(route('principal'));
             
     }else{
         

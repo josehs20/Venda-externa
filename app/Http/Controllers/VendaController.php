@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Produto;
 use Illuminate\Http\Request;
+use Laravel\Ui\Presets\React;
 
 class VendaController extends Controller
 {
@@ -11,9 +13,11 @@ class VendaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        dd('q');
+        $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->produto}%'")->orderBy('nome')->paginate(20);
+
+        return view('home', compact('produtos'));
     }
 
     /**

@@ -21,3 +21,4 @@ Route::get('/login', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/principal', [App\Http\Controllers\VendaController::class, 'index'])->name('principal');
