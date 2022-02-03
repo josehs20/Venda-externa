@@ -29,7 +29,7 @@ class HomeController extends Controller
             
     }else{
         
-        return redirect('/')->with('message', 'Sem premissão de acesso');
+        return redirect('/login')->with('message', 'Sem premissão de acesso');
         }
     }
 }

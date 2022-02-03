@@ -34,7 +34,7 @@ trait AuthenticatesUsers
     {
         $verifica = User::where('email', $request->email)->first();
     
-       if ($verifica->perfil != 'vendedor') {
+       if (!$verifica or $verifica->perfil != 'vendedor') {
         return redirect('/login')->with('message', 'Sem premissão de acesso');
        }
         $this->validateLogin($request);
@@ -183,7 +183,7 @@ trait AuthenticatesUsers
 
         return $request->wantsJson()
             ? new JsonResponse([], 204)
-            : redirect('/');
+            : redirect('/login');
     }
 
     /**
