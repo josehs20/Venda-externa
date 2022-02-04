@@ -15,6 +15,7 @@ class VendaController extends Controller
      */
     public function index(Request $request)
     {
+      
         $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->produto}%'")->orderBy('nome')->paginate(20);
 
         return view('home', compact('produtos'));
@@ -38,7 +39,7 @@ class VendaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request->all());
     }
 
     /**
