@@ -4,6 +4,7 @@
 
 <div class="row col-10">
 
+@include('componentes.navbar')
 
   @foreach ($produtos as $produto)
   <div class="col-6 my-2">
