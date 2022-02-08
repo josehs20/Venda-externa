@@ -9,6 +9,18 @@ body{
     height: 100%;
 }
 
+@media(max-width:600px){
+    .externa{
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    .card{
+        width: 90% !important;
+    }
+}
+
 .div-externa-login{
     display: flex;
     justify-content: center;
@@ -81,7 +93,7 @@ body{
         flex-direction: column;
         width: 90%;
         height: 90%;
-        margin: 10px;
+        margin: 10px;       
     }
     .div-logo{
         width: 100%;

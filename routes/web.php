@@ -22,4 +22,4 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/principal', [App\Http\Controllers\VendaController::class, 'index'])->Middleware('vendedor')->name('principal');
-Route::post('/carrinho', [App\Http\Controllers\VendaController::class, 'store'])->Middleware('vendedor')->name('carrinho');
+Route::post('/carrinho/{produto_id}', [App\Http\Controllers\VendaController::class, 'store'])->Middleware('vendedor')->name('carrinho');

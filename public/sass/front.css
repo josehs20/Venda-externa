@@ -10,6 +10,24 @@ body {
   height: 100%;
 }
 
+@media (max-width: 600px) {
+  .externa {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    width: 100%;
+  }
+  .card {
+    width: 90% !important;
+  }
+}
+
 .div-externa-login {
   display: -webkit-box;
   display: -ms-flexbox;
