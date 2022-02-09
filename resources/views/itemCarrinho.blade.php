@@ -143,7 +143,7 @@
                     <td title="{{ $item->nome }}">{{ substr($item->nome, 0, 20) }}</td>
                     <td>{{ $item->preco }}</td>
                     <td>{{ $item->quantidade }}</td>
-                    <td>{{ $item->desconto }}</td>
+                    <td>{{ $item->qtd_desconto && $item->tipo_desconto == 'Porcentagem' ? "%".$item->qtd_desconto : "R$".$item->qtd_desconto}}</td>
                     <td>{{ $item->valor }}</td>
                 </tr>
             @endforeach
