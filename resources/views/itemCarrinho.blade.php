@@ -81,11 +81,9 @@
 
     </style>
 
-    <div class="row col-12 mx-1">
 
-        @include('componentes.navbar')
-    </div>
-
+    @include('componentes.navbar')
+   
     {{-- cards iniciais --}}
     <div class="container">
         <div class="row">

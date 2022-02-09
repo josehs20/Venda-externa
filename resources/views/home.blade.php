@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row col-12 mx-1">
-        @include('componentes.navbar')
-    </div>
+    
+    @include('componentes.navbar')    
 
     @if (Session::has('message'))
         <div class="alert alert-success">
