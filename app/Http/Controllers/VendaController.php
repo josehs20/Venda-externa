@@ -21,7 +21,7 @@ class VendaController extends Controller
 
         $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->produto}%'")->orderBy('nome')->paginate(20);
 
-        $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->first();
+        $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
         return view('home', compact('produtos', 'count_item'));
     }
@@ -71,24 +71,32 @@ class VendaController extends Controller
 
                 $up_qtd = ($request->quantidade + $up_carrinho->quantidade);
 
-                $up_valor_desconto = $up_carrinho->tipo_desconto == 'Porcentagem' ? ($up_carrinho->valor_desconto / 100) * ($up_qtd * $produto->preco) : $up_carrinho->qtd_desconto;
+                if ($request->qtd_desconto) {
+                    $desconto_final = $request->desc_tipo == 'Porcentagem'
+                        ? ($request->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
+                } else {
+                    $desconto_final = $request->desc_tipo == 'Porcentagem' && $up_carrinho->tipo_desconto == 'Porcentagem'
+                        ? ($up_carrinho->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
+                }
 
                 $up_carrinho->update([
                     'quantidade' => $up_qtd,
-                    'qtd_desconto' => $up_valor_desconto,
-                    'valor'      => ($produto->preco * $up_qtd) - $up_valor_desconto,
+                    'tipo_desconto' => $request->desc_tipo,
+                    'qtd_desconto' => $request->qtd_desconto ? $request->qtd_desconto : $up_carrinho->qtd_desconto,
+                    'valor_desconto' => $desconto_final,
+                    'valor'      => ($produto->preco * $up_qtd) - $desconto_final,
                 ]);
             } else {
                 $itens = new CarrinhoItem();
                 $itens->produto_id     = $produto->id;
-                $itens->carrinho_id    = !$check? $car->id : $check->id;
+                $itens->carrinho_id    = !$check ? $car->id : $check->id;
                 $itens->alltech_id     = $produto->alltech_id;
                 $itens->nome           = $produto->nome;
                 $itens->quantidade     = $request->quantidade;
                 $itens->preco          = $produto->preco;
                 $itens->tipo_desconto  = $request->desc_tipo;
-                $itens->valor_desconto = $request->qtd_desconto ? $request->qtd_desconto : null;
-                $itens->qtd_desconto   = $desconto_final;
+                $itens->valor_desconto = $desconto_final;
+                $itens->qtd_desconto   = $request->qtd_desconto ? $request->qtd_desconto : null;
                 $itens->valor          = $request->qtd_desconto ? ($produto->preco * $request->quantidade) - $desconto_final : ($produto->preco * $request->quantidade);
                 $itens->save();
             }

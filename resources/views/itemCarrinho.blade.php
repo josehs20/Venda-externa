@@ -122,35 +122,51 @@
     <hr><br>
     {{-- tabela de itens --}}
     @if ($itens)
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th scope="col-3">Nome</th>
-                <th scope="col-1">Preco</th>
-                <th scope="col-1">Qtd.</th>
-                <th scope="col-1">Desconto</th>
-                <th scope="col-1">Valor</th>
-                <th scope="col-1"></th>
-                <th scope="col-1"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($itens->carItem as $item)
-
+   
+        {{-- <table class="table table-striped table-hover">
+            <thead>
                 <tr>
-                    <td title="{{ $item->nome }}">{{ substr($item->nome, 0, 20) }}</td>
-                    <td>{{ $item->preco }}</td>
-                    <td>{{ $item->quantidade }}</td>
-                    <td>{{ $item->desconto }}</td>
-                    <td>{{ $item->valor }}</td>
+                    <th scope="col-2">Nome</th>
+                    <th scope="col-1">Preco</th>
+                    <th scope="col-1">Qtd.</th>
+                    <th scope="col-1">Desc</th>
+                    <th scope="col-1">Valor</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
-    @else
-    <div class="alert alert-warning" role="alert">
-        Adicione Produtos No Seu Carrinho De Vendas :)
-      </div>
+            </thead>
+            <tbody>
+                @foreach ($itens->carItem as $item)
+
+                    <tr>
+                        <td title="{{ $item->nome }}">{{ substr($item->nome, 0, 20) }}</td>
+                        <td>{{ $item->preco }}</td>
+                        <td>{{ $item->quantidade }}<td>{{ $item->valor }}</td></td>
+                        <td>{{ !$item->qtd_desconto? '': ($item->tipo_desconto == 'Porcentagem'? '%' . $item->qtd_desconto: "R$" . $item->qtd_desconto) }}</td>
+                        
+                    </tr>
+                @endforeach
+            </tbody>
+        </table> --}}
+        <div class="container">
+        @foreach ($itens->carItem as $item)
+        <ul class="list-group">
+            <li class="list-group-item active" aria-current="true">{{$item->nome}}</li>
+            <li class="list-group-item">Preço </li><span class="rounded-pill">{{$item->preco}}</span>
+            <li class="list-group-item">Quantidade </li><span class="rounded-pill">{{$item->quantidade}} </span>
+            
+            <li class="list-group-item">
+                <div class="listCar">
+                   <p> Desconto </p>
+                    <span>{{ !$item->qtd_desconto? '': ($item->tipo_desconto == 'Porcentagem'? '%' . $item->qtd_desconto: "R$" . $item->qtd_desconto) }}</span>           
+                </div>
+                </li> 
+          </ul>
+          <br>
+        @endforeach
+        </div>
+        @else
+        <div class="alert alert-warning" role="alert">
+            Adicione Produtos No Seu Carrinho De Vendas :)
+        </div>
     @endif
     {{-- Fim tabela de itens --}}
 @endsection
