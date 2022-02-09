@@ -11,9 +11,11 @@ class CarrinhoItem extends Model
     protected $fillable = [
         'alltech_id',
         'nome',
-        'quantidade', 
+        'quantidade',
         'preco',
-        'desconto',
+        'tipo_desconto',
+        'qtd_desconto',
+        'valor_desconto',
         'valor',
         'produto_id',
         'carrinho_id',
