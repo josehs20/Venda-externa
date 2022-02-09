@@ -10,19 +10,21 @@ body {
   height: 100%;
 }
 
+.externa {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
 @media (max-width: 600px) {
-  .externa {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
-    -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-    width: 100%;
-  }
   .card {
     width: 90% !important;
   }
@@ -168,6 +170,93 @@ body {
   color: #000;
 }
 
+<<<<<<< HEAD
+.div-logo-alltech {
+  background-image: url(../image/logo1.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 50px;
+  width: 130px;
+}
+
+@media (max-width: 800px) {
+  .div-logo-alltech {
+    background-image: url(../image/logo2.png);
+    height: 50px;
+    width: 50px;
+  }
+}
+
+.bar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+}
+
+.bar-items {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+}
+
+.bar-user-carrinho {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.bar-pesquisa-user-carrinho {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .bar-pesquisa-user-carrinho {
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+  }
+  .bar-user-carrinho {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+        -ms-flex-direction: row-reverse;
+            flex-direction: row-reverse;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    width: 100%;
+  }
+}
+
+=======
+>>>>>>> 36fd716f1b0fb1c436ec1a10b54fcf6ae1a1136d
 .listCar {
   display: -webkit-box;
   display: -ms-flexbox;

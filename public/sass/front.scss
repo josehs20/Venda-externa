@@ -9,13 +9,14 @@ body{
     height: 100%;
 }
 
+.externa{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
 @media(max-width:600px){
-    .externa{
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        width: 100%;
-    }
     .card{
         width: 90% !important;
     }
@@ -120,6 +121,58 @@ body{
         top: 20px;
         right: 18px;
         color: #000;
+    }
+}
+
+.div-logo-alltech{
+    background-image: url(../image/logo1.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 50px;
+    width: 130px;
+}
+
+@media (max-width: 800px){    
+    .div-logo-alltech{
+        background-image: url(../image/logo2.png); 
+        height: 50px;
+        width: 50px;       
+    }
+}
+
+.bar{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.bar-items{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.bar-user-carrinho{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bar-pesquisa-user-carrinho{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+@media (max-width: 600px){
+    .bar-pesquisa-user-carrinho{
+        flex-wrap: wrap;
+    }
+    .bar-user-carrinho{
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        width: 100%;
     }
 }
 
