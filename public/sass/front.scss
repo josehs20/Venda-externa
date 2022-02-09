@@ -107,4 +107,20 @@ body{
 
 }
 
+.carrinho{
+    margin: 0 25px;
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    .icone-carrinho{
+        position: relative;
+    }
+    .quantidade-carrinho{
+        position: absolute;
+        top: 20px;
+        right: 18px;
+        color: #000;
+    }
+}
+
 @import '../../node_modules/bootstrap/scss/bootstrap.scss';

@@ -343,6 +343,7 @@ url(/fonts/vendor/bootstrap-icons/bootstrap-icons.woff?4e80a14a205e5b6212ffc52fc
 .bi-cart-x::before { content: "\f241"; }
 .bi-cart::before { content: "\f242"; }
 .bi-cart2::before { content: "\f243"; }
+.bi-cart2 { font-size: 45px; color: black; }
 .bi-cart3::before { content: "\f244"; }
 .bi-cart4::before { content: "\f245"; }
 .bi-cash-stack::before { content: "\f246"; }

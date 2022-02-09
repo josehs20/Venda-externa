@@ -28,8 +28,8 @@ class VendaController extends Controller
     public function itens_carrinho()
     {
         $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->first();
-
-        return view('itemCarrinho', compact('itens'));
+        $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->first();
+        return view('itemCarrinho', compact('itens', 'count_item'));
     }
 
     /**

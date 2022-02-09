@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="row col-12 mx-1">
-
         @include('componentes.navbar')
     </div>
 
@@ -11,9 +10,6 @@
             <h5 style=""> {{ Session::get('message') }}</h5>
         </div>
     @endif
-    <a href="{{ route('itens_carrinho') }}"><i class="bi bi-cart">
-            <h5>{{ $count_item ? $count_item->carItem->count() : '0' }}</h5>
-        </i></a>
 
     <div class="externa" style="margin-top: 2%;">
 
@@ -64,45 +60,6 @@
                                     </div>
 
                                 </div>
-
-                                <div class="form-row">
-                                    @if ($count_item)
-
-                                        @foreach ($count_item->carItem as $item)
-                                            @if ($item->produto_id == $produto->id && $item->qtd_desconto > 0)
-                                                <label for="">Esse Item Já Contém desconto Individual
-                                                    de
-                                                   <strong>{{ $item->tipo_desconto == 'Porcentagem' ? '%' . $item->qtd_desconto : "R$" . $item->qtd_desconto }}</strong>
-                                                    para sua quantidade, Caso
-                                                    insira um novo valor o mesmo será alterado!!</label>
-                                            @endif
-                                        @endforeach
-                                    @endif
-                                    <hr>
-                                    <input class="col-8 mx-2" type="number" placeholder="DESCONTO AO PRODUTO ?"
-                                        name="qtd_desconto" min="0.01" step="0.01">
-                                    <div>
-                                        <select name="desc_tipo" class="custom-select mx-1" id="inlineFormCustomSelect">
-
-                                            <option value="Porcentagem"><b>
-                                                    <h4> % </h4>
-                                            </option>
-                                            <option value="Dinheiro"><b>
-                                                    <h4> $ </h4>
-                                            </option>
-
-                                        </select>
-                                    </div>
-
-
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Adicionar ao carrinho</button>
-                                </div>
-                            </form>
-
-
-                        </div>
 
                     </div>
                 </div>
