@@ -7,17 +7,18 @@
     </div>
 
     @if (Session::has('message'))
-        <div class="alert alert-success">{{ Session::get('message') }}</div>
+        <div class="alert alert-success"><h5 style=""> {{ Session::get('message') }}</h5></div>
     @endif
+    <a href="{{ route('itens_carrinho') }}"><i class="bi bi-cart"><h5>{{ $count_item ? $count_item->carItem->count() : '0'}}</h5></i></a>
 
-    <div class="externa">
+    <div class="externa" style="margin-top: 2%;">
         @foreach ($produtos as $produto)
-            <div class="card col-5 mx-2""""""""" my-2 d-inline-flex" style="background-color: rgb(96, 43, 241)">
-                <a data-bs-toggle="modal" data-bs-target="#venda{{ $produto->id }}">
+            <div class="card col-5 mx-4 my-2 d-inline-flex" style="background-color: rgb(68, 0, 255)">
+                <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#venda{{ $produto->id }}">
 
                     <div class="card-body">
-                       <h6 style="color: white">{{ $produto->nome }}</h6> 
-                       <h6 style="color: white"> R$ : {{ reais($produto->preco) }}</h6>
+                       <h6 style="color: white">Nº <u>{{$produto->alltech_id}}</u> : {{ $produto->nome }}</h6> 
+                       <h5 style="color: white"> R$ : {{ reais($produto->preco) }}</h5>
                     </div>
                 </a>
             </div>
@@ -41,7 +42,7 @@
                         <div class="form-row my-5">
 
                             <input required class="col-8 mx-2" type="number" placeholder="QUANTIDADE" name="quantidade"
-                                min="00.00" max="100" step="0.01">
+                                min="0.01" step="0.01">
 
                             <div>
                                 <select name="qtd_tipo" class="custom-select mx-1" id="inlineFormCustomSelect">
@@ -61,7 +62,7 @@
                         <div class="form-row">
 
                             <input class="col-8 mx-2" type="number" placeholder="DESCONTO AO PRODUTO ?"
-                                name="qtd_desconto" min="00.00" max="100" step="0.01">
+                                name="qtd_desconto" min="1" max="100" step="0.01">
 
                             <div>
                                 <select name="desc_tipo" class="custom-select mx-1" id="inlineFormCustomSelect">
@@ -79,7 +80,6 @@
 
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Sair</button>
                             <button type="submit" class="btn btn-primary">Adicionar ao carrinho</button>
                         </div>
                     </form>
@@ -93,6 +93,7 @@
 
     @endforeach
     </div>
+
     {{-- paginação --}}
     <nav aria-label="Navegação de página exemplo">
         <ul class="pagination">
