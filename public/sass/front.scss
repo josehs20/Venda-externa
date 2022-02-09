@@ -176,4 +176,9 @@ body{
     }
 }
 
+.listCar{
+    display: flex;
+    justify-content: space-between;
+}
+
 @import '../../node_modules/bootstrap/scss/bootstrap.scss';
