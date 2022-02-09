@@ -48,19 +48,49 @@
 
                                     <div>
                                         <select name="qtd_tipo" class="custom-select mx-1" id="inlineFormCustomSelect">
-
                                             <option value="un"><b>
                                                     <h4> UN </h4>
                                             </option>
                                             <option value="cx"><b>
                                                     <h4> CAIXA </h4>
                                             </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    @if ($count_item)
+
+                                        @foreach ($count_item->carItem as $item)
+                                            @if ($item->produto_id == $produto->id && $item->qtd_desconto > 0)
+                                                <label for="">Esse Item Já Contém desconto Individual
+                                                    de
+                                                   <b>{{ $item->tipo_desconto == 'Porcentagem' ? "%" . $item->qtd_desconto : "R$" . $item->qtd_desconto }}</b>
+                                                    para sua quantidade, Caso
+                                                    insira um novo valor o mesmo será alterado!!</label>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                    <hr>
+                                    <input class="col-8 mx-2" type="number" placeholder="DESCONTO AO PRODUTO ?"
+                                        name="qtd_desconto" min="0.01" step="0.01">
+                                    <div>
+                                        <select name="desc_tipo" class="custom-select mx-1" id="inlineFormCustomSelect">
+
+                                            <option value="Porcentagem"><b>
+                                                    <h4> % </h4>
+                                            </option>
+                                            <option value="Dinheiro"><b>
+                                                    <h4> $ </h4>
+                                            </option>
 
                                         </select>
                                     </div>
-
                                 </div>
-
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Adicionar ao carrinho</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
