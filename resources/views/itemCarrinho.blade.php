@@ -126,13 +126,18 @@
 
         <div class="container">
             @foreach ($itens->carItem as $item)
-                <ul class="list-group">
-                    <li class="list-group-item active" aria-current="true">{{ $item->nome }}</li>
-                
+                <ul class="list-group">            
+                    <li class="list-group-item active">
+                        <div class="listCar">
+                            <p> {{ $item->nome }} </p>
+                            <h5>Valor R$ {{ reais($item->valor) }}</h5>
+                        </div>
+                    </li>
+
                     <li class="list-group-item">
                         <div class="listCar">
                             <p> Preço </p>
-                            <span>{{ $item->preco }}</span>
+                            <span>{{ reais($item->preco) }}</span>
                         </div>
                     </li>
 
@@ -146,7 +151,7 @@
                     <li class="list-group-item">
                         <div class="listCar">
                             <p> Desconto </p>
-                            <span>{{ !$item->qtd_desconto? '': ($item->tipo_desconto == 'Porcentagem'? '%' . $item->qtd_desconto: "R$" . $item->qtd_desconto) }}</span>
+                            <span>{{ !$item->qtd_desconto? 'Não inserido': ($item->tipo_desconto == 'Porcentagem'? '%' . $item->qtd_desconto: "R$" . $item->qtd_desconto) }}</span>
                         </div>
                     </li>
                 </ul>

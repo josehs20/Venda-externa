@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    
-    @include('componentes.navbar')    
+
+    @include('componentes.navbar')
 
     @if (Session::has('message'))
         <div class="alert alert-success">
@@ -10,19 +10,25 @@
         </div>
     @endif
 
-    <div class="externa" style="margin-top: 2%;">
+    <div class="container">
 
         @foreach ($produtos as $produto)
-            <div class="card col-5 mx-4 my-2 d-inline-flex" style="background-color: rgb(68, 0, 255)">
-                <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#venda{{ $produto->id }}">
-
-                    <div class="card-body">
-                        <h6 style="color: white">Nº <u>{{ $produto->alltech_id }}</u> : {{ $produto->nome }}</h6>
-                        <h5 style="color: white"> R$ : {{ reais($produto->preco) }}</h5>
-                    </div>
-                </a>
-            </div>
-
+            <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#venda{{ $produto->id }}">
+                <ul class="list-group">
+                    <li class="list-group-item active">
+                        <div class="listCar">
+                            <h6>{{$produto->nome}}</h6>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="listCar">
+                            <h6> Preço :</h6>
+                            <h4>R$ {{ reais($produto->preco) }}</h4>
+                        </div>
+                    </li>
+                </ul>
+            </a>
+          <br>
             {{-- Modal --}}
             <div class="modal fade" id="venda{{ $produto->id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
@@ -34,9 +40,9 @@
                                 aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <p><b>Preço Venda: </b> {{ reais($produto->preco) }}</p>
-                            <p><b>Estoque: </b> </p>
-
+                            
+                            <p>Preço Venda: <b>{{ reais($produto->preco) }}</b></p>
+                        
                             <form action="{{ route('carrinho', ['produto_id' => $produto->id]) }}" method="post">
                                 @csrf
 
@@ -63,7 +69,7 @@
                                             @if ($item->produto_id == $produto->id && $item->qtd_desconto > 0)
                                                 <label for="">Esse Item Já Contém desconto Individual
                                                     de
-                                                   <b>{{ $item->tipo_desconto == 'Porcentagem' ? "%" . $item->qtd_desconto : "R$" . $item->qtd_desconto }}</b>
+                                                    <b>{{ $item->tipo_desconto == 'Porcentagem' ? '%' . $item->qtd_desconto : "R$" . $item->qtd_desconto }}</b>
                                                     para sua quantidade, Caso
                                                     insira um novo valor o mesmo será alterado!!</label>
                                             @endif
@@ -93,7 +99,7 @@
                     </div>
                 </div>
             </div>
-
+            
         @endforeach
     </div>
 
