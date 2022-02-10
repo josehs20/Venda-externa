@@ -10,11 +10,14 @@ class Carrinho extends Model
     protected $fillable = [
        'id',
        'user_id',
-       'desconto_total', 
-       'valor_total', 
+       'desconto_valor', 
+       'desconto_qtd',
+       'tp_desconto_unificado',
+       'total_desconto',
+       'total', 
        'status', 
     ];
-
+    
     public function carItem()
     {
         return $this->hasMany('App\Models\CarrinhoItem');

@@ -1,132 +1,105 @@
 @extends('layouts.app')
 
 @section('content')
-    <style>
-        .card-box {
-            position: relative;
-            color: #fff;
-            padding: 20px 10px 40px;
-            margin: 20px 0px;
-        }
-
-        .card-box:hover {
-            text-decoration: none;
-            color: #f1f1f1;
-        }
-
-        .card-box:hover .icon i {
-            font-size: 100px;
-            transition: 1s;
-            -webkit-transition: 1s;
-        }
-
-        .card-box .inner {
-            padding: 5px 10px 0 10px;
-        }
-
-        .card-box h3 {
-            font-size: 27px;
-            font-weight: bold;
-            margin: 0 0 8px 0;
-            white-space: nowrap;
-            padding: 0;
-            text-align: left;
-        }
-
-        .card-box p {
-            font-size: 15px;
-        }
-
-        .card-box .icon {
-            position: absolute;
-            top: auto;
-            bottom: 5px;
-            right: 5px;
-            z-index: 0;
-            font-size: 72px;
-            color: rgba(0, 0, 0, 0.15);
-        }
-
-        .card-box .card-box-footer {
-            position: absolute;
-            left: 0px;
-            bottom: 0px;
-            text-align: center;
-            padding: 3px 0;
-            color: rgba(255, 255, 255, 0.8);
-            background: rgba(0, 0, 0, 0.1);
-            width: 100%;
-            text-decoration: none;
-        }
-
-        .card-box:hover .card-box-footer {
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .bg-blue {
-            background-color: #00c0ef !important;
-        }
-
-        .bg-green {
-            background-color: #00a65a !important;
-        }
-
-        .bg-orange {
-            background-color: #f39c12 !important;
-        }
-
-        .bg-red {
-            background-color: #d9534f !important;
-        }
-
-    </style>
-
 
     @include('componentes.navbar')
-   
+    {{-- Modal Desconto Unificado --}}
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Unificar Desconto</h5><br>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+              
+                    <form method="post" action="{{ route('unifica_valor_Itens', ['itensCarr' => $itens]) }}">
+                        @csrf
+                        @method('put')
+                <div class="modal-body">
+                        <div class="row g-2">
+                            <div class="col-8">
+                                <div class="form-floating">
+                                    <input required name="qtd_unificado" type="number" class="form-control" min="0.01" step="0.01"
+                                        id="floatingInputGrid" placeholder="Desconto Geral">
+                                    <label for="floatingInputGrid">Quantidade</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-floating">
+                                    <select name="tipo_unificado" class="form-select" id="floatingSelectGrid"
+                                        aria-label="Floating label select example">
+                                        <option value="Porcentagem">%</option>
+                                        <option value="Dinheiro">R$</option>
+                                    </select>
+                                    <label for="floatingSelectGrid">Tipo</label>
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Confirmar</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    {{-- Fim Modal Unificado --}}
     {{-- cards iniciais --}}
     <div class="container">
-        <div class="row">
+        <div class="row d-flex justify-content-center">
 
-            <div class="col-lg-3 col-sm-6">
+            <div class="col-lg-5 col-sm-6">
                 <div class="card-box bg-green">
                     <div class="inner">
-                        <i class="bi bi-cash-coin">&ensp;185358</i>
+                        <h6><i class="bi bi-cash-coin"> Sem Desconto:&ensp;R$<u>{{ reais($valor_itens_total->total) }}</u></i></h6>
 
                     </div>
-                    &ensp;
+                    <div class="inner">
+                        <h6><i class="bi bi-cash-coin"> Com Desconto:&ensp;R$<u>{{ $valor_itens_desconto }}</u></i></h6>
+                    </div>
                     <div class="icon">
                         <i class="bi bi-cash-coin"></i>
                     </div>
                     <a href="#" class="card-box-footer">Valor Total<i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
-            <div class="col-lg-3 col-sm-6">
+            <div class="col-lg-5 col-sm-6">
                 <div class="card-box bg-orange">
                     <div class="inner">
-                        <i class="bi bi-percent">&ensp; 5464 </i>
+                        <i class="bi bi-cash-stack">&ensp;{{ $total_desconto_valor }} </i>
                     </div>
                     <div class="inner">
-                        <i class="bi bi-cash-stack">&ensp; 5464 </i>
+                        <p>&ensp;{{ ($tp_desconto == 'Porcentagem_unificado') ? "Unificado em % $itens->desconto_qtd" : (($tp_desconto == 'Dinheiro_unificado') ? "Unificado em R$ $itens->desconto_qtd" : 'Não unificado') }} </p>
                     </div>
+                   
                     <div class="icon">
                         <i class="bi bi-percent"></i>
+
                     </div>
                     <a href="#" class="card-box-footer">Total De Desconto<i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
-
         </div>
     </div>
     {{-- Fim cards iniciais --}}
+    <div class="row d-flex justify-content-center">
+        <button type="button" class="btn btn-primary col-4 mx-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Unificar Desconto
+        </button>
+
+        <a href="{{ route('itens_carrinho')}}" type="button" class="btn btn-danger col-4 mx-3">
+            Reverter Unificação
+        </a>
+    </div>
     <hr><br>
     {{-- tabela de itens --}}
     @if ($itens)
-   
-
         <div class="container">
             @foreach ($itens->carItem as $item)
-                <ul class="list-group">            
+                <ul class="list-group">
                     <li class="list-group-item active">
                         <div class="listCar">
                             <p> {{ $item->nome }} </p>
@@ -151,7 +124,11 @@
                     <li class="list-group-item">
                         <div class="listCar">
                             <p> Desconto </p>
+                            @if ($tp_desconto)
+                            <span>Desconto Unico</span>
+                            @else
                             <span>{{ !$item->qtd_desconto? 'Não inserido': ($item->tipo_desconto == 'Porcentagem'? '%' . $item->qtd_desconto: "R$" . $item->qtd_desconto) }}</span>
+                            @endif
                         </div>
                     </li>
                 </ul>
@@ -163,5 +140,6 @@
             Adicione Produtos No Seu Carrinho De Vendas :)
         </div>
     @endif
+
     {{-- Fim tabela de itens --}}
 @endsection

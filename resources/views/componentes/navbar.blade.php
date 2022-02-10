@@ -25,11 +25,12 @@
                         <i class="bi bi-cart2 icone-carrinho"></i>
                     </a>
                 </div> --}}
+                <a href="{{ route('itens_carrinho') }}">
                 <div class="carrinho">
-                    <a href="{{ route('itens_carrinho') }}">
                         <h5 class="quantidade-carrinho">{{ $count_item ? $count_item->carItem->count() : '0' }}</h5>
-                    </a>
+                    
                 </div>
+            </a>
                 <ul class="navbar-nav mx-3">
                     <li>
                         <!-- Authentication Links -->
