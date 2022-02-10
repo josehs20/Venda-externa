@@ -46,18 +46,20 @@ class VendaController extends Controller
             $count_item = $itens;
 
             //valores com e sem desconto
-            $valor_itens_total = $itens->carItem()->selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itens->id)->first();
-            $valor_itens_desconto = $itens->carItem()->sum('valor');
+            $valor_itens_total = $itens ? $itens->carItem()->selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itens->id)->first() : null;
+            $valor_itens_desconto = $itens ? $itens->carItem()->sum('valor') : null;
 
-            $total_desconto_valor = $itens->carItem()->where('carrinho_id', $itens->id)->sum('valor_desconto');
-            //$total_desconto_qtd = $itens->carItem()->where('carrinho_id', $itens->id)->where('tipo_desconto', 'Porcentagem')->sum('valor_desconto');
-            $itens->update([
-                'desconto_valor' => null,
-                'desconto_qtd' => null,
-                'tp_desconto_unificado' => 'Não Unificado',
-                'total_desconto' => null,
-                'total' => $valor_itens_desconto,
-            ]); 
+            $total_desconto_valor = $itens ? $itens->carItem()->where('carrinho_id', $itens->id)->sum('valor_desconto') : null;
+
+            if ($itens) {
+                $itens->update([
+                    'desconto_valor' => null,
+                    'desconto_qtd' => null,
+                    'tp_desconto_unificado' => 'Não Unificado',
+                    'total_desconto' => null,
+                    'total' => $valor_itens_desconto,
+                ]);
+            }
             return view('itemCarrinho', compact('itens', 'count_item', 'valor_itens_total', 'total_desconto_valor', 'valor_itens_desconto', 'tp_desconto'));
         }
     }
@@ -84,7 +86,7 @@ class VendaController extends Controller
 
         $check = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
-        $up_carrinho = CarrinhoItem::where('produto_id', $produto_id)->first();
+        $up_carrinho = CarrinhoItem::where('carrinho_id', $check->id)->where('produto_id', $produto_id)->first();
 
         $desconto_final = $request->desc_tipo == 'Porcentagem' ? ($request->qtd_desconto / 100) * ($request->quantidade * $produto->preco) : $request->qtd_desconto;
 
@@ -95,6 +97,7 @@ class VendaController extends Controller
             $car->status = 'Aberto';
             $car->save();
         }
+
         if ($produto) {
 
             if ($up_carrinho) {
@@ -108,6 +111,11 @@ class VendaController extends Controller
                     $desconto_final = $request->desc_tipo == 'Porcentagem' && $up_carrinho->tipo_desconto == 'Porcentagem'
                         ? ($up_carrinho->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
                 }
+                if (!$this->verifica_custo_venda($produto, $desconto_final, $up_qtd)) {
+                    Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
+
+                    return redirect()->back();
+                }
 
                 $up_carrinho->update([
                     'quantidade' => $up_qtd,
@@ -117,6 +125,12 @@ class VendaController extends Controller
                     'valor'      => ($produto->preco * $up_qtd) - $desconto_final,
                 ]);
             } else {
+                if (!$this->verifica_custo_venda($produto, $desconto_final, $request->quantidade)) {
+                    Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
+
+                    return redirect()->back();
+                }
+
                 $itens = new CarrinhoItem();
                 $itens->produto_id     = $produto->id;
                 $itens->carrinho_id    = !$check ? $car->id : $check->id;
@@ -136,6 +150,19 @@ class VendaController extends Controller
 
         return redirect()->back();
     }
+    public function verifica_custo_venda($produto, $desconto_final, $quantidade)
+    {
+        $custo = ($produto->custo * $quantidade);
+        $preco_final = ($produto->preco * $quantidade) - $desconto_final;
+
+        if (($preco_final - $custo) <= 0) {
+
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public function unifica_valor_Itens(Request $request, $itensCarr)
     {
         $itens_carr_valor = CarrinhoItem::selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itensCarr)->first();

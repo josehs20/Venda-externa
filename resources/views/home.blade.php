@@ -9,7 +9,11 @@
             <h5 style=""> {{ Session::get('message') }}</h5>
         </div>
     @endif
-
+    @if (Session::has('error'))
+        <div class="alert alert-danger">
+            <h5 style=""> {{ Session::get('error') }}</h5>
+        </div>
+    @endif
     <div class="container">
 
         @foreach ($produtos as $produto)
@@ -17,7 +21,7 @@
                 <ul class="list-group">
                     <li class="list-group-item active">
                         <div class="listCar">
-                            <h6>{{$produto->nome}}</h6>
+                            <h6>{{ $produto->nome }}</h6>
                         </div>
                     </li>
                     <li class="list-group-item">
@@ -28,41 +32,42 @@
                     </li>
                 </ul>
             </a>
-          <br>
             {{-- Modal --}}
             <div class="modal fade" id="venda{{ $produto->id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">{{ $produto->nome }}</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">{{ $produto->nome }} <br> Preço Venda:
+                                <b>R${{ reais($produto->preco) }}</b></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            
-                            <p>Preço Venda: <b>{{ reais($produto->preco) }}</b></p>
-                        
-                            <form action="{{ route('carrinho', ['produto_id' => $produto->id]) }}" method="post">
-                                @csrf
-
-                                <div class="form-row my-5">
-
-                                    <input required class="col-8 mx-2" type="number" placeholder="QUANTIDADE"
-                                        name="quantidade" min="0.01" step="0.01">
-
-                                    <div>
-                                        <select name="qtd_tipo" class="custom-select mx-1" id="inlineFormCustomSelect">
-                                            <option value="un"><b>
-                                                    <h4> UN </h4>
-                                            </option>
-                                            <option value="cx"><b>
-                                                    <h4> CAIXA </h4>
-                                            </option>
-                                        </select>
+                        <form action="{{ route('carrinho', ['produto_id' => $produto->id]) }}" method="post">
+                            @csrf
+                            <div class="modal-body">
+                                <div class="row g-2">
+                                    <div class="col-8">
+                                        <div class="form-floating">
+                                            <input required class="form-control" type="number" placeholder="QUANTIDADE"
+                                                name="quantidade" min="0.01" step="0.01">
+                                            <label for="floatingInputGrid">Quantiadade</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-floating">
+                                            <select name="tipo_unificado" class="form-select" id="floatingSelectGrid"
+                                                aria-label="Floating label select example">
+                                                <option value="un">UN</option>
+                                                <option value="cx">CX</option>
+                                            </select>
+                                            <label for="floatingSelectGrid">Tipo</label>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-row">
+                                <br><br>
+                                {{-- --------------------------DESCONTO---------------------------- --}}
+                                <div class="row g-2">
                                     @if ($count_item)
 
                                         @foreach ($count_item->carItem as $item)
@@ -75,31 +80,36 @@
                                             @endif
                                         @endforeach
                                     @endif
-                                    <hr>
-                                    <input class="col-8 mx-2" type="number" placeholder="DESCONTO AO PRODUTO ?"
-                                        name="qtd_desconto" min="0.01" step="0.01">
-                                    <div>
-                                        <select name="desc_tipo" class="custom-select mx-1" id="inlineFormCustomSelect">
-
-                                            <option value="Porcentagem"><b>
-                                                    <h4> % </h4>
-                                            </option>
-                                            <option value="Dinheiro"><b>
-                                                    <h4> $ </h4>
-                                            </option>
-
-                                        </select>
+                                    <div class="col-8">
+                                        <div class="form-floating">
+                                            <input class="form-control" type="number"
+                                                placeholder="DESCONTO AO PRODUTO ?" name="qtd_desconto" min="0.01"
+                                                step="0.01">
+                                            <label for="floatingInputGrid">Desconto</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-floating">
+                                            <select class="form-select" name="desc_tipo">
+                                                <option value="Porcentagem"><b>
+                                                        <h4> % </h4>
+                                                </option>
+                                                <option value="Dinheiro"><b>
+                                                        <h4> $ </h4>
+                                                </option>
+                                            </select>
+                                            <label for="floatingSelectGrid">Tipo</label>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Adicionar ao carrinho</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Adicionar ao carrinho</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-            
         @endforeach
     </div>
 
