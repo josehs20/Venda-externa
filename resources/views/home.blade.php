@@ -9,16 +9,11 @@
             <h5 style=""> {{ Session::get('message') }}</h5>
         </div>
     @endif
-    @if (Session::has('error'))
-        <div class="alert alert-danger">
-            <h5 style=""> {{ Session::get('error') }}</h5>
-        </div>
-    @endif
     <div class="container">
 
         @foreach ($produtos as $produto)
             <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#venda{{ $produto->id }}">
-                <ul class="list-group">
+                <ul class="list-group my-3">
                     <li class="list-group-item active">
                         <div class="listCar">
                             <h6>{{ $produto->nome }}</h6>
@@ -68,7 +63,7 @@
                                 <br><br>
                                 {{-- --------------------------DESCONTO---------------------------- --}}
                                 <div class="row g-2">
-                                    @if ($count_item)
+                                    @if ($count_item->tp_desconto_unificado == 'Não Unificado')
 
                                         @foreach ($count_item->carItem as $item)
                                             @if ($item->produto_id == $produto->id && $item->qtd_desconto > 0)
@@ -79,28 +74,35 @@
                                                     insira um novo valor o mesmo será alterado!!</label>
                                             @endif
                                         @endforeach
+                                        <div class="col-8">
+                                            <div class="form-floating">
+                                                <input class="form-control" type="number"
+                                                    placeholder="DESCONTO AO PRODUTO ?" name="qtd_desconto" min="0.01"
+                                                    step="0.01">
+                                                <label for="floatingInputGrid">Desconto</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="form-floating">
+                                                <select class="form-select" name="desc_tipo">
+                                                    <option value="Porcentagem"><b>
+                                                            <h4> % </h4>
+                                                    </option>
+                                                    <option value="Dinheiro"><b>
+                                                            <h4> $ </h4>
+                                                    </option>
+                                                </select>
+                                                <label for="floatingSelectGrid">Tipo</label>
+                                            </div>
+                                        </div>
+                                        @elseif($count_item->tp_desconto_unificado == 'Porcentagem_unificado' or $count_item->tp_desconto_unificado == 'Dinheiro_unificado')
+                                        <label for="">Seu Carrinho Já Foi Estabelecido um desconto Fixo de
+                                            <b>{{ $count_item->tp_desconto_unificado == 'Porcentagem_unificado' ? '%' . $count_item->desconto_qtd : "R$" . $count_item->desconto_qtd }}</b>
+                                            para o total do mesmo!!</label>
+
+                                            
                                     @endif
-                                    <div class="col-8">
-                                        <div class="form-floating">
-                                            <input class="form-control" type="number"
-                                                placeholder="DESCONTO AO PRODUTO ?" name="qtd_desconto" min="0.01"
-                                                step="0.01">
-                                            <label for="floatingInputGrid">Desconto</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="form-floating">
-                                            <select class="form-select" name="desc_tipo">
-                                                <option value="Porcentagem"><b>
-                                                        <h4> % </h4>
-                                                </option>
-                                                <option value="Dinheiro"><b>
-                                                        <h4> $ </h4>
-                                                </option>
-                                            </select>
-                                            <label for="floatingSelectGrid">Tipo</label>
-                                        </div>
-                                    </div>
+                
                                 </div>
                             </div>
                             <div class="modal-footer">

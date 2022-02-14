@@ -21,6 +21,10 @@ class CarrinhoItem extends Model
         'carrinho_id',
     ];
 
+    public function produto() {
+        return $this->hasMany('App\Models\Produto', 'id', 'produto_id');
+    }
+
     public function car()
     {
         return $this->belongsTo('App\Models\Carrinho');

@@ -25,9 +25,10 @@ class VendaController extends Controller
 
         return view('home', compact('produtos', 'count_item'));
     }
-    public function itens_carrinho($unificado = null)
+    public function itens_carrinho($unificado = null, $zerar = null)
     {
         $tp_desconto = null;
+        dd($zerar);
         //pega retorno de da função unifica_valor_Itens
         if ($unificado) {
             $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
@@ -166,21 +167,39 @@ class VendaController extends Controller
     public function unifica_valor_Itens(Request $request, $itensCarr)
     {
         $itens_carr_valor = CarrinhoItem::selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itensCarr)->first();
-        // dd($itens_carr_valor);
-        //valor desconto
+
+        $id_itens = CarrinhoItem::with('produto')->where('carrinho_id', $itensCarr)->get();
+        $custo = 0;
+        foreach ($id_itens as $value) {
+
+            $custo +=  ($value->produto[0]->custo * $value->quantidade);
+        }
         if ($request->qtd_unificado) {
             $desconto_final = $request->tipo_unificado == 'Porcentagem'
                 ? ($request->qtd_unificado / 100) * $itens_carr_valor->total : $request->qtd_unificado;
         }
+
+        $preco_final = ($itens_carr_valor->total - $desconto_final);
+        // dd($preco_final - $custo);
+        if ($preco_final <= $custo) {
+            Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
+
+            return redirect()->back();
+            return false;
+        } else {
+            Carrinho::find($itensCarr)->update([
+                'desconto_valor' => $desconto_final,
+                'desconto_qtd' => $request->qtd_unificado,
+                'tp_desconto_unificado' => $request->tipo_unificado == 'Porcentagem' ? 'Porcentagem_unificado' : 'Dinheiro_unificado',
+                'total_desconto' => $preco_final,
+                'total' => $itens_carr_valor->total,
+            ]);
+            Session::flash('message', "Desconto Autorizado!!");
+            return redirect(route('itens_carrinho', ['unificado' => 1]));
+            return true;
+        }
+
         //  dd($request->qtd_unificado);
-        Carrinho::find($itensCarr)->update([
-            'desconto_valor' => $desconto_final,
-            'desconto_qtd' => $request->qtd_unificado,
-            'tp_desconto_unificado' => $request->tipo_unificado == 'Porcentagem' ? 'Porcentagem_unificado' : 'Dinheiro_unificado',
-            'total_desconto' => ($itens_carr_valor->total - $desconto_final),
-            'total' => $itens_carr_valor->total,
-        ]);
-        return redirect(route('itens_carrinho', ['unificado' => 1]));
     }
 
     /**

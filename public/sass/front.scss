@@ -42,7 +42,7 @@ body{
 }
 
 .div-logo{
-    width: 60%;
+    width: 100%;
     height: 90%;
     margin: 10px;
     padding:10px;
@@ -52,7 +52,7 @@ body{
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        width: 100%;
+        width: 120%;
         height: 100%;
     }
 }
@@ -108,42 +108,56 @@ body{
 
 }
 
-.carrinho{
-    background-image: url(../image/carrinho.png);
-    background-size: contain;
-    background-repeat: no-repeat;
-    position: relative;
+
+//tela web
+.inicio{
+    height: 30px;
+    width: 35px; 
+    margin-top: 5px;
+    margin-right: 15px;
+}
+.fotocarr{
     height: 50px;
-    width: 80px;
-    .quantidade-carrinho{
-        position: absolute;
-        top: 10px;
-        right: 30px;
-        color: #000;
-    }
+    width: 60px; 
+    margin-top: 5px;
+   // background-image: url(../image/carrinho-de-com.png);
+}
+.quanti{
+    position: absolute; 
+    margin-top: -40px;
+    margin-left: 26px;
 }
 
+  /* width and height can be anything, as long as they're equal */
+    
+
 .div-logo-alltech{
-    background-image: url(../image/logo1.png);
+    background-image: url(../image/logo1m.png);
     background-size: contain;
     background-repeat: no-repeat;
-    height: 50px;
-    width: 130px;
+    height: 45px;
+    width: 150px;
+    margin-left: 30px;
 }
 
 @media (max-width: 800px){    
     .div-logo-alltech{
         background-image: url(../image/logo2.png); 
         height: 50px;
-        width: 50px;       
+        width: 50px;  
+        margin-top: -20px; 
+        margin-left: -0.1px;
     }
 }
 
 .bar{
     display: flex;
+    margin-top: -5px;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: 110%;
+    height: 80px;
+    background-color: #0296bb;
 }
 .bar-items{
     display: flex;
@@ -151,10 +165,11 @@ body{
     align-items: center;
     width: 100%;
 }
-.bar-user-carrinho{
+.bar-user-carrinho{ 
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
 }
 
 .bar-pesquisa-user-carrinho{
@@ -164,8 +179,14 @@ body{
     width: 100%;
 }
 
-@media (max-width: 600px){
+
+
+
+// media para celualar
+@media (max-width: 500px){
     .bar-pesquisa-user-carrinho{
+        margin-top: 20px;
+        width: 100%;
         flex-wrap: wrap;
     }
     .bar-user-carrinho{
@@ -173,6 +194,44 @@ body{
         justify-content: space-between;
         width: 100%;
     }
+    .search {
+        position: relative;
+        margin-left: -20px;
+        width: 72%; 
+    }
+    .lupa{
+        width: 30px;
+    }
+    .search input {
+        height: 20px;
+        margin-top: -15px;
+        text-indent: 10px;
+        border: none;
+    }
+    .logout{
+        position: absolute;
+        margin-top: -30px;
+        margin-left: 100px;
+    }
+  
+    .inicio{
+        position: relative;
+        height: 30px;
+        width: 35px; 
+        margin-top: -80px;
+        
+    }
+    .fot{
+        margin-left: 200px;
+        margin-top: -100px;
+    }
+    .quanti{
+        position: relative;
+        margin-top: -40px;
+        margin-left: 28px;
+        width: 20px;
+    }
+  
 }
 
 .listCar{
@@ -255,5 +314,35 @@ body{
 
 .bg-red {
     background-color: #d9534f !important;
+}
+
+
+
+
+.search {
+    position: relative;
+    box-shadow: 5px 2px 8px black;
+}
+
+.search input {
+    height: 45px;
+    text-indent: 25px;
+   border: none;
+}
+
+.search input:focus {
+    box-shadow: none;
+    border-radius:none;
+}
+
+.lupa {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    height: 35px;
+    width: 50px;
+    border: none;
+    border-left: 1px solid rgb(78, 78, 78);
+    background: rgb(255, 255, 255)
 }
 @import '../../node_modules/bootstrap/scss/bootstrap.scss';
