@@ -28,7 +28,7 @@ class VendaController extends Controller
     public function itens_carrinho($unificado = null, $zerar = null)
     {
         $tp_desconto = null;
-        dd($zerar);
+       // dd($zerar);
         //pega retorno de da função unifica_valor_Itens
         if ($unificado) {
             $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
@@ -87,7 +87,7 @@ class VendaController extends Controller
 
         $check = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
-        $up_carrinho = CarrinhoItem::where('carrinho_id', $check->id)->where('produto_id', $produto_id)->first();
+        $up_carrinho = $check ? CarrinhoItem::where('carrinho_id', $check->id)->where('produto_id', $produto_id)->first() : null;
 
         $desconto_final = $request->desc_tipo == 'Porcentagem' ? ($request->qtd_desconto / 100) * ($request->quantidade * $produto->preco) : $request->qtd_desconto;
 

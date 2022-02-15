@@ -63,6 +63,7 @@
                                 <br><br>
                                 {{-- --------------------------DESCONTO---------------------------- --}}
                                 <div class="row g-2">
+                                    
                                     @if ($count_item->tp_desconto_unificado == 'Não Unificado')
 
                                         @foreach ($count_item->carItem as $item)
