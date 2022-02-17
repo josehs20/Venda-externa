@@ -24,6 +24,29 @@ body {
           align-items: center;
 }
 
+.list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.listHome {
+  width: 40%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin: 1%;
+}
+
 @media (max-width: 600px) {
   .card {
     width: 90% !important;
@@ -161,6 +184,27 @@ body {
     background-image: url(../image/logo2.png);
     height: 50px;
     width: 50px;
+  }
+  .list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+  }
+  .listHome {
+    width: 95%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-top: 2%;
   }
 }
 
@@ -392,6 +436,22 @@ body {
   border: none;
   border-left: 1px solid #4e4e4e;
   background: white;
+}
+
+.imgCarr {
+  width: 40px;
+  height: 35px;
+}
+
+.buttonAdd {
+  width: 45px;
+  height: 40px;
+  background-color: #bf7817;
+  -webkit-box-shadow: 5px 5px 20px 5px #250101;
+          box-shadow: 5px 5px 20px 5px #250101;
+  border: 2.5px;
+  border-radius: 10px;
+  padding: 5px;
 }
 
 /*!
@@ -12351,5 +12411,9 @@ fieldset:disabled .btn {
   .d-print-none {
     display: none !important;
   }
+}
+
+.list-group {
+  width: 100% !important;
 }
 /*# sourceMappingURL=front.css.map */

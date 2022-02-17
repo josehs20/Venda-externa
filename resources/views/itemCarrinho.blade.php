@@ -109,6 +109,9 @@
                 Reverter Unificação
             </a>
         </div>
+        <div class="row d-flex justify-content-center mt-3">
+            <button class="btn btn-success col-6" >Finalizar Venda</button>
+        </div>
         <hr><br>
         {{-- tabela de itens --}}
         @if ($itens)

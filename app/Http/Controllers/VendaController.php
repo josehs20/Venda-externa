@@ -18,7 +18,6 @@ class VendaController extends Controller
      */
     public function index(Request $request)
     {
-
         $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
 
         $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
@@ -28,7 +27,7 @@ class VendaController extends Controller
     public function itens_carrinho($unificado = null, $zerar = null)
     {
         $tp_desconto = null;
-       // dd($zerar);
+        // dd($zerar);
         //pega retorno de da função unifica_valor_Itens
         if ($unificado) {
             $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
@@ -81,15 +80,10 @@ class VendaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $produto_id)
+    public function store()
     {
-        $produto = Produto::find($produto_id);
-
         $check = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-
-        $up_carrinho = $check ? CarrinhoItem::where('carrinho_id', $check->id)->where('produto_id', $produto_id)->first() : null;
-
-        $desconto_final = $request->desc_tipo == 'Porcentagem' ? ($request->qtd_desconto / 100) * ($request->quantidade * $produto->preco) : $request->qtd_desconto;
+        $produto = Produto::find($_POST['id']);
 
         if (!$check) {
 
@@ -100,56 +94,88 @@ class VendaController extends Controller
         }
 
         if ($produto) {
+            $dado['count_item'] = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+            ->where('status', 'Aberto')->first();
+            $dado['produto_adicionado'] = $produto = Produto::find($_POST['id']);
+            $dado['ok'] = 'succes';
 
-            if ($up_carrinho) {
-
-                $up_qtd = ($request->quantidade + $up_carrinho->quantidade);
-
-                if ($request->qtd_desconto) {
-                    $desconto_final = $request->desc_tipo == 'Porcentagem'
-                        ? ($request->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
-                } else {
-                    $desconto_final = $request->desc_tipo == 'Porcentagem' && $up_carrinho->tipo_desconto == 'Porcentagem'
-                        ? ($up_carrinho->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
-                }
-                if (!$this->verifica_custo_venda($produto, $desconto_final, $up_qtd)) {
-                    Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
-
-                    return redirect()->back();
-                }
-
-                $up_carrinho->update([
-                    'quantidade' => $up_qtd,
-                    'tipo_desconto' => $request->desc_tipo,
-                    'qtd_desconto' => $request->qtd_desconto ? $request->qtd_desconto : $up_carrinho->qtd_desconto,
-                    'valor_desconto' => $desconto_final,
-                    'valor'      => ($produto->preco * $up_qtd) - $desconto_final,
-                ]);
-            } else {
-                if (!$this->verifica_custo_venda($produto, $desconto_final, $request->quantidade)) {
-                    Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
-
-                    return redirect()->back();
-                }
-
-                $itens = new CarrinhoItem();
-                $itens->produto_id     = $produto->id;
-                $itens->carrinho_id    = !$check ? $car->id : $check->id;
-                $itens->alltech_id     = $produto->alltech_id;
-                $itens->nome           = $produto->nome;
-                $itens->quantidade     = $request->quantidade;
-                $itens->preco          = $produto->preco;
-                $itens->tipo_desconto  = $request->desc_tipo;
-                $itens->valor_desconto = $desconto_final;
-                $itens->qtd_desconto   = $request->qtd_desconto ? $request->qtd_desconto : null;
-                $itens->valor          = $request->qtd_desconto ? ($produto->preco * $request->quantidade) - $desconto_final : ($produto->preco * $request->quantidade);
-                $itens->save();
-            }
+            $itens = new CarrinhoItem();
+            $itens->produto_id     = $produto->id;
+            $itens->carrinho_id    = !$check ? $car->id : $check->id;
+            $itens->alltech_id     = $produto->alltech_id;
+            $itens->nome           = $produto->nome;
+            $itens->save();
         }
 
-        Session::flash('message', "Adicionado Com Sucesso!!");
+        echo json_encode($dado);
+        //$produto = Produto::find($produto_id);
 
-        return redirect()->back();
+        // $check = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+
+        // $up_carrinho = $check ? CarrinhoItem::where('carrinho_id', $check->id)->where('produto_id', $produto_id)->first() : null;
+
+        // $desconto_final = $request->desc_tipo == 'Porcentagem' ? ($request->qtd_desconto / 100) * ($request->quantidade * $produto->preco) : $request->qtd_desconto;
+
+        // if (!$check) {
+
+        //     $car = new Carrinho();
+        //     $car->user_id = auth()->user()->id;
+        //     $car->status = 'Aberto';
+        //     $car->save();
+        // }
+
+        // if ($produto) {
+
+        //     if ($up_carrinho) {
+
+        //         $up_qtd = ($request->quantidade + $up_carrinho->quantidade);
+
+        //         if ($request->qtd_desconto) {
+        //             $desconto_final = $request->desc_tipo == 'Porcentagem'
+        //                 ? ($request->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
+        //         } else {
+        //             $desconto_final = $request->desc_tipo == 'Porcentagem' && $up_carrinho->tipo_desconto == 'Porcentagem'
+        //                 ? ($up_carrinho->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
+        //         }
+        //         if (!$this->verifica_custo_venda($produto, $desconto_final, $up_qtd)) {
+        //             Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
+
+        //             return redirect()->back();
+        //         }
+
+        //         $up_carrinho->update([
+        //             'quantidade' => $up_qtd,
+        //             'tipo_desconto' => $request->desc_tipo,
+        //             'qtd_desconto' => $request->qtd_desconto ? $request->qtd_desconto : $up_carrinho->qtd_desconto,
+        //             'valor_desconto' => $desconto_final,
+        //             'valor'      => ($produto->preco * $up_qtd) - $desconto_final,
+        //         ]);
+        //     } else {
+        //         if (!$this->verifica_custo_venda($produto, $desconto_final, $request->quantidade)) {
+        //             Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
+
+        //             return redirect()->back();
+        //         }
+
+        //         $itens = new CarrinhoItem();
+        //         $itens->produto_id     = $produto->id;
+        //         $itens->carrinho_id    = !$check ? $car->id : $check->id;
+        //         $itens->alltech_id     = $produto->alltech_id;
+        //         $itens->nome           = $produto->nome;
+        //         $itens->quantidade     = $request->quantidade;
+        //         $itens->preco          = $produto->preco;
+        //         $itens->tipo_desconto  = $request->desc_tipo;
+        //         $itens->valor_desconto = $desconto_final;
+        //         $itens->qtd_desconto   = $request->qtd_desconto ? $request->qtd_desconto : null;
+        //         $itens->valor          = $request->qtd_desconto ? ($produto->preco * $request->quantidade) - $desconto_final : ($produto->preco * $request->quantidade);
+        //         $itens->save();
+        //     }
+        // }
+
+        // Session::flash('message', "Adicionado Com Sucesso!!");
+
+        // return redirect()->back();
+        return;
     }
     public function verifica_custo_venda($produto, $desconto_final, $quantidade)
     {
@@ -246,4 +272,15 @@ class VendaController extends Controller
     {
         //
     }
+
+    // public function testin()
+    // {
+
+    //     $dado['quantidade'] = $_POST['produto_id'];
+
+    //     echo json_encode($dado);
+
+    //     return;
+
+    // }
 }

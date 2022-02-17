@@ -1,22 +1,22 @@
 @extends('layouts.app')
-
+<meta name="csrf_token" content="{{ csrf_token() }}" />
 @section('content')
-
     @include('componentes.navbar')
+    
 
-    @if (Session::has('message'))
-        <div class="alert alert-success">
-            <h5 style=""> {{ Session::get('message') }}</h5>
-        </div>
-    @endif
-    <div class="container">
+    <form name="addItem" method="POST" class="list">
+        @csrf
 
+        <label id="count_itens" for="count_itens"></label>
         @foreach ($produtos as $produto)
-            <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#venda{{ $produto->id }}">
-                <ul class="list-group my-3">
+            <a class="listHome" style="cursor: pointer">
+                <ul class="list-group">
                     <li class="list-group-item active">
                         <div class="listCar">
                             <h6>{{ $produto->nome }}</h6>
+
+                            <button type="submit" onclick="cli(<?php echo $produto->id; ?>)" class="buttonAdd"><img
+                                    class="imgCarr" src="{{ asset('addCar.ico') }}" alt=""></button>
                         </div>
                     </li>
                     <li class="list-group-item">
@@ -28,93 +28,11 @@
                 </ul>
             </a>
             {{-- Modal --}}
-            <div class="modal fade" id="venda{{ $produto->id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">{{ $produto->nome }} <br> Preço Venda:
-                                <b>R${{ reais($produto->preco) }}</b></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <form action="{{ route('carrinho', ['produto_id' => $produto->id]) }}" method="post">
-                            @csrf
-                            <div class="modal-body">
-                                <div class="row g-2">
-                                    <div class="col-8">
-                                        <div class="form-floating">
-                                            <input required class="form-control" type="number" placeholder="QUANTIDADE"
-                                                name="quantidade" min="0.01" step="0.01">
-                                            <label for="floatingInputGrid">Quantiadade</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="form-floating">
-                                            <select name="tipo_unificado" class="form-select" id="floatingSelectGrid"
-                                                aria-label="Floating label select example">
-                                                <option value="un">UN</option>
-                                                <option value="cx">CX</option>
-                                            </select>
-                                            <label for="floatingSelectGrid">Tipo</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <br><br>
-                                {{-- --------------------------DESCONTO---------------------------- --}}
-                                <div class="row g-2">
-                                    
-                                    @if ($count_item->tp_desconto_unificado == 'Não Unificado')
 
-                                        @foreach ($count_item->carItem as $item)
-                                            @if ($item->produto_id == $produto->id && $item->qtd_desconto > 0)
-                                                <label for="">Esse Item Já Contém desconto Individual
-                                                    de
-                                                    <b>{{ $item->tipo_desconto == 'Porcentagem' ? '%' . $item->qtd_desconto : "R$" . $item->qtd_desconto }}</b>
-                                                    para sua quantidade, Caso
-                                                    insira um novo valor o mesmo será alterado!!</label>
-                                            @endif
-                                        @endforeach
-                                        <div class="col-8">
-                                            <div class="form-floating">
-                                                <input class="form-control" type="number"
-                                                    placeholder="DESCONTO AO PRODUTO ?" name="qtd_desconto" min="0.01"
-                                                    step="0.01">
-                                                <label for="floatingInputGrid">Desconto</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="form-floating">
-                                                <select class="form-select" name="desc_tipo">
-                                                    <option value="Porcentagem"><b>
-                                                            <h4> % </h4>
-                                                    </option>
-                                                    <option value="Dinheiro"><b>
-                                                            <h4> $ </h4>
-                                                    </option>
-                                                </select>
-                                                <label for="floatingSelectGrid">Tipo</label>
-                                            </div>
-                                        </div>
-                                        @elseif($count_item->tp_desconto_unificado == 'Porcentagem_unificado' or $count_item->tp_desconto_unificado == 'Dinheiro_unificado')
-                                        <label for="">Seu Carrinho Já Foi Estabelecido um desconto Fixo de
-                                            <b>{{ $count_item->tp_desconto_unificado == 'Porcentagem_unificado' ? '%' . $count_item->desconto_qtd : "R$" . $count_item->desconto_qtd }}</b>
-                                            para o total do mesmo!!</label>
-
-                                            
-                                    @endif
-                
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Adicionar ao carrinho</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            {{-- Fim Desconto Modal --}}
         @endforeach
-    </div>
+    </form>
+
 
     {{-- paginação --}}
     <nav aria-label="Navegação de página exemplo">
@@ -140,5 +58,5 @@
             </li>
         </ul>
     </nav>
-
 @endsection
+<script type="text/javascript" src="{{ asset('js/viewhome.js') }}" defer></script>
