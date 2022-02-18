@@ -12,9 +12,8 @@
                     <li class="list-group-item active">
                         <div class="listCar">
                             <h6>{{ $produto->nome }}</h6>
-
                             <button type="submit" onclick="cli(<?php echo $produto->id; ?>)" class="buttonAdd"><img
-                                    class="imgCarr" src="{{ asset('addCar.ico') }}" alt=""></button>
+                                 id="imgg" class="imgCarr" src="addCar.ico" alt=""></button>
                         </div>
                     </li>
                     <li class="list-group-item">

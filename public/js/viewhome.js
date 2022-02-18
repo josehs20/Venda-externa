@@ -17,8 +17,8 @@ $(function () {
 
 
             var itens = response['busca']['data'];
-console.log(response);
-            // console.log(itens);
+var img = document.getElementById('imgg');
+             console.log(img);
             var resultado = "";
             itens.forEach(element => {
 resultado +=                '<a class="listHome" style="cursor: pointer">'
@@ -26,8 +26,7 @@ resultado +=                '<ul class="list-group">'
 resultado +=                    '<li class="list-group-item active">'
 resultado +=                        '<div class="listCar">'
 resultado +=                            '<h6>'+ element['nome'] +'</h6>'
-resultado +=                            '<button type="submit"onclick="cli('+element['id']+')"' + 'class="buttonAdd"><img'
-resultado +=                                    'class="imgCarr" src="+{{ asset(addCar.ico) }}+" alt=""></button>'
+resultado +=                            '<button type="submit"onclick="cli('+element['id']+')"class="buttonAdd"><img class="imgCarr" src="addCar.ico" alt=""></button>'
 resultado +=                        '</div>'
 resultado +=                    '</li>'
 resultado +=                    '<li class="list-group-item">'

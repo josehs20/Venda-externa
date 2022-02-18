@@ -25,6 +25,10 @@ class VendaController extends Controller
 
          return view('home', compact('produtos', 'count_item'));
     }
+    public function loginnovo()
+    {
+       return view('auth.index');
+    }
      public function teste()
     {
         
