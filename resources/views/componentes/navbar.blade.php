@@ -6,9 +6,9 @@
                 <a class="navbar-brand" href="{{ url('/principal') }}">
                     <div class="div-logo-alltech"></div>
                 </a>
-                <form class="search" action="{{ route('principal') }}" method="GET">
+                <form class="search" action="/teste" method="GET">
                     @csrf
-                   <input name="nome" type="search" class="form-control"
+                   <input id="search" name="nome" type="search" class="form-control"
                             placeholder="Buscar Produto"> <button class="lupa"><i class="bi-search"
                                 style="color: black"></i></button>
                 </form>

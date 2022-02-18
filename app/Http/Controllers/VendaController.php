@@ -18,11 +18,21 @@ class VendaController extends Controller
      */
     public function index(Request $request)
     {
-        $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
 
-        $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+         $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
 
-        return view('home', compact('produtos', 'count_item'));
+         $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+
+         return view('home', compact('produtos', 'count_item'));
+    }
+     public function teste()
+    {
+        
+        $dados['busca'] = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$_GET['busca']}%'")->orderBy('nome')->paginate(20);
+
+        //$result = count($resu);
+        echo  json_encode($dados);
+     
     }
     public function itens_carrinho($unificado = null, $zerar = null)
     {
@@ -84,9 +94,9 @@ class VendaController extends Controller
     {
         $check = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
         $produto = Produto::find($_POST['id']);
+        $up_carrinho = $check ? CarrinhoItem::where('carrinho_id', $check->id)->where('produto_id', $produto->id)->first() : null;
 
         if (!$check) {
-
             $car = new Carrinho();
             $car->user_id = auth()->user()->id;
             $car->status = 'Aberto';
@@ -94,20 +104,33 @@ class VendaController extends Controller
         }
 
         if ($produto) {
-            $dado['count_item'] = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
-            ->where('status', 'Aberto')->first();
-            $dado['produto_adicionado'] = $produto = Produto::find($_POST['id']);
-            $dado['ok'] = 'succes';
+            if ($up_carrinho) {
 
-            $itens = new CarrinhoItem();
-            $itens->produto_id     = $produto->id;
-            $itens->carrinho_id    = !$check ? $car->id : $check->id;
-            $itens->alltech_id     = $produto->alltech_id;
-            $itens->nome           = $produto->nome;
-            $itens->save();
+                $up_carrinho->update([
+                    'quantidade' => $up_carrinho->quantidade + 1,
+                ]);
+
+                $dado['produto_adicionado'] = $produto->nome;
+                $dado['ok'] = "add";
+                echo json_encode($dado);
+            } else {
+                $itens = new CarrinhoItem();
+                $itens->produto_id     = $produto->id;
+                $itens->carrinho_id    = !$check ? $car->id : $check->id;
+                $itens->alltech_id     = $produto->alltech_id;
+                $itens->nome           = $produto->nome;
+                $itens->preco           = $produto->preco;
+                $itens->save();
+
+                $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+                    ->where('status', 'Aberto')->first();
+
+                $dado['count_item'] = $count_item->carItem->count();
+                $dado['produto_adicionado'] = $produto->nome;
+                $dado['ok'] = true;
+                echo json_encode($dado);
+            }
         }
-
-        echo json_encode($dado);
         //$produto = Produto::find($produto_id);
 
         // $check = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
@@ -273,14 +296,12 @@ class VendaController extends Controller
         //
     }
 
-    // public function testin()
+    // public function teste(Request $request)
     // {
+    //     $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
 
-    //     $dado['quantidade'] = $_POST['produto_id'];
+    //     $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
-    //     echo json_encode($dado);
-
-    //     return;
-
+    //     return view('home', compact('produtos', 'count_item'));
     // }
 }

@@ -1,22 +1,14 @@
 @extends('layouts.app')
 <meta name="csrf_token" content="{{ csrf_token() }}" />
 @section('content')
-
+@include('componentes.navbar')
 <form name="formteste">
     @csrf
-      <input type="text" placeholder="nome" id="nome">
-           
-      <input class="form-control" type="number" id="quant" >
-      <select class="form-select" id="desc_tipo">
-          <option value="Porcentagem"><b>
-                  <h4> % </h4>
-          </option>
-          <option value="Dinheiro"><b>
-                  <h4> $ </h4>
-          </option>
-      </select>
-           <button type="submit" >enviar</button>
+      <input id="search" type="text" placeholder="nome" id="nome">  
    </form>
+   <label id="resultado">
+
+   </label>
 @endsection
-<script src="{{ asset('js/viewhome.js') }}" defer></script>
+
 

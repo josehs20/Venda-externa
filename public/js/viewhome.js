@@ -1,6 +1,58 @@
+
 function cli(id) {
     produto_id = id;
 };
+$(function () {
+    $("#search").keyup(function () {
+        var busca = $("#search").val();
+        // console.log(busca);
+        $.ajax({
+            url: "/teste",
+            type: "GET",
+            data: {
+                busca: busca,
+            },
+            dataType: 'json',
+        }).done(function (response) {
+
+
+            var itens = response['busca']['data'];
+console.log(response);
+            // console.log(itens);
+            var resultado = "";
+            itens.forEach(element => {
+resultado +=                '<a class="listHome" style="cursor: pointer">'
+resultado +=                '<ul class="list-group">'
+resultado +=                    '<li class="list-group-item active">'
+resultado +=                        '<div class="listCar">'
+resultado +=                            '<h6>'+ element['nome'] +'</h6>'
+resultado +=                            '<button type="submit"onclick="cli('+element['id']+')"' + 'class="buttonAdd"><img'
+resultado +=                                    'class="imgCarr" src="+{{ asset(addCar.ico) }}+" alt=""></button>'
+resultado +=                        '</div>'
+resultado +=                    '</li>'
+resultado +=                    '<li class="list-group-item">'
+resultado +=                        '<div class="listCar">'
+resultado +=                            '<h6> Preço :</h6>'
+resultado +=                            '<h4>R$'+element['preco'] +'</h4>'
+resultado +=                        '</div>'
+resultado +=                    '</li>'
+resultado +=                '</ul>'
+resultado +=            '</a>'
+
+                console.log(element['id']);
+            });
+            document.getElementById("vaii").innerHTML = resultado;
+
+            //     $("#resultado").html(itens.forEach( nome => {
+
+            //             h2 = document.createElement('h2');
+            //             div = document.getElementById('resultado');
+            //             h2.textContent = nome['nome'];
+            //             div.appendChild(h2);  
+            //    }));
+        });
+    });
+});
 
 $(function () {
     $('form[name="addItem"]').submit(function (event) {
@@ -8,12 +60,6 @@ $(function () {
         //var global
         var id = produto_id;
 
-        var quantidade = "1";
-        var tipo_uni = "UN";
-        var qtd_desconto = "10";
-        var desc_tipo = "porcentagem";
-        var arr = [quantidade, tipo_uni, qtd_desconto, desc_tipo, produto_id];
-       // console.log(arr);
         $.ajax({
             url: "/carrinho",
             type: "POST",
@@ -22,44 +68,50 @@ $(function () {
             },
             data: {
                 id: id,
-                quantidade: quantidade,
-                tipo_uni: tipo_uni,
-                qtd_desconto: qtd_desconto,
-                desc_tipo: desc_tipo,
             },
             dataType: 'json',
         }).done(function (response) {
-            var count_itens = response['count_item']['car_item'].length;   
-            $('.quanti').html(count_itens);
-console.log(response);
-              //msg de success
-              var mensagem = 'deu certo a mensagem de successo';
-              var tipo = 'info'
-              var tempo = 2000
+            if (response['ok'] === true) {
 
-      mostraDialogo(mensagem, tipo, tempo);
-           
-        
+                var count_itens = response['count_item'];
+                $('.quanti').html(count_itens);
+                console.log(response);
+                //msg de success
+                var mensagem = "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso!!!";
+                var tipo = 'success';
+                var tempo = 2000;
+
+                mostraDialogo(mensagem, tipo, tempo);
+
+            } else if (response['ok'] == "add") {
+                var mensagem = "Adicionado mais 1 na quantidade";
+                var tipo = 'warning';
+                mostraDialogo(mensagem, tipo);
+            } else {
+                var mensagem = "Não Foi Possível";
+                var tipo = 'danger';
+
+                mostraDialogo(mensagem, tipo);
+            }
+
         });
     });
 });
-
 //Mensagem Personalizada
-function mostraDialogo(mensagem, tipo, tempo){
-    
+function mostraDialogo(mensagem, tipo) {
+
     // se houver outro alert desse sendo exibido, cancela essa requisição
-    if($("#message").is(":visible")){
+    if ($("#message").is(":visible")) {
         return false;
     }
 
     // se não setar o tempo, o padrão é 3 segundos
-    if(!tempo){
-        var tempo = 3000;
-    }
+    var tempo = 2000;
+
 
     // se não setar o tipo, o padrão é alert-info
-    if(!tipo){
-        var tipo = "sucess";
+    if (!tipo) {
+        var tipo = "info";
     }
 
     // monta o css da mensagem para que fique flutuando na frente de todos elementos da página
@@ -68,10 +120,9 @@ function mostraDialogo(mensagem, tipo, tempo){
 
     // monta o html da mensagem com Bootstrap
     var dialogo = "";
-    dialogo += '<div id="message" style="'+cssMessage+'">';
-    dialogo += '    <div class="alert alert-'+tipo+' alert-dismissable" style="'+cssInner+'">';
-    dialogo += '    <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>';
-    dialogo +=          mensagem;
+    dialogo += '<div id="message" style="' + cssMessage + '">';
+    dialogo += '    <div class="alert alert-' + tipo + ' alert-dismissable col-6" style="' + cssInner + '">';
+    dialogo += mensagem;
     dialogo += '    </div>';
     dialogo += '</div>';
 
@@ -81,10 +132,11 @@ function mostraDialogo(mensagem, tipo, tempo){
     $("#message").fadeIn(200);
 
     // contador de tempo para a mensagem sumir
-    setTimeout(function() {
-        $('#message').fadeOut(300, function(){
+    setTimeout(function () {
+        $('#message').fadeOut(300, function () {
             $(this).remove();
         });
     }, tempo); // milliseconds
-
 }
+
+

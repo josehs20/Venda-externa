@@ -2,12 +2,10 @@
 <meta name="csrf_token" content="{{ csrf_token() }}" />
 @section('content')
     @include('componentes.navbar')
-    
 
-    <form name="addItem" method="POST" class="list">
+   <form id="vaii" name="addItem" method="POST" class="list">
         @csrf
 
-        <label id="count_itens" for="count_itens"></label>
         @foreach ($produtos as $produto)
             <a class="listHome" style="cursor: pointer">
                 <ul class="list-group">
@@ -27,6 +25,7 @@
                     </li>
                 </ul>
             </a>
+
             {{-- Modal --}}
 
             {{-- Fim Desconto Modal --}}
