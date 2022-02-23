@@ -10,7 +10,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may specify which of the database connections below you wish
-    | to use as your default connection for all database work. Of course
+    | to use as your defaulupdated_at" => "2022-02-22 19:39t connection for all database work. Of course
     | you may use many connections at once using the Database library.
     |
     */

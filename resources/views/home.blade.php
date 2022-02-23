@@ -1,19 +1,18 @@
 @extends('layouts.app')
 <meta name="csrf_token" content="{{ csrf_token() }}" />
 @section('content')
-    @include('componentes.navbar')
-
-   <form id="vaii" name="addItem" method="POST" class="list">
+@include('componentes.navbar')
+    @include('componentes.titulo', ['titlePage' => 'Produtos'])
+    <form id="elemento_ajax_html" name="addItem" method="POST" class="list">
         @csrf
-
         @foreach ($produtos as $produto)
             <a class="listHome" style="cursor: pointer">
                 <ul class="list-group">
-                    <li class="list-group-item active">
+                    <li class="list-group-item" style="background-color: rgb(58, 36, 252)">
                         <div class="listCar">
-                            <h6>{{ $produto->nome }}</h6>
-                            <button type="submit" onclick="cli(<?php echo $produto->id; ?>)" class="buttonAdd"><img
-                                 id="imgg" class="imgCarr" src="addCar.ico" alt=""></button>
+                            <h6 style="color: white">{{ $produto->nome }}</h6>
+                            <button type="submit" onclick="cli(<?php echo $produto->id; ?>)" class="buttonAdd"><img id="imgg"
+                                    class="imgCarr" src="addCar.ico" alt=""></button>
                         </div>
                     </li>
                     <li class="list-group-item">

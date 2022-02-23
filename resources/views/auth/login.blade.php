@@ -28,7 +28,7 @@
                 <form class="login100-form validate-form" method="POST" action="{{ route('login') }}">
                     @csrf
                     <span class="login100-form-title">
-                        Sistema de Vendas <u>Alltech</u>
+                        Sistema de Vendas 
                     </span>
 
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">

@@ -23,7 +23,6 @@
     
 </head>
 <body>
-  
     @yield('content')
     
     <script src="{{ asset('js/jquery.js') }}"></script>

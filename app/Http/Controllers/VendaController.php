@@ -19,25 +19,20 @@ class VendaController extends Controller
     public function index(Request $request)
     {
 
-         $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
+        $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
 
-         $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+        $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
-         return view('home', compact('produtos', 'count_item'));
+        return view('home', compact('produtos', 'count_item'));
     }
-    public function loginnovo()
+
+    public function busca_produto_ajax()
     {
-       return view('auth.index');
-    }
-     public function teste()
-    {
-        
         $dados['busca'] = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$_GET['busca']}%'")->orderBy('nome')->paginate(20);
 
-        //$result = count($resu);
         echo  json_encode($dados);
-     
     }
+
     public function itens_carrinho($unificado = null, $zerar = null)
     {
         $tp_desconto = null;
