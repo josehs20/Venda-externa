@@ -46,7 +46,7 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\VendedorCliente');
     }
-    
+  
     public function vendedor() {
         return $this->perfil == 'vendedor';
     }

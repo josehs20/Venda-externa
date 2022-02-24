@@ -22,7 +22,7 @@
 
     
 </head>
-<body>
+<body style="background-color: rgb(233, 233, 233);">
     @yield('content')
     
     <script src="{{ asset('js/jquery.js') }}"></script>

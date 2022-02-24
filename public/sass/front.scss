@@ -265,8 +265,7 @@ body {
 }
 
 .search input {
-    height: 45px;
-    text-indent: 25px;
+    height: 45px;   
     border: none;
 }
 
@@ -316,9 +315,9 @@ body {
 
 // index cliente
 .collapsible {
+    height: 20px;
     background-color: #777;
     color: white;
-    cursor: pointer;
     padding: 18px;
     width: 100%;
     border: none;
@@ -338,16 +337,17 @@ body {
     font-weight: bold;
     float: right;
     margin-left: 5px;
+    margin-top:-30px;
 }
 
 .active:after {
     content: "\2212";
+    
 }
 
 .contentconspllan {
-    padding: 0 18px;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
-    background-color: #f1f1f1;
+    background-color: #a8a8a8;
 }

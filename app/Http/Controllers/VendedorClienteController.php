@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Carrinho;
+use App\Models\InfoCliente;
 use App\Models\VendedorCliente;
 use Illuminate\Support\Facades\Session;
 
@@ -20,8 +21,9 @@ class VendedorClienteController extends Controller
         $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
         $count_item = $itens;
 
-        $clientes = auth()->user()->vendedorCliente()->get();
-
+        $clientes = VendedorCliente::with('infoCliente')->where('user_id', auth()->user()->id)->get();
+        //  $info_cliente = InfoCliente::);
+        //  dd($clientes->all('id'));
         return view('cliente.index', compact('count_item', 'clientes'));
     }
 
@@ -49,15 +51,36 @@ class VendedorClienteController extends Controller
         date_default_timezone_set('America/Sao_Paulo');
         $date = date('Y-m-d H:i');
 
-        VendedorCliente::create([
+        $cliente = VendedorCliente::create([
             'nome' => $request->nome,
-            'telefone' => $request->tel ? $request->tel : null,
-            'observacao' => $request->observacao,
+            'email' => $request->email ? $request->email : null,
+            'telefone' => $request->telefone ? $request->telefone : null,
+            'cidade' => $request->cidade ? $request->cidade : null,
+            'rua' => $request->rua ? $request->rua : null,
+            'numero_rua' => $request->n_rua ? $request->n_rua : null,
             'user_id' => auth()->user()->id,
-            'updated_at' => $date,
         ]);
+
+        if ($request->observacao) {
+
+            InfoCliente::create([
+                'observacao' => $request->observacao,
+                'data' => $date,
+                'vendedor_cliente_id' => $cliente->id,
+            ]);
+        }
+
         Session::flash('message', "Cliente Adicionado Com Sucesso!!");
         return redirect(route('vendedor.cliente.index', auth()->user()->id));
+    }
+    public function adiciona_obs($observacao)
+    {
+        dd($observacao);
+    }
+
+    public function deleta_obs($observacao)
+    {
+        dd($observacao);
     }
 
     /**
@@ -68,7 +91,9 @@ class VendedorClienteController extends Controller
      */
     public function show($id)
     {
+        dd('1');
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -78,7 +103,7 @@ class VendedorClienteController extends Controller
      */
     public function edit($id)
     {
-        //
+        dd('id');
     }
 
     /**
@@ -90,7 +115,7 @@ class VendedorClienteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        dd('id');
     }
 
     /**
@@ -101,6 +126,6 @@ class VendedorClienteController extends Controller
      */
     public function destroy($id)
     {
-        //
+        dd('id');
     }
 }

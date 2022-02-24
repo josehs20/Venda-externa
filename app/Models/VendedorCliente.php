@@ -7,21 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class VendedorCliente extends Model
 {
+    protected $table = 'vendedor_clientes';
     protected $fillable = [
         'nome',
+        'email',
         'telefone',
-        'observacao',
+        'cidade',
+        'rua',
+        'numero_rua',
         'user_id',
-        'updated_at',
-    ];
-
-    protected $dates = [
-        'created_at',
-        'updated_at',
     ];
 
     public function userCliente()
     {
         return $this->belongsTo('App\Models\User');
     }
+    public function infoCliente()
+    {
+        return $this->hasMany('App\Models\InfoCliente');
+    }
+
 }
