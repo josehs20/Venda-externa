@@ -27,7 +27,8 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }, "files": [
-            "app/Helpers/MoneyHelper.php"
+            "app/Helpers/MoneyHelper.php",
+            "app/Helpers/ItemCarrinho.php"
         ]
     },
     "autoload-dev": {

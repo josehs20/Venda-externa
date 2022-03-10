@@ -3,6 +3,10 @@
 @section('content')
 @include('componentes.navbar')
     @include('componentes.titulo', ['titlePage' => 'Produtos'])
+    @if (Session::has('cancelar_carrinho'))
+
+            <body onload="msgContato(msg = 7)">
+    @endif
     <form id="elemento_ajax_html" name="addItem" method="POST" class="list">
         @csrf
         @foreach ($produtos as $produto)

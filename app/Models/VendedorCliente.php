@@ -15,6 +15,7 @@ class VendedorCliente extends Model
         'cidade',
         'rua',
         'numero_rua',
+        'carriho_id',
         'user_id',
     ];
 
@@ -26,5 +27,8 @@ class VendedorCliente extends Model
     {
         return $this->hasMany('App\Models\InfoCliente');
     }
-
+    public function carrinho()
+    {
+        return $this->hasMany('App\Models\Carrinho');
+    }
 }

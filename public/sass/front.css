@@ -236,6 +236,21 @@ body {
   .listCliente {
     margin-top: 20%;
   }
+  .bar-user-sair {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -ms-flex-pack: distribute;
+        justify-content: space-around;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    margin-left: 40px;
+  }
 }
 
 .listCar {
@@ -353,6 +368,22 @@ body {
   background: white;
 }
 
+.lupa-list {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 35px;
+  width: 50px;
+  border: none;
+  background: white;
+}
+
+@media (min-width: 700px) {
+  .list-qtd {
+    width: 15% !important;
+  }
+}
+
 .imgCarr {
   width: 40px;
   height: 35px;
@@ -369,9 +400,45 @@ body {
   padding: 5px;
 }
 
-.clienteForm {
-  width: 50%px !important;
-  height: 50%px !important;
+.search-cliente {
+  position: relative;
+  margin: 1em;
+  -webkit-box-shadow: 5px 2px 8px black;
+          box-shadow: 5px 2px 8px black;
+  width: 90%;
+}
+
+.search-cliente input {
+  height: 45px;
+  border: none;
+}
+
+.search-cliente input:focus {
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  border-radius: none;
+}
+
+.lupa-cliente {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 35px;
+  width: 50px;
+  border: none;
+  border-left: 1px solid #4e4e4e;
+  background: white;
+}
+
+.lupa-salvaItem {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 35px;
+  width: 120px;
+  border: none;
+  border-left: 1px solid #4e4e4e;
+  background: white;
 }
 
 /*!
@@ -12373,5 +12440,13 @@ fieldset:disabled .btn {
   -webkit-transition: max-height 0.2s ease-out;
   transition: max-height 0.2s ease-out;
   background-color: #a8a8a8;
+}
+
+.contentconspllanVendaSalva {
+  max-height: 0;
+  overflow: hidden;
+  -webkit-transition: max-height 0.2s ease-out;
+  transition: max-height 0.2s ease-out;
+  background-color: #ffffff;
 }
 /*# sourceMappingURL=front.css.map */

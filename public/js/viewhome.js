@@ -48,7 +48,7 @@ $(function () {
         var id = produto_id;
 
         $.ajax({
-            url: "/carrinho",
+            url: "/venda",
             type: "POST",
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -84,9 +84,7 @@ $(function () {
         });
     });
 });
-function name(params) {
-    
-}
+
 //Mensagem Personalizada
 function mostraDialogo(mensagem, tipo) {
 

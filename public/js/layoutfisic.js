@@ -1,21 +1,62 @@
 var btnMenu = document.querySelectorAll(".btnMenu div");
 var btn = document.getElementById("btnMenu");
-btn.addEventListener("click", function(){
+btn.addEventListener("click", function () {
     btnMenu.forEach((linha) => {
         linha.classList.toggle(linha.id);
     });
 });
 
 function msgContato(msg) {
-   
-    if (msg) {
-        var msg = 'Cliente Adicionado Com Sucesso';
+
+    if (msg === 1) {
+        var msg = 'Cliente Adicionado Com sucesso!!';
         var tipo = 'success';
-        setTimeout(function(){
-            console.log("I am the third log after 5 seconds");
+        setTimeout(function () {
             mostraDialogo(msg, tipo);
-        },100);
-      
+        }, 100);
+
+    } else if (msg === 2) {
+        var msg = 'Observação Adicionada Com sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    } else if (msg === 3) {
+        var msg = 'Não Autorizado Custo Maior Que Venda!!';
+        var tipo = 'warning';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    } else if (msg === 4) {
+        var msg = 'Venda Salva Com sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    } else if (msg === 5) {
+        var msg = 'Cliente excluido com sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    } else if (msg === 6) {
+        var msg = 'Cliente Editado com sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    } else if (msg === 7) {
+        var msg = 'Venda Cancelada Com sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    }else if (msg === 8) {
+        var msg = 'Itens retornados com sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
     }
 }
 

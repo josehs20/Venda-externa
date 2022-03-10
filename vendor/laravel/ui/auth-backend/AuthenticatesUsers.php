@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Auth;
 
-use App\Http\Middleware\Vendedor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,13 +31,8 @@ trait AuthenticatesUsers
      */
     public function login(Request $request)
     {
-        $verifica = User::where('email', $request->email)->first();
-    
-       if (!$verifica or $verifica->perfil != 'vendedor') {
-        return redirect('/login')->with('message', 'Sem premissão de acesso');
-       }
         $this->validateLogin($request);
-        
+
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
@@ -183,7 +177,7 @@ trait AuthenticatesUsers
 
         return $request->wantsJson()
             ? new JsonResponse([], 204)
-            : redirect('/login');
+            : redirect('/');
     }
 
     /**

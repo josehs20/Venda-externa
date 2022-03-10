@@ -13,6 +13,7 @@ use function array_unique;
 use function assert;
 use function file_get_contents;
 use function is_array;
+use function max;
 use function sprintf;
 use function substr_count;
 use function token_get_all;
@@ -25,12 +26,11 @@ use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 use SebastianBergmann\CodeCoverage\ParserException;
 use SebastianBergmann\LinesOfCode\LineCountingVisitor;
-use SebastianBergmann\LinesOfCode\LinesOfCode;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for phpunit/php-code-coverage
  */
-final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
+final class ParsingFileAnalyser implements FileAnalyser
 {
     /**
      * @var array
@@ -48,7 +48,7 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
     private $functions = [];
 
     /**
-     * @var LinesOfCode[]
+     * @var array<string,array{linesOfCode: int, commentLinesOfCode: int, nonCommentLinesOfCode: int}>
      */
     private $linesOfCode = [];
 
@@ -56,6 +56,11 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
      * @var array
      */
     private $ignoredLines = [];
+
+    /**
+     * @var array
+     */
+    private $executableLines = [];
 
     /**
      * @var bool
@@ -94,11 +99,21 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
         return $this->functions[$filename];
     }
 
-    public function linesOfCodeFor(string $filename): LinesOfCode
+    /**
+     * @psalm-return array{linesOfCode: int, commentLinesOfCode: int, nonCommentLinesOfCode: int}
+     */
+    public function linesOfCodeFor(string $filename): array
     {
         $this->analyse($filename);
 
         return $this->linesOfCode[$filename];
+    }
+
+    public function executableLinesIn(string $filename): array
+    {
+        $this->analyse($filename);
+
+        return $this->executableLines[$filename];
     }
 
     public function ignoredLinesFor(string $filename): array
@@ -118,7 +133,7 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
         }
 
         $source      = file_get_contents($filename);
-        $linesOfCode = substr_count($source, "\n");
+        $linesOfCode = max(substr_count($source, "\n") + 1, substr_count($source, "\r") + 1);
 
         if ($linesOfCode === 0 && !empty($source)) {
             $linesOfCode = 1;
@@ -134,16 +149,18 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
 
             assert($nodes !== null);
 
-            $traverser                  = new NodeTraverser;
-            $codeUnitFindingVisitor     = new CodeUnitFindingVisitor;
-            $lineCountingVisitor        = new LineCountingVisitor($linesOfCode);
-            $ignoredLinesFindingVisitor = new IgnoredLinesFindingVisitor($this->useAnnotationsForIgnoringCode, $this->ignoreDeprecatedCode);
+            $traverser                     = new NodeTraverser;
+            $codeUnitFindingVisitor        = new CodeUnitFindingVisitor;
+            $lineCountingVisitor           = new LineCountingVisitor($linesOfCode);
+            $ignoredLinesFindingVisitor    = new IgnoredLinesFindingVisitor($this->useAnnotationsForIgnoringCode, $this->ignoreDeprecatedCode);
+            $executableLinesFindingVisitor = new ExecutableLinesFindingVisitor;
 
             $traverser->addVisitor(new NameResolver);
             $traverser->addVisitor(new ParentConnectingVisitor);
             $traverser->addVisitor($codeUnitFindingVisitor);
             $traverser->addVisitor($lineCountingVisitor);
             $traverser->addVisitor($ignoredLinesFindingVisitor);
+            $traverser->addVisitor($executableLinesFindingVisitor);
 
             /* @noinspection UnusedFunctionResultInspection */
             $traverser->traverse($nodes);
@@ -161,11 +178,11 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
         }
         // @codeCoverageIgnoreEnd
 
-        $this->classes[$filename]      = $codeUnitFindingVisitor->classes();
-        $this->traits[$filename]       = $codeUnitFindingVisitor->traits();
-        $this->functions[$filename]    = $codeUnitFindingVisitor->functions();
-        $this->linesOfCode[$filename]  = $lineCountingVisitor->result();
-        $this->ignoredLines[$filename] = [];
+        $this->classes[$filename]         = $codeUnitFindingVisitor->classes();
+        $this->traits[$filename]          = $codeUnitFindingVisitor->traits();
+        $this->functions[$filename]       = $codeUnitFindingVisitor->functions();
+        $this->executableLines[$filename] = $executableLinesFindingVisitor->executableLines();
+        $this->ignoredLines[$filename]    = [];
 
         $this->findLinesIgnoredByLineBasedAnnotations($filename, $source, $this->useAnnotationsForIgnoringCode);
 
@@ -177,6 +194,14 @@ final class ParsingCoveredFileAnalyser implements CoveredFileAnalyser
         );
 
         sort($this->ignoredLines[$filename]);
+
+        $result = $lineCountingVisitor->result();
+
+        $this->linesOfCode[$filename] = [
+            'linesOfCode'           => $result->linesOfCode(),
+            'commentLinesOfCode'    => $result->commentLinesOfCode(),
+            'nonCommentLinesOfCode' => $result->nonCommentLinesOfCode(),
+        ];
     }
 
     private function findLinesIgnoredByLineBasedAnnotations(string $filename, string $source, bool $useAnnotationsForIgnoringCode): void

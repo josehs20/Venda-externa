@@ -1,57 +1,88 @@
-
-
-function deleta_obs_ajax(id) {
-    info_id = id;
-    console.log(info_id);
-   
-};
-
-function confirmDel(event) {
-    event.preventDefault();
-    console.log(event);
+//view cliente/vendaSalva
+function fechaModal(id) {
+    var botao = document.getElementById("fechaModal" + id);  
+    console.log(botao);
+    botao.click();
 }
 
+//View cliente/index
+function botaoInfo(id) {
 
-$(function () {
-    $('form[name="infoObs"]').submit(function (event) {
+    info_id = id;
+}
+(function (win, doc) {
+    'use strict'
+
+    function deleta_obs_ajax(event) {
         event.preventDefault();
-        //var global
-        alert(info_id);
 
-        // $.ajax({
-        //     url: "/carrinho",
-        //     type: "POST",
-        //     headers: {
-        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //     },
-        //     data: {
-        //         id: id,
-        //     },
-        //     dataType: 'json',
-        // }).done(function (response) {
-        //     if (response['ok'] === true) {
+        $.ajax({
+            url: "/deleta_obs/" + info_id,
+            type: "DELETE",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            dataType: 'json',
+        }).done(function (response) {
+            if (response['success'] === true) {
+                document.getElementById(info_id).remove();
+                var msg = 'Observação Excluida Com Sucesso!!';
+                var tipo = 'success';
+                mostraDialogo(msg, tipo);
+            } else {
+                var msg = 'Observação já Excluida, Atualize a Página!!';
+                var tipo = 'warning';
+                mostraDialogo(msg, tipo);
+            }
 
-        //         var count_itens = response['count_item'];
-        //         $('.quanti').html(count_itens);
-        //         console.log(response);
-        //         //msg de success
-        //         var mensagem = "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso!!!";
-        //         var tipo = 'success';
-        //         var tempo = 2000;
+        });
+    }
+    if (doc.querySelector('.js-del')) {
+        var btn = doc.querySelectorAll('.js-del');
+        for (let i = 0; i < btn.length; i++) {
+            btn[i].addEventListener('click', deleta_obs_ajax, false)
+        }
+    }
 
-        //         mostraDialogo(mensagem, tipo, tempo);
+})(window, document);
 
-        //     } else if (response['ok'] == "add") {
-        //         var mensagem = "Adicionado mais 1 na quantidade";
-        //         var tipo = 'warning';
-        //         mostraDialogo(mensagem, tipo);
-        //     } else {
-        //         var mensagem = "Não Foi Possível";
-        //         var tipo = 'danger';
+function mostraDialogo(mensagem, tipo) {
 
-        //         mostraDialogo(mensagem, tipo);
-        //     }
+    // se houver outro alert desse sendo exibido, cancela essa requisição
+    if ($("#message").is(":visible")) {
+        return false;
+    }
 
-        // });
-    });
-});
+    // se não setar o tempo, o padrão é 3 segundos
+    var tempo = 2000;
+
+
+    // se não setar o tipo, o padrão é alert-info
+    if (!tipo) {
+        var tipo = "info";
+    }
+
+    // monta o css da mensagem para que fique flutuando na frente de todos elementos da página
+    var cssMessage = "display: block; position: fixed; top: 0; left: 20%; right: 20%; width: 60%; padding-top: 10px; z-index: 9999";
+    var cssInner = "margin: 0 auto; box-shadow: 1px 1px 5px black;";
+
+    // monta o html da mensagem com Bootstrap
+    var dialogo = "";
+    dialogo += '<div id="message" style="' + cssMessage + '">';
+    dialogo += '    <div class="alert alert-' + tipo + ' alert-dismissable col-10" style="' + cssInner + '">';
+    dialogo += mensagem;
+    dialogo += '    </div>';
+    dialogo += '</div>';
+
+    // adiciona ao body a mensagem com o efeito de fade
+    $("body").append(dialogo);
+    $("#message").hide();
+    $("#message").fadeIn(200);
+
+    // contador de tempo para a mensagem sumir
+    setTimeout(function () {
+        $('#message').fadeOut(300, function () {
+            $(this).remove();
+        });
+    }, tempo); // milliseconds
+}

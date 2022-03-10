@@ -15,11 +15,17 @@ class Carrinho extends Model
        'tp_desconto_unificado',
        'total_desconto',
        'total', 
+       'vendedor_cliente_id',
        'status', 
     ];
     
     public function carItem()
     {
         return $this->hasMany('App\Models\CarrinhoItem');
+    }
+
+    public function vendedorCliente()
+    {
+        return $this->belongsTo('App\Models\VendedorCliente');
     }
 }

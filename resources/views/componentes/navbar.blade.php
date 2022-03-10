@@ -3,7 +3,7 @@
         <div class="bar-pesquisa-user-carrinho">
             <div class="bar-items">
                 <!-- Logo all tech -->
-                <a class="navbar-brand" href="{{ url('/principal') }}">
+                <a class="navbar-brand" href="{{ route('venda.index') }}">
                     <div class="div-logo-alltech"></div>
                 </a>
 
@@ -23,19 +23,20 @@
                                 <div class="" id="linha3"></div>
                             </div>
                         </a>
-             
+
                         <ul class="dropdown-menu">
 
-                            <li><a class="dropdown-item" href="{{route('vendedor.cliente.index', auth()->user()->id)}} ">Clientes</a></li>
-                            <li><a class="dropdown-item" href="#">Vendas Salvas</a></li>
+                            <li><a class="dropdown-item"
+                                    href="{{ route('vendedor.cliente.index', auth()->user()->id) }} ">Clientes</a></li>
+                            <li><a class="dropdown-item" href="{{ route('venda_salva') }} ">Vendas Salvas</a></li>
 
                         </ul>
                     </div>
 
-                    <a href="{{ route('itens_carrinho') }}">
+                    <a href="{{ route('venda.edit', ['venda' => auth()->user()->id]) }}">
                         <img class="fotocarr" src="{{ asset('navCarr.ico') }}">
                         <h6 class="quanti" style="color:#fff">
-                            {{ $count_item ? $count_item->carItem->count() : '0' }}</h6>
+                            {{ count_item(auth()->user()->id) }}</h6>
                     </a>
                 </div>
             </div>
@@ -52,7 +53,6 @@
                         <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                     @endif
                 @else
-
                     <!-- Usuario -->
 
                     <div class="sair">
@@ -61,7 +61,7 @@
                         </a> &emsp;&emsp;&emsp;
                         <a style="color: rgb(138, 138, 138);" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
-                                                                                                                                         document.getElementById('logout-form').submit();">
+                                                                                                                                             document.getElementById('logout-form').submit();">
                             {{ __('Sair') }}
                         </a>
 

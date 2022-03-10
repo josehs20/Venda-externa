@@ -32,25 +32,9 @@ class VendedorClienteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request, $vendedor)
     {
-        // $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-        // $count_item = $itens;
-
-        // return view('cliente._form', compact('count_item'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        date_default_timezone_set('America/Sao_Paulo');
-        $date = date('Y-m-d H:i');
-
+        // dd($vendedor);
         $cliente = VendedorCliente::create([
             'nome' => $request->nome,
             'email' => $request->email ? $request->email : null,
@@ -58,10 +42,13 @@ class VendedorClienteController extends Controller
             'cidade' => $request->cidade ? $request->cidade : null,
             'rua' => $request->rua ? $request->rua : null,
             'numero_rua' => $request->n_rua ? $request->n_rua : null,
-            'user_id' => auth()->user()->id,
+            'user_id' => $vendedor,
         ]);
 
         if ($request->observacao) {
+
+            date_default_timezone_set('America/Sao_Paulo');
+            $date = date('Y-m-d H:i');
 
             InfoCliente::create([
                 'observacao' => $request->observacao,
@@ -73,14 +60,35 @@ class VendedorClienteController extends Controller
         Session::flash('message', "Cliente Adicionado Com Sucesso!!");
         return redirect(route('vendedor.cliente.index', auth()->user()->id));
     }
-    public function adiciona_obs($observacao)
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request, $cliente)
     {
-        dd($observacao);
+        $data = date('d-m-Y', strtotime($request->data_obs));
+
+        InfoCliente::create([
+            'data' => $request->data_obs ?  $data : null,
+            'observacao' => $request->observacao,
+            'vendedor_cliente_id' => $cliente,
+        ]);
+        Session::flash('clienteadd', "Adicionado Com Sucesso!!");
+        return redirect()->back();
     }
 
-    public function deleta_obs($observacao)
+    public function deleta_obs_ajax($observacao)
     {
-        dd($observacao);
+        $response = InfoCliente::find($observacao)->delete();
+        if ($response) {
+            $dado['success'] = true;
+        } else {
+            $dado['success'] = false;
+        }
+        return json_encode($dado);
     }
 
     /**
@@ -113,9 +121,12 @@ class VendedorClienteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $vendedor, $cliente)
     {
-        dd('id');
+        VendedorCliente::find($cliente)->update($request->all());
+
+        Session::flash('updateCliente', "Cliente Adicionado Com Sucesso!!");
+        return redirect(route('vendedor.cliente.index', $vendedor));
     }
 
     /**
@@ -124,8 +135,53 @@ class VendedorClienteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($vendedor, $cliente)
     {
-        dd('id');
+        VendedorCliente::find($cliente)->delete();
+        Session::flash('deleta_cliente');
+        return redirect(route('vendedor.cliente.index', $vendedor));
+    }
+
+    public function venda_salva()
+    {
+
+        $carrinhos_Salvos = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Salvo')->get();
+        foreach ($carrinhos_Salvos as $key => $carrinho) {
+            $carrinho['somaItens'] = $carrinho->carItem()->selectRaw("sum(preco * quantidade) total")->get();
+        }
+
+        $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+
+        Session::flash('itens_salvo');
+        // dd($carrinhos_Salvos[0]['somaItens'][0]['total']);
+
+        return view('cliente.vendaSalva', compact('carrinhos_Salvos', 'cliente_carrinho'));
+    }
+
+    public function substitui_carrinho(Request $request, $carrinho)
+    {
+        $carrinho_salvo = Carrinho::find($carrinho);
+        if ($request->deleteCarrinho) {
+            $carrinho_salvo->delete();
+
+            return redirect(route('venda_salva'));
+        } elseif ($request->substituir) {
+            $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+            // dd($cliente_carrinho->vendedor_cliente_id);
+            if ($cliente_carrinho->vendedor_cliente_id) {
+                $cliente_carrinho->update(['status' => "Salvo"]);
+
+                Carrinho::find($carrinho)->update(['status' => "Aberto"]);
+            } else {
+                $cliente_carrinho->delete();
+
+                Carrinho::find($carrinho)->update(['status' => "Aberto"]);
+            }
+        } else {
+            Carrinho::find($carrinho)->update(['status' => "Aberto"]);
+        }
+        Session::flash('substituicao');
+
+        return redirect(route('itens_carrinho'));
     }
 }
