@@ -44,7 +44,6 @@
                 @elseif(Session::has('updateCliente'))
 
                     <body onload="msgContato(msg = 6)">
-                        
     @endif
 
     {{-- Modal Cadastro usuario --}}
@@ -107,8 +106,10 @@
                 @foreach ($clientes as $cliente)
                     <ul class="list-group mt-3">
                         <button class="collapsible"
-                            style="background-color: rgb(58, 36, 252); font-size:16px;border-radius:7px;cursor: pointer;">
-                            <h6 style="margin-top:-10px;">{{ $cliente->nome }}</h6>
+                            style="background-color: rgb(58, 36, 252); font-size:16px;border-radius:7px;cursor: pointer;white-space: nowrap; overflow: hidden">
+                            <div style="width:50%;">
+                                <h6 style="margin-top: -10px; margin-left:20px;"> {{ $cliente->nome }}</h6>
+                            </div>
                         </button>
                         <div class="contentconspllan" style="border-radius:7px;margin-top:-1px;">
                             <div class="list-group">
@@ -117,31 +118,31 @@
                                         <small class="text-muted"><b> E-mail:</b>
                                             {{ $cliente->email ? $cliente->email : 'Não Informado' }}</small><br>
 
-                                        <small class="text-muted"><b> Telefone:
-                                            </b>{{ $cliente->telefone ? $cliente->telefone : 'Não Informado' }} <i
+                                        <small class="text-muted"><b> Telefone 1:
+                                            </b>{{ $cliente->fone1 ? $cliente->fone1 : 'Não Informado' }} {{--<i
                                                 class="bi bi-pencil-square" style="float: right" data-bs-toggle="modal"
-                                                data-bs-target="#editarCliente{{ $cliente->id }}"></i></small>
+                                                data-bs-target="#editarCliente{{ $cliente->id }}"></i>--}}</small>
+                                        <br>
+                                        <small class="text-muted"><b> Telefone 2:
+                                            </b>{{ $cliente->fone2 ? $cliente->fone2 : 'Não Informado' }}</small>
                                         <br>
 
                                         <div class="d-flex w-100 justify-content-between">
-                                            <small class="text-muted"><b> Cidade:
-                                                </b>{{ $cliente->cidade ? $cliente->cidade : 'Não Informado' }}</small><br>
+                                            <small class="text-muted"><b> Celular:
+                                                </b>{{ $cliente->celular ? $cliente->celular : 'Não Informado' }}</small><br>
 
-                                            <small class="text-muted" style="float: right;" data-bs-toggle="modal"
-                                                data-bs-target="#addObs{{ $cliente->id }}"><i
-                                                    class="bi bi-plus-square"></i>
+                                            {{-- <small class="text-muted" style="float: right;" data-bs-toggle="modal"
+                                        data-bs-target="#addObs{{ $cliente->id }}"><i
+                                            class="bi bi-plus-square"></i>} --}}
 
                                             </small>
 
                                         </div>
-
-                                        <small class="text-muted"><b> Rua:
-                                            </b>{{ $cliente->rua ? $cliente->rua : 'Não Informado' }} &nbsp;&nbsp; &nbsp;
-                                            <b>Nº:</b>{{ $cliente->numero_rua ? $cliente->numero_rua : 'S/N' }}</small>
-
                                         <small class="text-muted" style="float: right;" data-bs-toggle="modal"
+                                            data-bs-target="#addObs{{ $cliente->id }}"><i class="bi bi-plus-square"></i></small>
+                                            {{-- <small class="text-muted" style="float: right;" data-bs-toggle="modal"
                                             data-bs-target="#deletaCliente{{ $cliente->id }}"><i
-                                                class="bi bi-x-square"></i>
+                                                class="bi bi-x-square"></i> --}}
 
                                     </div>
 
@@ -167,7 +168,7 @@
                                                     <small class="text-muted"><b> E-mail:</b>
                                                         {{ $cliente->email ? $cliente->email : 'Não Informado' }}</small><br>
                                                     <small class="text-muted"><b> Telefone:
-                                                        </b>{{ $cliente->telefone ? $cliente->telefone : 'Não Informado' }}</small><br>
+                                                        </b>{{ $cliente->fone1 ? $cliente->fone1 : 'Não Informado' }}</small><br>
 
                                                     <div class="d-flex w-100 justify-content-between">
                                                         <small class="text-muted"><b> Cidade:
@@ -333,7 +334,7 @@
                                                 </b>{{ $info->data ? $info->data : 'Não informado ' }}</small>
                                             <button
                                                 style="float: right; border:none!important;
-                                                                                                        background-color: rgb(172, 172, 172); "
+                                                                                                                background-color: rgb(172, 172, 172); "
                                                 type="submit" class="js-del"
                                                 onclick="botaoInfo(<?php echo $info->id; ?>)">
 

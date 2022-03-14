@@ -29,6 +29,7 @@ Route::get('/itens_carrinho/{unificado?}', [App\Http\Controllers\VendaController
 Route::put('/unifica_valor_Itens/{itensCarr?}', [App\Http\Controllers\VendaController::class, 'unifica_valor_Itens'])->Middleware('vendedor')->name('unifica_valor_Itens');
 Route::get('/busca_produto/', [App\Http\Controllers\VendaController::class, 'busca_produto_ajax'])->Middleware('vendedor')->name('busca_produto_ajax');
 Route::put('salvar_venda',  [App\Http\Controllers\VendaController::class, 'salvar_venda'])->middleware('vendedor')->name('salvar_venda');
+Route::get('busca_cliente', [App\Http\Controllers\VendaController::class, 'busca_cliente_ajax'])->middleware('vendedor')->name('busca_cliente_ajax');
 
 Route::delete('/deleta_obs/{observacao}',  [App\Http\Controllers\VendedorClienteController::class, 'deleta_obs_ajax'])->middleware('vendedor')->name('deleta_obs');
 Route::get('venda_salva',  [App\Http\Controllers\VendedorClienteController::class, 'venda_salva'])->middleware('vendedor')->name('venda_salva');

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace App\Models;
 
 //use GoldSpecDigital\LaravelEloquentUUID\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model;
@@ -54,7 +54,7 @@ class Loja extends Model
     }
 
     public function clientes() {
-        return $this->hasMany('App\Model\Cliente');
+        return $this->hasMany('App\Models\Cliente');
     }
 
     public function receitas() {

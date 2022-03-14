@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Carrinho;
+use App\Models\Cliente;
 use App\Models\InfoCliente;
 use App\Models\VendedorCliente;
 use Illuminate\Support\Facades\Session;
@@ -18,13 +19,11 @@ class VendedorClienteController extends Controller
      */
     public function index($vendedor)
     {
-        $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-        $count_item = $itens;
+        // $clientes = VendedorCliente::with('infoCliente')->where('user_id', auth()->user()->id)->get();
 
-        $clientes = VendedorCliente::with('infoCliente')->where('user_id', auth()->user()->id)->get();
-        //  $info_cliente = InfoCliente::);
-        //  dd($clientes->all('id'));
-        return view('cliente.index', compact('count_item', 'clientes'));
+        $clientes = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->orderBy('nome')->paginate(50);
+        //dd($clientes);
+        return view('cliente.index', compact('clientes'));
     }
 
     /**
@@ -70,11 +69,11 @@ class VendedorClienteController extends Controller
     public function store(Request $request, $cliente)
     {
         $data = date('d-m-Y', strtotime($request->data_obs));
-
+        //dd($cliente);
         InfoCliente::create([
             'data' => $request->data_obs ?  $data : null,
             'observacao' => $request->observacao,
-            'vendedor_cliente_id' => $cliente,
+            'cliente_id' => $cliente,
         ]);
         Session::flash('clienteadd', "Adicionado Com Sucesso!!");
         return redirect()->back();
@@ -149,37 +148,41 @@ class VendedorClienteController extends Controller
         foreach ($carrinhos_Salvos as $key => $carrinho) {
             $carrinho['somaItens'] = $carrinho->carItem()->selectRaw("sum(preco * quantidade) total")->get();
         }
-
         $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
+        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->get();
+      
         Session::flash('itens_salvo');
-        // dd($carrinhos_Salvos[0]['somaItens'][0]['total']);
 
-        return view('cliente.vendaSalva', compact('carrinhos_Salvos', 'cliente_carrinho'));
+        return view('cliente.vendaSalva', compact('carrinhos_Salvos', 'cliente_carrinho', 'clientes_user'));
     }
 
     public function substitui_carrinho(Request $request, $carrinho)
     {
-        $carrinho_salvo = Carrinho::find($carrinho);
+        $carrinho_substituido = Carrinho::find($carrinho);
+        // dd($request->all());
         if ($request->deleteCarrinho) {
-            $carrinho_salvo->delete();
+            $carrinho_substituido->delete();
+            Session::flash('deleta_carrinho');
 
             return redirect(route('venda_salva'));
         } elseif ($request->substituir) {
             $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-            // dd($cliente_carrinho->vendedor_cliente_id);
-            if ($cliente_carrinho->vendedor_cliente_id) {
+            // dd($cliente_carrinho);
+            if ($cliente_carrinho->cliente) {
                 $cliente_carrinho->update(['status' => "Salvo"]);
 
-                Carrinho::find($carrinho)->update(['status' => "Aberto"]);
+                $carrinho_substituido->update(['status' => "Aberto"]);
             } else {
                 $cliente_carrinho->delete();
 
                 Carrinho::find($carrinho)->update(['status' => "Aberto"]);
             }
         } else {
+            //  dd(Carrinho::find($carrinho)->first());
             Carrinho::find($carrinho)->update(['status' => "Aberto"]);
         }
+        //  dd('a');
         Session::flash('substituicao');
 
         return redirect(route('itens_carrinho'));

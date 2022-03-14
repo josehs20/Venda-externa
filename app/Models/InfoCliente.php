@@ -11,7 +11,7 @@ class InfoCliente extends Model
     protected $fillable = [
         'observacao',
         'data',
-        'vendedor_cliente_id',
+        'cliente_id',
     ];
   
     public function vendedorCliente()

@@ -1,7 +1,12 @@
 //view cliente/vendaSalva
 function fechaModal(id) {
     var botao = document.getElementById("fechaModal" + id);  
-    console.log(botao);
+ 
+    botao.click();
+}
+function fechaModalSalvaVenda(){
+    var botao = document.getElementById("fechaModalSalva");  
+
     botao.click();
 }
 

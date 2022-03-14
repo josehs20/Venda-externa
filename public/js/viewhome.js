@@ -61,8 +61,7 @@ $(function () {
             if (response['ok'] === true) {
 
                 var count_itens = response['count_item'];
-                $('.quanti').html(count_itens);
-                console.log(response);
+                $('.quantiCar').html(count_itens);
                 //msg de success
                 var mensagem = "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso!!!";
                 var tipo = 'success';
@@ -109,7 +108,7 @@ function mostraDialogo(mensagem, tipo) {
     // monta o html da mensagem com Bootstrap
     var dialogo = "";
     dialogo += '<div id="message" style="' + cssMessage + '">';
-    dialogo += '    <div class="alert alert-' + tipo + ' alert-dismissable col-10" style="' + cssInner + '">';
+    dialogo += '    <div class="alert alert-' + tipo + ' alert-dismissable col-5" style="' + cssInner + '">';
     dialogo += mensagem;
     dialogo += '    </div>';
     dialogo += '</div>';

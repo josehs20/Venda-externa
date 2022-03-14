@@ -36,7 +36,8 @@
                     <a href="{{ route('venda.edit', ['venda' => auth()->user()->id]) }}">
                         <img class="fotocarr" src="{{ asset('navCarr.ico') }}">
                         <h6 class="quanti" style="color:#fff">
-                            {{ count_item(auth()->user()->id) }}</h6>
+                            <div class="quantiCar" style="width: 25px; height: 20px; text-align:center;"><p>{{count_item(auth()->user()->id)}}</p></div>
+                            </h6>
                     </a>
                 </div>
             </div>

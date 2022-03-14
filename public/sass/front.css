@@ -108,7 +108,7 @@ body {
 
 .quanti {
   position: absolute;
-  margin-left: 69px;
+  margin-left: 64px;
   margin-top: -40px;
 }
 
@@ -202,7 +202,7 @@ body {
   }
   .quanti {
     position: absolute;
-    margin-left: 69px;
+    margin-left: 64px;
     margin-top: -40px;
   }
   .search button {
@@ -251,15 +251,59 @@ body {
             align-items: center;
     margin-left: 40px;
   }
+  .collapsible {
+    height: 20px;
+    background-color: #777;
+    color: white;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+  }
+  .active,
+  .collapsible:hover {
+    background-color: #555;
+  }
+  .collapsible:after {
+    content: '\002B';
+    color: white;
+    font-weight: bold;
+    float: left;
+    margin-top: -30px;
+  }
+  .active:after {
+    content: "\2212";
+  }
+  .contentconspllan {
+    max-height: 0;
+    overflow: hidden;
+    -webkit-transition: max-height 0.2s ease-out;
+    transition: max-height 0.2s ease-out;
+    background-color: #a8a8a8;
+  }
+  .contentconspllanVendaSalva {
+    max-height: 0;
+    overflow: hidden;
+    -webkit-transition: max-height 0.2s ease-out;
+    transition: max-height 0.2s ease-out;
+    background-color: #ffffff;
+  }
 }
 
 .listCar {
+  width: 102%;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
+}
+
+.listCar h6, .listCar .h6 {
+  font-size: 12px;
 }
 
 .card-box {
@@ -385,19 +429,19 @@ body {
 }
 
 .imgCarr {
-  width: 40px;
-  height: 35px;
+  width: 25px;
+  height: 23px;
 }
 
 .buttonAdd {
-  width: 45px;
-  height: 40px;
-  background-color: #bf7817;
+  width: 25px;
+  height: 100%;
+  background-color: #b87518;
   -webkit-box-shadow: 5px 5px 20px 5px #250101;
           box-shadow: 5px 5px 20px 5px #250101;
   border: 2.5px;
-  border-radius: 10px;
-  padding: 5px;
+  border-radius: 5px;
+  padding: 1px;
 }
 
 .search-cliente {
@@ -12425,8 +12469,7 @@ fieldset:disabled .btn {
   content: '\002B';
   color: white;
   font-weight: bold;
-  float: right;
-  margin-left: 5px;
+  float: left;
   margin-top: -30px;
 }
 

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Carrinho;
 use App\Models\CarrinhoItem;
+use App\Models\Cliente;
 use App\Models\Produto;
 use App\Models\VendedorCliente;
+use Facade\FlareClient\Http\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Laravel\Ui\Presets\React;
@@ -37,9 +39,9 @@ class VendaController extends Controller
     public function itens_carrinho($unificado = null, $zerar = null)
     {
         $tp_desconto = null;
-        $clientes_user = VendedorCliente::where('user_id', auth()->user()->id)->get();
+        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->get();
 
-        // dd($zerar);
+        // dd($clientes_user);
         //pega retorno de da função unifica_valor_Itens
         if ($unificado) {
             $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
@@ -247,7 +249,6 @@ class VendaController extends Controller
             ]);
             Session::flash('message', "Desconto Autorizado!!");
             return redirect(route('itens_carrinho', ['unificado' => 1]));
-            
         }
 
         //  dd($request->qtd_unificado);
@@ -272,14 +273,16 @@ class VendaController extends Controller
      */
     public function edit($venda)
     {
-        $clientes_user = VendedorCliente::where('user_id', $venda)->get();
+        $clientes_user = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->orderBy('nome')->paginate(50);
+        // dd($clientes_user);
         $itens = Carrinho::with('carItem')->where('user_id', $venda)->where('status', 'Aberto')->first();
 
         $valor_itens_total = $itens ? $itens->carItem()->selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itens->id)->first() : null;
         $valor_itens_desconto = $itens ? $itens->total_desconto : null;
 
         $total_desconto_valor = $itens ? $itens->desconto_valor : null;
-        $tp_desconto = $itens ? $itens->tp_desconto_unificado :null;
+        $tp_desconto = $itens ? $itens->tp_desconto_unificado : null;
+        // dd($itens);
 
         return view('itemCarrinho', compact('itens', 'clientes_user', 'valor_itens_total', 'total_desconto_valor', 'valor_itens_desconto', 'tp_desconto',));
     }
@@ -304,46 +307,49 @@ class VendaController extends Controller
      */
     public function destroy($venda)
     {
-       // dd($venda);
+        // dd($venda);
         Carrinho::find($venda)->delete();
 
         Session::flash('cancelar_carrinho');
 
         return redirect(route('venda.index'));
-
     }
-
-    // public function teste(Request $request)
-    // {
-    //     $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
-
-    //     $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-
-    //     return view('home', compact('produtos', 'count_item'));
-    // }
 
     public function salvar_venda(Request $request)
     {
-        $carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-
+       // dd($request->all());
+        $carrinho_aberto =     Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+        // dd($request->cliente_id);
         if ($request->cliente_id) {
-            // dd($carrinho);
-            $carrinho->update([
+            $carrinho_aberto->update([
                 'status' => 'Salvo',
-                'vendedor_cliente_id' => $request->cliente_id,
+                'cliente_id' => $carrinho_aberto->cliente_id ? $carrinho_aberto->cliente_id : $request->cliente_id,
             ]);
+           // dd($carrinho_aberto);
+
         } else {
+            //vai virar busca de clientes
             $cliente = VendedorCliente::create([
                 'nome' => $request->nomeCliente,
                 'user_id' => auth()->user()->id,
             ]);
 
-            $carrinho->update([
+            $carrinho_aberto->update([
                 'status' => 'Salvo',
                 'vendedor_cliente_id' => $cliente->id,
             ]);
         }
         Session::flash('carrinho_salvo');
         return redirect(route('itens_carrinho'));
+    }
+
+    public function busca_cliente_ajax()
+    {
+        if ($_GET['nome']) {
+            $dado['result'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->paginate(20);
+            //$dado['result'] = $_GET['nome'];
+            echo json_encode($dado);
+      
+        }
     }
 }
