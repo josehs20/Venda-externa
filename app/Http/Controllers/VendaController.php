@@ -21,12 +21,9 @@ class VendaController extends Controller
      */
     public function index(Request $request)
     {
-
         $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
 
-        $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-
-        return view('home', compact('produtos', 'count_item'));
+        return view('home', compact('produtos',));
     }
 
     public function busca_produto_ajax()
@@ -36,46 +33,32 @@ class VendaController extends Controller
         echo  json_encode($dados);
     }
 
-    public function itens_carrinho($unificado = null, $zerar = null)
+    public function itens_carrinho($user_id = null, $msg = null)
     {
-        $tp_desconto = null;
-        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->get();
-
+        // dd($msg);
+        $clientes_user = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->orderBy('nome')->paginate(50);
         // dd($clientes_user);
-        //pega retorno de da função unifica_valor_Itens
-        if ($unificado) {
-            $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-            $count_item = $itens;
-            //dd($itens);
-            $valor_itens_total = $itens->carItem()->selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itens->id)->first();
-            $valor_itens_desconto = $itens->total_desconto;
+        $itens = Carrinho::with('carItem')->where('user_id', $user_id)->where('status', 'Aberto')->first();
 
-            $total_desconto_valor = $itens->desconto_valor;
-            $tp_desconto = $itens->tp_desconto_unificado;
+        $valor_itens_total_sem_desconto = $itens ? $itens->carItem()->selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itens->id)->first() : null;
+        $valor_itens_desconto = $itens ? $itens->total : null;
 
-            return view('itemCarrinho', compact('itens', 'count_item', 'valor_itens_total', 'valor_itens_desconto', 'total_desconto_valor', 'tp_desconto', 'clientes_user'));
-        } else {
+        $total_desconto_valor = $itens ? $itens->valor_desconto : null;
+        $tp_desconto = $itens ? $itens->tp_desconto_unificado : null;
 
-            $itens = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-            $count_item = $itens;
-
-            //valores com e sem desconto
-            $valor_itens_total = $itens ? $itens->carItem()->selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itens->id)->first() : null;
-            $valor_itens_desconto = $itens ? $itens->carItem()->sum('valor') : null;
-
-            $total_desconto_valor = $itens ? $itens->carItem()->where('carrinho_id', $itens->id)->sum('valor_desconto') : null;
-
-            if ($itens) {
-                $itens->update([
-                    'desconto_valor' => null,
-                    'desconto_qtd' => null,
-                    'tp_desconto_unificado' => 'Não Unificado',
-                    'total_desconto' => null,
-                    'total' => $valor_itens_desconto,
-                ]);
-            }
-            return view('itemCarrinho', compact('itens', 'count_item', 'valor_itens_total', 'total_desconto_valor', 'valor_itens_desconto', 'tp_desconto', 'clientes_user'));
+        if ($msg == 'deletado') {
+            Session::flash('item_deletado_carrinho');
+        } elseif ($msg == 'alterado') {
+            Session::flash('item_alterado_carrinho');
+        } elseif ($msg == 'unificado') {
+            Session::flash('item_unificado_carrinho');
+        } elseif ($msg == 'zerado') {
+            Session::flash('item_zerado_carrinho');
+        } elseif ($msg == 'quantidade_alterada') {
+            Session::flash('quantidade_alterada');
         }
+
+        return view('itemCarrinho', compact('itens', 'clientes_user', 'valor_itens_total_sem_desconto', 'total_desconto_valor', 'valor_itens_desconto', 'tp_desconto',));
     }
 
     /**
@@ -94,115 +77,84 @@ class VendaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store()
+    public function store() //metodo usado pelo ajax
     {
-        $check = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+        $carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
         $produto = Produto::find($_POST['id']);
-        $up_carrinho = $check ? CarrinhoItem::where('carrinho_id', $check->id)->where('produto_id', $produto->id)->first() : null;
+        $item = $carrinho ? CarrinhoItem::where('carrinho_id', $carrinho->id)->where('produto_id', $produto->id)->first() : null;
 
-        if (!$check) {
-            $car = new Carrinho();
-            $car->user_id = auth()->user()->id;
-            $car->status = 'Aberto';
-            $car->save();
-        }
+        //caso carrinho não tenha nenhum carrinho aberto já é aberto automaticamente
+        if (!$carrinho) {
+            $carrinho = new Carrinho();
+            $carrinho->user_id = auth()->user()->id;
+            $carrinho->status = 'Aberto';
+            $carrinho->save();
 
-        if ($produto) {
-            if ($up_carrinho) {
+            $item = new CarrinhoItem();
+            $this->add_item($item, $produto, $carrinho);
 
-                $up_carrinho->update([
-                    'quantidade' => $up_carrinho->quantidade + 1,
-                ]);
+            $this->atualiza_Carrinho_desconto_unico($carrinho);
+
+            $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+                ->where('status', 'Aberto')->first();
+
+            $dado['count_item'] = $count_item->carItem->count();
+            $dado['produto_adicionado'] = $produto->nome;
+            $dado['ok'] = true;
+            echo json_encode($dado);
+            return;
+        } elseif (!$item) {
+
+            $item = new CarrinhoItem();
+            $this->add_item($item, $produto, $carrinho);
+
+            // atualização de desconto unico ou sem desconto para itens diferentes que são inseridos no carrinho
+            $this->atualiza_Carrinho_desconto_unico($carrinho);
+
+            //conta quantidade no carrinho ajax
+            $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+                ->where('status', 'Aberto')->first();
+
+            $dado['count_item'] = $count_item->carItem->count();
+            $dado['produto_adicionado'] = $produto->nome;
+            $dado['ok'] = true;
+            echo json_encode($dado);
+
+            return;
+        } else {
+            $quantidade = $item->quantidade + 1;
+
+            if ($item->tipo_desconto) {
+
+                $this->atualiza_Carrinho_desconto_parcial($item, $item->qtd_desconto, $quantidade);
 
                 $dado['produto_adicionado'] = $produto->nome;
                 $dado['ok'] = "add";
                 echo json_encode($dado);
             } else {
-                $itens = new CarrinhoItem();
-                $itens->produto_id     = $produto->id;
-                $itens->carrinho_id    = !$check ? $car->id : $check->id;
-                $itens->alltech_id     = $produto->alltech_id;
-                $itens->nome           = $produto->nome;
-                $itens->preco           = $produto->preco;
-                $itens->save();
+                $item->update([
+                    'quantidade' => $quantidade,
+                    'valor' => $item->preco * $quantidade,
+                ]);
 
-                $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
-                    ->where('status', 'Aberto')->first();
+                $this->atualiza_Carrinho_desconto_unico($carrinho);
 
-                $dado['count_item'] = $count_item->carItem->count();
                 $dado['produto_adicionado'] = $produto->nome;
-                $dado['ok'] = true;
+                $dado['ok'] = "add";
                 echo json_encode($dado);
             }
         }
-        //$produto = Produto::find($produto_id);
+    }
 
-        // $check = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-
-        // $up_carrinho = $check ? CarrinhoItem::where('carrinho_id', $check->id)->where('produto_id', $produto_id)->first() : null;
-
-        // $desconto_final = $request->desc_tipo == 'Porcentagem' ? ($request->qtd_desconto / 100) * ($request->quantidade * $produto->preco) : $request->qtd_desconto;
-
-        // if (!$check) {
-
-        //     $car = new Carrinho();
-        //     $car->user_id = auth()->user()->id;
-        //     $car->status = 'Aberto';
-        //     $car->save();
-        // }
-
-        // if ($produto) {
-
-        //     if ($up_carrinho) {
-
-        //         $up_qtd = ($request->quantidade + $up_carrinho->quantidade);
-
-        //         if ($request->qtd_desconto) {
-        //             $desconto_final = $request->desc_tipo == 'Porcentagem'
-        //                 ? ($request->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
-        //         } else {
-        //             $desconto_final = $request->desc_tipo == 'Porcentagem' && $up_carrinho->tipo_desconto == 'Porcentagem'
-        //                 ? ($up_carrinho->qtd_desconto / 100) * ($up_qtd * $produto->preco) : $request->qtd_desconto;
-        //         }
-        //         if (!$this->verifica_custo_venda($produto, $desconto_final, $up_qtd)) {
-        //             Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
-
-        //             return redirect()->back();
-        //         }
-
-        //         $up_carrinho->update([
-        //             'quantidade' => $up_qtd,
-        //             'tipo_desconto' => $request->desc_tipo,
-        //             'qtd_desconto' => $request->qtd_desconto ? $request->qtd_desconto : $up_carrinho->qtd_desconto,
-        //             'valor_desconto' => $desconto_final,
-        //             'valor'      => ($produto->preco * $up_qtd) - $desconto_final,
-        //         ]);
-        //     } else {
-        //         if (!$this->verifica_custo_venda($produto, $desconto_final, $request->quantidade)) {
-        //             Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
-
-        //             return redirect()->back();
-        //         }
-
-        //         $itens = new CarrinhoItem();
-        //         $itens->produto_id     = $produto->id;
-        //         $itens->carrinho_id    = !$check ? $car->id : $check->id;
-        //         $itens->alltech_id     = $produto->alltech_id;
-        //         $itens->nome           = $produto->nome;
-        //         $itens->quantidade     = $request->quantidade;
-        //         $itens->preco          = $produto->preco;
-        //         $itens->tipo_desconto  = $request->desc_tipo;
-        //         $itens->valor_desconto = $desconto_final;
-        //         $itens->qtd_desconto   = $request->qtd_desconto ? $request->qtd_desconto : null;
-        //         $itens->valor          = $request->qtd_desconto ? ($produto->preco * $request->quantidade) - $desconto_final : ($produto->preco * $request->quantidade);
-        //         $itens->save();
-        //     }
-        // }
-
-        // Session::flash('message', "Adicionado Com Sucesso!!");
-
-        // return redirect()->back();
-        return;
+    public function add_item($item, $produto, $carrinho)
+    {
+        $item->produto_id     = $produto->id;
+        $item->carrinho_id    = !$carrinho ? $carrinho->id : $carrinho->id;
+        $item->alltech_id     = $produto->alltech_id;
+        $item->preco          = $produto->preco;
+        $item->quantidade     = 1;
+        $item->valor          = $produto->preco;
+        $item->save();
     }
     public function verifica_custo_venda($produto, $desconto_final, $quantidade)
     {
@@ -217,41 +169,31 @@ class VendaController extends Controller
         }
     }
 
-    public function unifica_valor_Itens(Request $request, $itensCarr)
+    public function unifica_valor_Itens(Request $request, $carrinho)
     {
-        $itens_carr_valor = CarrinhoItem::selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itensCarr)->first();
-
-        $id_itens = CarrinhoItem::with('produto')->where('carrinho_id', $itensCarr)->get();
-        $custo = 0;
-        foreach ($id_itens as $value) {
-
-            $custo +=  ($value->produto[0]->custo * $value->quantidade);
-        }
-        if ($request->qtd_unificado) {
-            $desconto_final = $request->tipo_unificado == 'Porcentagem'
-                ? ($request->qtd_unificado / 100) * $itens_carr_valor->total : $request->qtd_unificado;
-        }
-
-        $preco_final = ($itens_carr_valor->total - $desconto_final);
-        // dd($preco_final - $custo);
-        if ($preco_final <= $custo) {
-            Session::flash('message', "Não Autorizado Custo Maior Que Venda!!");
-
-            return redirect()->back();
-            return false;
-        } else {
-            Carrinho::find($itensCarr)->update([
-                'desconto_valor' => $desconto_final,
-                'desconto_qtd' => $request->qtd_unificado,
-                'tp_desconto_unificado' => $request->tipo_unificado == 'Porcentagem' ? 'Porcentagem_unificado' : 'Dinheiro_unificado',
-                'total_desconto' => $preco_final,
-                'total' => $itens_carr_valor->total,
+        $carrinho = Carrinho::with('carItem')->find($carrinho);
+        // dd($request->all());
+        foreach ($carrinho->carItem as $item) {
+            $item->update([
+                'tipo_desconto' => null,
+                'qtd_desconto' => null,
+                'valor_desconto' => null,
+                'valor' => $item->preco * $item->quantidade,
             ]);
-            Session::flash('message', "Desconto Autorizado!!");
-            return redirect(route('itens_carrinho', ['unificado' => 1]));
+            $valor_itens_bruto[] = $item->valor;
         }
+        $desconto_final = $request->tipo_unificado == 'porcento' ? ($request->qtd_unificado / 100) * (array_sum($valor_itens_bruto)) : $request->qtd_desconto;
+        $valor_final_item = array_sum($valor_itens_bruto) - $desconto_final;
+        //  dd($desconto_final);
+        $carrinho->update([
+            'desconto_qtd' => $request->qtd_unificado,
+            'tp_desconto' => $request->tipo_unificado == 'porcento' ? 'porcento_unico' : 'dinheiro_unico',
+            'valor_desconto' => $desconto_final,
+            'valor_bruto' => array_sum($valor_itens_bruto),
+            'total' => $valor_final_item,
+        ]);
 
-        //  dd($request->qtd_unificado);
+        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'unificado']));
     }
 
     /**
@@ -273,18 +215,8 @@ class VendaController extends Controller
      */
     public function edit($venda)
     {
-        $clientes_user = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->orderBy('nome')->paginate(50);
-        // dd($clientes_user);
-        $itens = Carrinho::with('carItem')->where('user_id', $venda)->where('status', 'Aberto')->first();
+        //dd($venda);
 
-        $valor_itens_total = $itens ? $itens->carItem()->selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itens->id)->first() : null;
-        $valor_itens_desconto = $itens ? $itens->total_desconto : null;
-
-        $total_desconto_valor = $itens ? $itens->desconto_valor : null;
-        $tp_desconto = $itens ? $itens->tp_desconto_unificado : null;
-        // dd($itens);
-
-        return view('itemCarrinho', compact('itens', 'clientes_user', 'valor_itens_total', 'total_desconto_valor', 'valor_itens_desconto', 'tp_desconto',));
     }
 
     /**
@@ -294,9 +226,56 @@ class VendaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $venda)
     {
-        //
+        //id do item da venda
+
+        $item = CarrinhoItem::find($venda);
+
+        if ($request->quantidade && !$request->tipo_desconto) {
+            $carrinho = Carrinho::find($item->carrinho_id);
+
+            // dd($item);
+            $item->update([
+                'quantidade' => $request->quantidade,
+                'valor' => $item->preco * $request->quantidade,
+            ]);
+
+            $this->atualiza_Carrinho_desconto_unico($carrinho);
+            return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'quantidade_alterada']));
+        } else {
+
+            $item->update([
+                'tipo_desconto' => $request->tipo_desconto == 'porcento' ? 'porcento' : 'dinheiro'
+            ]);
+
+            $this->atualiza_Carrinho_desconto_parcial($item, $request->qtd_desconto, $request->quantidade);
+
+            return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'alterado']));
+        }
+    }
+    public function zeraDesconto($carrinho)
+    {
+        $carrinho = Carrinho::with('carITem')->find($carrinho);
+
+        foreach ($carrinho->carItem as $key => $item) {
+            $item->update([
+                'tipo_desconto' => null,
+                'qtd_desconto' => null,
+                'valor_desconto' => null,
+                'valor' => $item->preco * $item->quantidade,
+            ]);
+            $valor_itens[] = $item->valor;
+        }
+        //dd(array_sum($valor_itens));
+        $carrinho->update([
+            'desconto_qtd' => null,
+            'tp_desconto_unificado' => null,
+            'valor_desconto' => null,
+            'total' => array_sum($valor_itens),
+        ]);
+
+        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'zerado']));
     }
 
     /**
@@ -307,36 +286,52 @@ class VendaController extends Controller
      */
     public function destroy($venda)
     {
-        // dd($venda);
         Carrinho::find($venda)->delete();
 
         Session::flash('cancelar_carrinho');
 
         return redirect(route('venda.index'));
     }
+    public function destroyItem($item)
+    {
+        $carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+
+        if ($carrinho->carItem()->count() === 1) {
+            $carrinho->delete();
+            return redirect(route('venda.index'));
+        } else {
+            if (CarrinhoItem::find($item)) {
+                CarrinhoItem::find($item)->delete();
+                $this->atualiza_Carrinho_desconto_unico($carrinho);
+
+                return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'deletado']));
+            } else {
+                return redirect(route('itens_carrinho', auth()->user()->id));
+            }
+        }
+    }
 
     public function salvar_venda(Request $request)
     {
-       // dd($request->all());
+
         $carrinho_aberto =     Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-        // dd($request->cliente_id);
+
         if ($request->cliente_id) {
+            if ($request->salvaSubstitui) {
+
+                $carrinho_aberto->update([
+                    'status' => 'Salvo',
+                    'cliente_id' => $carrinho_aberto->cliente_id ? $carrinho_aberto->cliente_id : $request->cliente_id,
+                ]);
+
+                Carrinho::find($request->salvaSubstitui)->update([
+                    'status' => 'Aberto',
+                ]);
+            }
+
             $carrinho_aberto->update([
                 'status' => 'Salvo',
                 'cliente_id' => $carrinho_aberto->cliente_id ? $carrinho_aberto->cliente_id : $request->cliente_id,
-            ]);
-           // dd($carrinho_aberto);
-
-        } else {
-            //vai virar busca de clientes
-            $cliente = VendedorCliente::create([
-                'nome' => $request->nomeCliente,
-                'user_id' => auth()->user()->id,
-            ]);
-
-            $carrinho_aberto->update([
-                'status' => 'Salvo',
-                'vendedor_cliente_id' => $cliente->id,
             ]);
         }
         Session::flash('carrinho_salvo');
@@ -349,7 +344,62 @@ class VendaController extends Controller
             $dado['result'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->paginate(20);
             //$dado['result'] = $_GET['nome'];
             echo json_encode($dado);
-      
         }
+    }
+    public function atualiza_Carrinho_desconto_parcial($item, $quantidade_desconto, $quantidade)
+    {
+
+        $desconto_final = $item->tipo_desconto == 'porcento' ? ($quantidade_desconto / 100) * ($quantidade * $item->preco) : $quantidade_desconto;
+        $valor_final_item = ($quantidade * $item->preco) - $desconto_final;
+        //dd($desconto_final);
+        $item->update([
+            'quantidade' => $quantidade,
+            'qtd_desconto' => $quantidade_desconto,
+            'valor_desconto' => $desconto_final,
+            'valor'          => $valor_final_item,
+        ]);
+
+        $itens = CarrinhoItem::where('carrinho_id', $item->carrinho_id)->get();
+
+        foreach ($itens as $item) {
+            // dd($item->valor_desconto);
+            $valor_itens_desconto[] = $item->valor_desconto;
+            $valor_itens_bruto[] = $item->preco * $item->quantidade;
+            $valor_itens[] = $item->valor;
+        }
+
+        Carrinho::find($item->carrinho_id)->update([
+            'tp_desconto' => 'parcial',
+            'valor_desconto' => array_sum($valor_itens_desconto),
+            'valor_bruto' => array_sum($valor_itens_bruto),
+            'total' => array_sum($valor_itens),
+        ]);
+    }
+    public function atualiza_Carrinho_desconto_unico($carrinho)
+    {
+        $itens = $carrinho->carItem()->get();
+
+        foreach ($itens as $item) {
+            $valor_itens_desconto[] = $item->valor_desconto;
+            $valor_itens_bruto[] = $item->preco * $item->quantidade;
+            $valor_itens[] = $item->valor;
+        }
+        if ($carrinho->tp_desconto == 'porcento_unico' or $carrinho->tp_desconto == 'dinheiro_unico') {
+            $desconto_final = $carrinho->tp_desconto == 'porcento_unico' ? ($carrinho->desconto_qtd / 100) * (array_sum($valor_itens)) : $carrinho->desconto_qtd;
+            $valor_final_item = array_sum($valor_itens) - $desconto_final;
+
+            $carrinho->update([
+                'valor_desconto' => $desconto_final,
+                'valor_bruto' => array_sum($valor_itens),
+                'total' => $valor_final_item,
+            ]);
+            return;
+        }
+
+        $carrinho->update([
+            'valor_desconto' => array_sum($valor_itens_desconto),
+            'valor_bruto' => array_sum($valor_itens_bruto),
+            'total' => array_sum($valor_itens),
+        ]);
     }
 }

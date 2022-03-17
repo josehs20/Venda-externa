@@ -26,8 +26,7 @@ $(function () {
             clientes.forEach(element => {
 
                 monta_consulta += '<li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;" class="list-group-item d-flex justify-content-between align-items-center">' + element['nome']
-                monta_consulta += '<input type="hidden" name="cliente_id" value="' + element['id'] + '"/>'
-                monta_consulta += '<button type="submit" class="lupa-list"><i class="bi bi-save2"></i></button>'
+                monta_consulta += '<button type="submit" name="cliente_id" value="' + element['id'] + '" class="lupa-list"><i class="bi bi-save2"></i></button>'
                 monta_consulta += '</li>'
 
             });
@@ -37,3 +36,8 @@ $(function () {
         });
     });
 });
+function fechaModalUnificaDesconto() {
+    var botao = document.getElementById("fechaModalUnificaDesconto");  
+ 
+    botao.click();
+}

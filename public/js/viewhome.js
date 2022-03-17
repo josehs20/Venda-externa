@@ -5,7 +5,7 @@ function cli(id) {
 $(function () {
     $("#search").keyup(function () {
         var busca = $("#search").val();
-     
+
         $.ajax({
             url: "/busca_produto",
             type: "GET",
@@ -15,26 +15,26 @@ $(function () {
             dataType: 'json',
         }).done(function (response) {
 
-            var itens = response['busca']['data'];       
+            var itens = response['busca']['data'];
             var resultado = "";
-         //monta a listagem de busca de produto
+            //monta a listagem de busca de produto
             itens.forEach(element => {
-resultado += '<a class="listHome" style="cursor: pointer">'
-resultado +=   '<ul class="list-group">'
-resultado +=       '<li class="list-group-item" style="background-color: rgb(58, 36, 252)">'
-resultado +=           '<div class="listCar">'
-resultado +=               '<h6 style="color: white">'+ element['nome'] +'</h6>'
-resultado +=               '<button type="submit"onclick="cli('+element['id']+')"class="buttonAdd"><img class="imgCarr" src="addCar.ico" alt=""></button>'
-resultado +=           '</div>'
-resultado +=       '</li>'
-resultado +=       '<li class="list-group-item">'
-resultado +=           '<div class="listCar">'
-resultado +=               '<h6> Preço :</h6>'
-resultado +=               '<h4>R$'+element['preco'] +'</h4>'
-resultado +=           '</div>'
-resultado +=       '</li>'
-resultado +=   '</ul>'
-resultado += '</a>'
+                resultado += '<a class="listHome" style="cursor: pointer">'
+                resultado += '<ul class="list-group">'
+                resultado += '<li class="list-group-item" style="background-color: rgb(58, 36, 252)">'
+                resultado += '<div class="listCar">'
+                resultado += '<h6 style="color: white">' + element['nome'] + '</h6>'
+                resultado += '<button type="submit"onclick="cli(' + element['id'] + ')"class="buttonAdd"><img class="imgCarr" src="addCar.ico" alt=""></button>'
+                resultado += '</div>'
+                resultado += '</li>'
+                resultado += '<li class="list-group-item">'
+                resultado += '<div class="listCar">'
+                resultado += '<h6> Preço :</h6>'
+                resultado += '<h4>' + Intl.NumberFormat('pt-br', { style: 'currency', currency: 'BRL' }).format(element['preco']) + '</h4>'
+                resultado += '</div>'
+                resultado += '</li>'
+                resultado += '</ul>'
+                resultado += '</a>'
             });
             document.getElementById("elemento_ajax_html").innerHTML = resultado;
         });
@@ -58,8 +58,8 @@ $(function () {
             },
             dataType: 'json',
         }).done(function (response) {
-            if (response['ok'] === true) {
 
+            if (response['ok'] === true) {
                 var count_itens = response['count_item'];
                 $('.quantiCar').html(count_itens);
                 //msg de success
@@ -70,6 +70,7 @@ $(function () {
                 mostraDialogo(mensagem, tipo, tempo);
 
             } else if (response['ok'] == "add") {
+                console.log(response);
                 var mensagem = "Adicionado mais 1 na quantidade";
                 var tipo = 'warning';
                 mostraDialogo(mensagem, tipo);

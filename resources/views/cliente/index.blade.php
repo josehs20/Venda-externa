@@ -19,6 +19,17 @@
         opacity: 0.7;
         position: fixed;
         right: 0;
+        background-color: #0d6efd;
+    }
+
+    #buscaCliente {
+        position: fixed;
+        bottom: 100px;
+        z-index: 9999;
+        opacity: 0.7;
+        position: fixed;
+        right: 0;
+        background-color: #b87518;
     }
 
 </style>
@@ -31,6 +42,8 @@
 
     <a id="addContato" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModaladdContato"><i
             class="bi bi-person-plus"></i></a>
+    <a id="buscaCliente" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCuscaCliente"><i
+            class="bi-search"></i></a>
 
     @if (Session::has('message'))
 
@@ -46,6 +59,31 @@
                     <body onload="msgContato(msg = 6)">
     @endif
 
+    {{-- Modal search --}}
+    <form action="{{ route('vendedor.cliente.index', auth()->user()->id) }} " method="GET">
+        @csrf
+        <div class="modal fade" id="modalCuscaCliente" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Buscar Cliente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <input required name="nome" type="search" class="form-control search col-12"
+                            placeholder="Buscar Cliente">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
     {{-- Modal Cadastro usuario --}}
     <div class="modal fade" id="ModaladdContato" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -85,8 +123,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="exampleFormControlTextarea1" class="form-label">Observação</label>
-                            <textarea class="form-control" name="observacao" id="exampleFormControlTextarea1"
-                                rows="2"></textarea>
+                            <textarea class="form-control" name="observacao" id="exampleFormControlTextarea1" rows="2"></textarea>
                         </div>
                 </div>
                 <div class="modal-footer">
@@ -119,9 +156,10 @@
                                             {{ $cliente->email ? $cliente->email : 'Não Informado' }}</small><br>
 
                                         <small class="text-muted"><b> Telefone 1:
-                                            </b>{{ $cliente->fone1 ? $cliente->fone1 : 'Não Informado' }} {{--<i
+                                            </b>{{ $cliente->fone1 ? $cliente->fone1 : 'Não Informado' }}
+                                            {{-- <i
                                                 class="bi bi-pencil-square" style="float: right" data-bs-toggle="modal"
-                                                data-bs-target="#editarCliente{{ $cliente->id }}"></i>--}}</small>
+                                                data-bs-target="#editarCliente{{ $cliente->id }}"></i> --}}</small>
                                         <br>
                                         <small class="text-muted"><b> Telefone 2:
                                             </b>{{ $cliente->fone2 ? $cliente->fone2 : 'Não Informado' }}</small>
@@ -139,8 +177,9 @@
 
                                         </div>
                                         <small class="text-muted" style="float: right;" data-bs-toggle="modal"
-                                            data-bs-target="#addObs{{ $cliente->id }}"><i class="bi bi-plus-square"></i></small>
-                                            {{-- <small class="text-muted" style="float: right;" data-bs-toggle="modal"
+                                            data-bs-target="#addObs{{ $cliente->id }}"><i
+                                                class="bi bi-plus-square"></i></small>
+                                        {{-- <small class="text-muted" style="float: right;" data-bs-toggle="modal"
                                             data-bs-target="#deletaCliente{{ $cliente->id }}"><i
                                                 class="bi bi-x-square"></i> --}}
 
@@ -295,8 +334,7 @@
                                                 <div class="mb-3">
                                                     <label for="exampleFormControlTextarea1"
                                                         class="form-label">Observação</label>
-                                                    <textarea required id="add_obs" class="form-control"
-                                                        name="observacao" rows="3" maxlength="255"></textarea>
+                                                    <textarea required id="add_obs" class="form-control" name="observacao" rows="3" maxlength="255"></textarea>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -334,7 +372,7 @@
                                                 </b>{{ $info->data ? $info->data : 'Não informado ' }}</small>
                                             <button
                                                 style="float: right; border:none!important;
-                                                                                                                background-color: rgb(172, 172, 172); "
+                                                                                                                                                    background-color: rgb(172, 172, 172); "
                                                 type="submit" class="js-del"
                                                 onclick="botaoInfo(<?php echo $info->id; ?>)">
 

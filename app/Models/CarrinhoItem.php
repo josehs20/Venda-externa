@@ -10,7 +10,6 @@ class CarrinhoItem extends Model
     protected $table = 'carrinho_itens';
     protected $fillable = [
         'alltech_id',
-        'nome',
         'quantidade',
         'preco',
         'tipo_desconto',
@@ -22,11 +21,11 @@ class CarrinhoItem extends Model
     ];
 
     public function produto() {
-        return $this->hasMany('App\Models\Produto', 'id', 'produto_id');
+        return $this->hasOne('App\Models\Produto', 'id', 'produto_id');
     }
 
     public function car()
     {
-        return $this->belongsTo('App\Models\Carrinho');
+        return $this->belongsTo('App\Models\Carrinho', 'carrinho_id', 'id');
     }
 }

@@ -7,10 +7,10 @@
                     <div class="div-logo-alltech"></div>
                 </a>
 
-                <form class="search" action="{{ route('busca_produto_ajax') }}" method="GET">
+                <form class="search" action="{{ route('venda.index') }}" method="GET">
                     @csrf
                     <input id="search" name="nome" type="search" class="form-control" placeholder="Buscar Produto">
-                    <button class="lupa"><i class="bi-search" style="color: black"></i></button>
+                    <button id="preventBuscaProduto" class="lupa"><i class="bi-search" style="color: black"></i></button>
                 </form>
                 <div class="home-carrinho">
                     {{-- Menu Personalizado --}}
@@ -33,7 +33,7 @@
                         </ul>
                     </div>
 
-                    <a href="{{ route('venda.edit', ['venda' => auth()->user()->id]) }}">
+                    <a href="{{ route('itens_carrinho', ['user_id' => auth()->user()->id]) }}">
                         <img class="fotocarr" src="{{ asset('navCarr.ico') }}">
                         <h6 class="quanti" style="color:#fff">
                             <div class="quantiCar" style="width: 25px; height: 20px; text-align:center;"><p>{{count_item(auth()->user()->id)}}</p></div>

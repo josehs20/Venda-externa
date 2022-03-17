@@ -10,10 +10,10 @@ class Carrinho extends Model
     protected $fillable = [
        'id',
        'user_id',
-       'desconto_valor', 
+       'valor_desconto', 
        'desconto_qtd',
-       'tp_desconto_unificado',
-       'total_desconto',
+       'tp_desconto',
+       'valor_bruto',
        'total', 
        'cliente_id',
        'status', 

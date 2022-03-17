@@ -1,3 +1,14 @@
+//evento de busca de produtos
+//var botaoBuscaProduto = document.getElementById('preventBuscaProduto');
+
+// function preventBuscaProduto(event) {
+//     event.preventDefault();
+//     console.log(botaoBuscaProduto);
+// }
+// botaoBuscaProduto.addEventListener('click', preventBuscaProduto, false);
+
+
+//menu seta <- navBar
 var btnMenu = document.querySelectorAll(".btnMenu div");
 var btn = document.getElementById("btnMenu");
 btn.addEventListener("click", function () {
@@ -57,12 +68,42 @@ function msgContato(msg) {
         setTimeout(function () {
             mostraDialogo(msg, tipo);
         }, 100);
+    }else if (msg === 9) {
+        var msg = 'Item Retirado Com Sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    }else if (msg === 10) {
+        var msg = 'Item Alterado Com Sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    }else if (msg === 11) {
+        var msg = 'Desconto Alterado Com Sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    }else if (msg === 12) {
+        var msg = 'Descontos Zerados Com Sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    }else if (msg === 13) {
+        var msg = 'Quantidade Alterada Com Sucesso!!';
+        var tipo = 'danger';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
     }
 }
 
 
 //Mensagem Personalizada
-function mostraDialogo(mensagem, tipo) {
+function mostraDialogo(mensagem, tipo, tempo) {
 
     // se houver outro alert desse sendo exibido, cancela essa requisição
     if ($("#message").is(":visible")) {
@@ -70,8 +111,9 @@ function mostraDialogo(mensagem, tipo) {
     }
 
     // se não setar o tempo, o padrão é 3 segundos
-    var tempo = 2000;
-
+    if (!tempo) {
+        var tempo = 2000;
+    }
 
     // se não setar o tipo, o padrão é alert-info
     if (!tipo) {

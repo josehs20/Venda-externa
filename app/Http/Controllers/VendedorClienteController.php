@@ -17,11 +17,10 @@ class VendedorClienteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($vendedor)
+    public function index(Request $request, $vendedor)
     {
-        // $clientes = VendedorCliente::with('infoCliente')->where('user_id', auth()->user()->id)->get();
-
-        $clientes = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->orderBy('nome')->paginate(50);
+       // dd($request->all());
+        $clientes = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
         //dd($clientes);
         return view('cliente.index', compact('clientes'));
     }
@@ -150,8 +149,8 @@ class VendedorClienteController extends Controller
         }
         $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
-        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->get();
-      
+        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->take(100)->get();
+
         Session::flash('itens_salvo');
 
         return view('cliente.vendaSalva', compact('carrinhos_Salvos', 'cliente_carrinho', 'clientes_user'));
@@ -185,6 +184,6 @@ class VendedorClienteController extends Controller
         //  dd('a');
         Session::flash('substituicao');
 
-        return redirect(route('itens_carrinho'));
+        return redirect(route('itens_carrinho', auth()->user()->id));
     }
 }
