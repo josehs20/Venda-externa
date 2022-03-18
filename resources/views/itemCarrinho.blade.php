@@ -167,7 +167,7 @@
                                 <i class="bi bi-cash-stack">&ensp;{{ $itens->valor_desconto }} </i>
                             </div>
                             <div class="inner">
-                                <p>&ensp;{{ $itens->tp_desconto == 'porcento_unico'? "Unificado em % $itens->desconto_qtd": ($tp_desconto == 'dinheiro_unico'? "Unificado em R$ $itens->desconto_qtd": 'Desconto Dado Parcialmente') }}
+                                <p>&ensp;{{ $itens->tp_desconto == 'porcento_unico'? "Unificado em % $itens->desconto_qtd": ($tp_desconto == 'dinheiro_unico'? "Unificado em R$ $itens->desconto_qtd": (!$itens->tp_desconto ? 'Nenhum Desconto Aplicado' : 'Desconto Dado Parcialmente')) }}
                                 </p>
                             </div>
 

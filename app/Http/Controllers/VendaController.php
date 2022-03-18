@@ -270,7 +270,7 @@ class VendaController extends Controller
         //dd(array_sum($valor_itens));
         $carrinho->update([
             'desconto_qtd' => null,
-            'tp_desconto_unificado' => null,
+            'tp_desconto' => null,
             'valor_desconto' => null,
             'total' => array_sum($valor_itens),
         ]);
