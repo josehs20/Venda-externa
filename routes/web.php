@@ -31,7 +31,7 @@ Route::put('/unifica_valor_Itens/{carrinho?}', [App\Http\Controllers\VendaContro
 Route::get('busca_cliente', [App\Http\Controllers\VendaController::class, 'busca_cliente_ajax'])->middleware('vendedor')->name('busca_cliente_ajax');
 Route::put('/zeraDesconto/{carrinho?}', [App\Http\Controllers\VendaController::class, 'zeraDesconto'])->Middleware('vendedor')->name('zeraDesconto');
 
-Route::delete('/deleta_obs/{observacao}',  [App\Http\Controllers\VendedorClienteController::class, 'deleta_obs_ajax'])->middleware('vendedor')->name('deleta_obs');
+Route::delete('/deleta_obs/{observacao}',  [App\Http\Controllers\VendedorClienteController::class, '4fb'])->middleware('vendedor')->name('deleta_obs');
 Route::get('venda_salva',  [App\Http\Controllers\VendedorClienteController::class, 'venda_salva'])->middleware('vendedor')->name('venda_salva');
 Route::put('substitui_carrinho/{carrinho_id?}', [App\Http\Controllers\VendedorClienteController::class, 'substitui_carrinho'])->middleware('vendedor')->name('substitui_carrinho');
 

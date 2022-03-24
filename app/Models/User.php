@@ -42,10 +42,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function lojas() {
-        return $this->belongsToMany('App\Model\Loja');
-    }
-
     public function vendedorCliente()
     {
         return $this->hasMany('App\Models\VendedorCliente');

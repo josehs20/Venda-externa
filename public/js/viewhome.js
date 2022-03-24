@@ -1,11 +1,18 @@
 
 function cli(id) {
     produto_id = id;
-};
+    gradeVefiry = false;
+  
+}
+function verifyGrade(id) {
+    produto_id = id;
+    gradeVefiry = true;
+}
+
 $(function () {
     $("#search").keyup(function () {
         var busca = $("#search").val();
-
+        console.log(busca);
         $.ajax({
             url: "/busca_produto",
             type: "GET",
@@ -14,17 +21,57 @@ $(function () {
             },
             dataType: 'json',
         }).done(function (response) {
+            //console.log(response);
+            //atualiza lista de busca
 
-            var itens = response['busca']['data'];
             var resultado = "";
+
             //monta a listagem de busca de produto
-            itens.forEach(element => {
+            response['produtos'].forEach(element => {
                 resultado += '<a class="listHome" style="cursor: pointer">'
                 resultado += '<ul class="list-group">'
                 resultado += '<li class="list-group-item" style="background-color: rgb(58, 36, 252)">'
                 resultado += '<div class="listCar">'
                 resultado += '<h6 style="color: white">' + element['nome'] + '</h6>'
-                resultado += '<button type="submit"onclick="cli(' + element['id'] + ')"class="buttonAdd"><img class="imgCarr" src="addCar.ico" alt=""></button>'
+
+                if (element['grades']) {
+                    resultado += '<button type="button" class="buttonAdd" data-bs-toggle="modal" data-bs-target="#Grade' + element['id'] + '"><img id="imgg" class="imgCarr" src="addCar.ico" alt=""></button>'
+
+
+                    resultado += '<div class="modal fade" id="Grade' + element['id'] + '" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">'
+                    resultado += '<div class="modal-dialog modal-dialog-scrollable">'
+                    resultado += '<div class="modal-content">'
+                    resultado += '<div class="modal-header">'
+                    resultado += '<h5 class="modal-title" id="staticBackdropLabel">' + element['nome'] + '/ ' + element['grades']['nome'] + '</h5>'
+                    resultado += '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+                    resultado += '</div>'
+                    resultado += '<div class="modal-body">'
+
+                    element['grades']['i_grades'].forEach(ig => {
+
+                        resultado += '<div class="input-group mb-3">'
+                        resultado += '<div class="input-group-text">'
+                        resultado += '<input class="form-check-input mt-0" type="checkbox" value="' + ig['id'] + '">'
+                        resultado += '</div>'
+                        resultado += '<div class="input-group-text">'
+                        resultado += '<span class="">' + ig['tam'] + '</span>'
+                        resultado += '</div>'
+                        resultado += '<input class="form-control" type="number" min="0.01" step="0.01" placeholder="Quantidade">'
+                        resultado += '</div>'
+
+                    });
+                    resultado += '</div>'
+                    resultado += '<div class="modal-footer">'
+                    resultado += '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>'
+                    resultado += '<button type="submit" onclick="cli(' + element['id'] + ')" class="btn btn-primary">Adicionar</button>'
+                    resultado += '</div>'
+                    resultado += '</div>'
+                    resultado += '</div>'
+                    resultado += '</div>'
+
+                } else {
+                    resultado += '<button type="submit" onclick="cli(' + element['id'] + ')"class="buttonAdd"><img class="imgCarr" src="addCar.ico" alt=""></button>'
+                }
                 resultado += '</div>'
                 resultado += '</li>'
                 resultado += '<li class="list-group-item">'
@@ -35,55 +82,92 @@ $(function () {
                 resultado += '</li>'
                 resultado += '</ul>'
                 resultado += '</a>'
+
+
             });
-            document.getElementById("elemento_ajax_html").innerHTML = resultado;
+            return document.getElementById("elemento_ajax_html").innerHTML = resultado;
+
         });
     });
 });
 
-$(function () {
-    $('form[name="addItem"]').submit(function (event) {
-        event.preventDefault();
-        //var global
-        var id = produto_id;
+    $(function () {
+        $('form[name="addItem"]').submit(function (event) {
+            event.preventDefault();
+    
+            var id = produto_id;
 
-        $.ajax({
-            url: "/venda",
-            type: "POST",
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: {
-                id: id,
-            },
-            dataType: 'json',
-        }).done(function (response) {
+            $.ajax({
+                url: "/venda",
+                type: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    id: id,
+                    i_grade_qtd: gradeVefiry ? valida_form(id) : null,
+                },
+                dataType: 'json',
+            }).done(function (response) {
+                  console.log(response);
+                if (response['ok'] === true) {
+                    var count_itens = response['count_item'];
+                    $('.quantiCar').html(count_itens);
+    
+                    var mensagem = "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso!!!";
+                    var tipo = 'success';
+                    var tempo = 2000;
+    
+                    mostraDialogo(mensagem, tipo, tempo);
+    
+                } else if (response['ok'] == "add") {
+                    // console.log(response);
+                    var mensagem = "Adicionado mais 1 na quantidade";
+                    var tipo = 'warning';
+                    mostraDialogo(mensagem, tipo);
+                } else {
+                    var mensagem = "Não Foi Possível";
+                    var tipo = 'danger';
+    
+                    mostraDialogo(mensagem, tipo);
+                }
+    
+            });
+        });
+    });
 
-            if (response['ok'] === true) {
-                var count_itens = response['count_item'];
-                $('.quantiCar').html(count_itens);
-                //msg de success
-                var mensagem = "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso!!!";
-                var tipo = 'success';
-                var tempo = 2000;
+    function valida_form(id) {
 
-                mostraDialogo(mensagem, tipo, tempo);
-
-            } else if (response['ok'] == "add") {
-                console.log(response);
-                var mensagem = "Adicionado mais 1 na quantidade";
-                var tipo = 'warning';
-                mostraDialogo(mensagem, tipo);
-            } else {
-                var mensagem = "Não Foi Possível";
-                var tipo = 'danger';
-
-                mostraDialogo(mensagem, tipo);
+        var camp = document.getElementById('Grade' + id);
+        var checks = camp.querySelectorAll('.valid_check');
+        if (!checks) {
+            console.log(checks);    
+        }
+        
+        var inputs = camp.querySelectorAll('.valid_input');
+        var valid = 0;
+        var dados = []
+    
+    
+        for (let i = 0; i < checks.length; i++) {
+            if (checks[i].checked && inputs[i].value != '') {
+                valid++;
+                dados[i] = [checks[i].value, inputs[i].value];
+                
             }
-
-        });
-    });
-});
+        }
+        if (!valid) {
+    
+            console.log('nenhum item marcado');
+            var msg = 'Selecione o Campo selecionado';
+            var tipo = 'warning';
+            mostraDialogo(msg, tipo)
+            return false
+        }else{
+            return dados;
+        }
+    
+    }
 
 //Mensagem Personalizada
 function mostraDialogo(mensagem, tipo) {
@@ -125,6 +209,7 @@ function mostraDialogo(mensagem, tipo) {
             $(this).remove();
         });
     }, tempo); // milliseconds
+
 }
 
 

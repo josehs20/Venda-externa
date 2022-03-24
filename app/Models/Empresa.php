@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace App\Models;
 
 //use GoldSpecDigital\LaravelEloquentUUID\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model;
@@ -12,19 +12,8 @@ class Empresa extends Model
         'ultima_sincronizacao' => 'datetime'
     ];
 
-    public function produtos() {
-        return $this->hasMany('App\Model\Produto');
-    }
-
     public function lojas() {
-        return $this->hasMany('App\Model\Loja');
+        return $this->hasMany('App\Models\Loja');
     }
 
-    public function logs() {
-        return $this->hasMany('App\Model\Log');
-    }
-
-    public function arquivos() {
-        return $this->hasMany('App\Model\ArquivoImportado');
-    }
 }

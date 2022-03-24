@@ -9,63 +9,45 @@ class Loja extends Model
 {
     protected $fillable = ['nome', 'alltech_id', 'empresa_id'];
 
-    public function empresa() {
+    public function empresa()
+    {
         return $this->belongsTo('App\Model\Empresa');
     }
 
-    public function empresaVenda() {
+    public function empresaVenda()
+    {
         return $this->belongsTo('App\Model\EmpresaVenda');
     }
 
-    public function users() {
+    public function users()
+    {
         return $this->belongsToMany('App\User');
     }
 
-    public function vendedorUser() {
-        return $this->belongsToMany('App\Model\VendedorUser');
+    public function vendedorUser()
+    {
+        return $this->belongsToMany('App\Models\VendedorUser');
     }
 
-    public function caixas() {
-        return $this->hasMany('App\Model\Caixa');
+
+    public function grades()
+    {
+        return $this->hasMany('App\Models\Grade');
     }
 
-    public function produtos() {
-        return $this->hasMany('App\Model\Produto');
+    public function igrades()
+    {
+        return $this->hasMany('App\Models\Igrade');
     }
 
-    public function estoques() {
-        return $this->hasMany('App\Model\Estoque');
+    public function produtos()
+    {
+        return $this->hasMany('App\Models\Produto');
     }
-
-    public function vendas() {
-        return $this->hasMany('App\Model\Venda');
-    }
-
-    public function devolucoes() {
-        return $this->hasMany('App\Model\Devolucao');
-    }
-
-    public function vendaItens() {
-        return $this->hasMany('App\Model\VendaItem');
-    }
-
-    public function devolucaoItens() {
-        return $this->hasMany('App\Model\DevolucaoItem');
-    }
-
-    public function clientes() {
+  
+    public function clientes()
+    {
         return $this->hasMany('App\Models\Cliente');
     }
 
-    public function receitas() {
-        return $this->hasMany('App\Model\Receita');
-    }
-
-    public function despesas() {
-        return $this->hasMany('App\Model\Despesa');
-    }
-
-    public function fornecedor() {
-        return $this->hasMany('App\Model\Fornecedor');
-    }
 }

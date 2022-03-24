@@ -1,3 +1,5 @@
+(function (win, doc) {
+    'use strict'
 //view cliente/vendaSalva
 function fechaModal(id) {
     var botao = document.getElementById("fechaModalPinci");  
@@ -20,9 +22,6 @@ function botaoInfo(id) {
 
     info_id = id;
 }
-(function (win, doc) {
-    'use strict'
-
     function deleta_obs_ajax(event) {
         event.preventDefault();
 

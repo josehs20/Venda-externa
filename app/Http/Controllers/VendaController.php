@@ -6,11 +6,9 @@ use App\Models\Carrinho;
 use App\Models\CarrinhoItem;
 use App\Models\Cliente;
 use App\Models\Produto;
-use App\Models\VendedorCliente;
-use Facade\FlareClient\Http\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Laravel\Ui\Presets\React;
+
 
 class VendaController extends Controller
 {
@@ -21,15 +19,23 @@ class VendaController extends Controller
      */
     public function index(Request $request)
     {
-        $produtos = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
-
-        return view('home', compact('produtos',));
+        $produtos = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
+        
+       
+       //dd($produtos[0]->grades->iGrades);
+        return view('home', compact('produtos'));
     }
 
     public function busca_produto_ajax()
     {
-        $dados['busca'] = Produto::where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$_GET['busca']}%'")->orderBy('nome')->paginate(20);
-
+        $dados['produtos'] = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$_GET['busca']}%'")->orderBy('nome')->take(30)->get();
+        
+        foreach ($dados['produtos'] as $p) {
+            if ($p['grades']) {
+                $p = $p['grades']['iGrades'];
+           }
+          // $dados['busca'];
+    }
         echo  json_encode($dados);
     }
 
@@ -82,9 +88,13 @@ class VendaController extends Controller
         $carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
         $produto = Produto::find($_POST['id']);
         $item = $carrinho ? CarrinhoItem::where('carrinho_id', $carrinho->id)->where('produto_id', $produto->id)->first() : null;
-
+        $i_grade_qtd = $_POST['i_grade_qtd'];
         //caso carrinho não tenha nenhum carrinho aberto já é aberto automaticamente
         if (!$carrinho) {
+            if ($i_grade_qtd) {
+                echo json_encode($i_grade_qtd);
+            return;
+            }
             $carrinho = new Carrinho();
             $carrinho->user_id = auth()->user()->id;
             $carrinho->status = 'Aberto';
@@ -93,7 +103,7 @@ class VendaController extends Controller
             $item = new CarrinhoItem();
             $this->add_item($item, $produto, $carrinho);
 
-            $this->atualiza_Carrinho_desconto_unico($carrinho);
+            $this->atualiza_carrinho_desconto_unico($carrinho);
 
             $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
                 ->where('status', 'Aberto')->first();
@@ -109,7 +119,7 @@ class VendaController extends Controller
             $this->add_item($item, $produto, $carrinho);
 
             // atualização de desconto unico ou sem desconto para itens diferentes que são inseridos no carrinho
-            $this->atualiza_Carrinho_desconto_unico($carrinho);
+            $this->atualiza_carrinho_desconto_unico($carrinho);
 
             //conta quantidade no carrinho ajax
             $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
@@ -126,7 +136,7 @@ class VendaController extends Controller
 
             if ($item->tipo_desconto) {
 
-                $this->atualiza_Carrinho_desconto_parcial($item, $item->qtd_desconto, $quantidade);
+                $this->atualiza_carrinho_desconto_parcial($item, $item->qtd_desconto, $quantidade);
 
                 $dado['produto_adicionado'] = $produto->nome;
                 $dado['ok'] = "add";
@@ -137,7 +147,7 @@ class VendaController extends Controller
                     'valor' => $item->preco * $quantidade,
                 ]);
 
-                $this->atualiza_Carrinho_desconto_unico($carrinho);
+                $this->atualiza_carrinho_desconto_unico($carrinho);
 
                 $dado['produto_adicionado'] = $produto->nome;
                 $dado['ok'] = "add";
@@ -241,7 +251,7 @@ class VendaController extends Controller
                 'valor' => $item->preco * $request->quantidade,
             ]);
 
-            $this->atualiza_Carrinho_desconto_unico($carrinho);
+            $this->atualiza_carrinho_desconto_unico($carrinho);
             return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'quantidade_alterada']));
         } else {
 
@@ -249,7 +259,7 @@ class VendaController extends Controller
                 'tipo_desconto' => $request->tipo_desconto == 'porcento' ? 'porcento' : 'dinheiro'
             ]);
 
-            $this->atualiza_Carrinho_desconto_parcial($item, $request->qtd_desconto, $request->quantidade);
+            $this->atualiza_carrinho_desconto_parcial($item, $request->qtd_desconto, $request->quantidade);
 
             return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'alterado']));
         }
@@ -302,7 +312,7 @@ class VendaController extends Controller
         } else {
             if (CarrinhoItem::find($item)) {
                 CarrinhoItem::find($item)->delete();
-                $this->atualiza_Carrinho_desconto_unico($carrinho);
+                $this->atualiza_carrinho_desconto_unico($carrinho);
 
                 return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'deletado']));
             } else {
@@ -346,7 +356,7 @@ class VendaController extends Controller
             echo json_encode($dado);
         }
     }
-    public function atualiza_Carrinho_desconto_parcial($item, $quantidade_desconto, $quantidade)
+    public function atualiza_carrinho_desconto_parcial($item, $quantidade_desconto, $quantidade)
     {
 
         $desconto_final = $item->tipo_desconto == 'porcento' ? ($quantidade_desconto / 100) * ($quantidade * $item->preco) : $quantidade_desconto;
@@ -375,7 +385,7 @@ class VendaController extends Controller
             'total' => array_sum($valor_itens),
         ]);
     }
-    public function atualiza_Carrinho_desconto_unico($carrinho)
+    public function atualiza_carrinho_desconto_unico($carrinho)
     {
         $itens = $carrinho->carItem()->get();
 
@@ -402,4 +412,8 @@ class VendaController extends Controller
             'total' => array_sum($valor_itens),
         ]);
     }
+   public function insere_produto_grade_ajax($item, $i_grade_qtd)
+   {
+    $item = $item;
+   }
 }
