@@ -75,7 +75,7 @@
 
                         </div>
                         <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
+                          <button id="fechaModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
                           <button onclick="verifyGrade(<?php echo $produto->id; ?>)" type="submit" class="btn btn-primary">Adicionar</button>
                         </div>
                       </div>

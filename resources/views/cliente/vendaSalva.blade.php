@@ -36,7 +36,7 @@
                                         <h5 class="modal-title" id="staticBackdropLabel">Itens salvos neste
                                             carrinho</h5>
 
-                                        <button id="fechaModalPinci" type="button" class="btn-close"
+                                        <button type="button" class="btn-close"
                                             data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
@@ -44,7 +44,7 @@
                                             <h6 class="col-5">Total: R$
                                                 <b>{{ reais($carrinho['somaItens'][0]['total']) }}</b>
                                             </h6>
-                                            <h6 class="col-7">Descontos Totais: 0000</h6>
+                                            <h6 class="col-5">Descontos Totais: R$ <b>{{$carrinho['valor_desconto']}}</b></h6>
                                         </div>
                                         <table class="table table-striped">
                                             <thead>
@@ -58,7 +58,7 @@
                                             <tbody>
                                                 @foreach ($carrinho->carItem as $item)
                                                     <tr>
-                                                        <td colspan="2">{{ substr($item->produto['nome'], 0, 25) }}</td>
+                                                        <td colspan="2">{{ substr($item->produto['nome'], 0, 25) }}&ensp;{{$item->iGrade ? '/'. $item->iGrade->tam : ''}}</td>
                                                         <th>{{ reais($item->preco) }}</th>
                                                         <th>{{ $item->quantidade }}</th>
                                                         <th>{{ reais($item->preco * $item->quantidade) }}</th>
@@ -76,7 +76,7 @@
                                             @method('PUT')
                                             @csrf
 
-                                            <button type="button" class="btn btn-secondary"
+                                            <button type="button" onclick="fechaModal()"  class="btn btn-secondary fechaModal"
                                                 id="fechaModal{{ $carrinho->id }}" ata-bs-dismiss="modal"
                                                 aria-label="Close">Sair</button>
 
@@ -86,11 +86,11 @@
                                         </form>
                                     @else
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
+                                            <button type="button" class="btn btn-secondary fechaModal"
                                                 id="fechaModal{{ $carrinho->id }}" data-bs-dismiss="modal"
                                                 ata-bs-dismiss="modal" aria-label="Close">Sair</button>
 
-                                            <button type="button" onclick="fechaModal(<?php echo $carrinho->id; ?>)"
+                                            <button type="button"
                                                 data-bs-toggle="modal" class="btn btn-primary"
                                                 id="confirmarContinuacaoVenda"
                                                 data-bs-target="#confirmarContinuacaoVenda{{ $carrinho->id }}">Continuar
@@ -126,7 +126,7 @@
                                                     @method('PUT')
                                                     @csrf
 
-                                                    <button type="button" onclick="reloadpag()" class="btn btn-secondary"
+                                                    <button type="button" onclick="fechaModal()" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Sair</button>
 
                                                     <button type="submit" class="btn btn-primary js-salvaItens"
@@ -142,7 +142,7 @@
                                                     @method('PUT')
                                                     @csrf
 
-                                                    <button type="button" id="fechaModalSalva"
+                                                    <button type="button" onclick="fechaModal()"
                                                 data-bs-dismiss="modal" class="btn btn-secondary">Sair</button>
                                                     <button type="submit" class="btn btn-primary" name="substituir"
                                                         value="1">Substituir</button>

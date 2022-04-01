@@ -18,6 +18,7 @@ class CarrinhoItem extends Model
         'valor',
         'produto_id',
         'carrinho_id',
+        'i_grade_id',
     ];
 
     public function produto() {
@@ -27,5 +28,10 @@ class CarrinhoItem extends Model
     public function car()
     {
         return $this->belongsTo('App\Models\Carrinho', 'carrinho_id', 'id');
+    }
+
+    public function iGrade()
+    {
+        return $this->belongsTo('App\Models\Igrade', 'i_grade_id', 'id');
     }
 }

@@ -1243,7 +1243,7 @@ url(/fonts/vendor/bootstrap-icons/bootstrap-icons.woff?4e80a14a205e5b6212ffc52fc
 .bi-telephone-plus::before { content: "\f5be"; }
 .bi-telephone-x-fill::before { content: "\f5bf"; }
 .bi-telephone-x::before { content: "\f5c0"; }
-.bi-telephone::before { content: "\f5c1"; }
+.bi-telephone::before { content: "\f5c1"; color: black; cursor: pointer;}
 .bi-terminal-fill::before { content: "\f5c2"; }
 .bi-terminal::before { content: "\f5c3"; }
 .bi-text-center::before { content: "\f5c4"; }

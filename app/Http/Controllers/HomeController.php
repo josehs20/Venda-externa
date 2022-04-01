@@ -22,14 +22,11 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index()
-    { 
-      
+    {
+
         if (auth()->user()->perfil === 'vendedor') {
             return redirect(route('venda.index'));
-            
-    }else{
-        
-        return redirect('/login')->with('message', 'Sem premissão de acesso');
         }
+        return redirect('/')->with('message', 'Sem premissão de acesso');
     }
 }

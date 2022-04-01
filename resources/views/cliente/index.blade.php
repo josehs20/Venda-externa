@@ -42,7 +42,7 @@
 
     <a id="addContato" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModaladdContato"><i
             class="bi bi-person-plus"></i></a>
-    <a id="buscaCliente" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCuscaCliente"><i
+    <a id="buscaCliente" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBuscaCliente"><i
             class="bi-search"></i></a>
 
     @if (Session::has('message'))
@@ -62,7 +62,7 @@
     {{-- Modal search --}}
     <form action="{{ route('vendedor.cliente.index', auth()->user()->id) }} " method="GET">
         @csrf
-        <div class="modal fade" id="modalCuscaCliente" tabindex="-1" aria-labelledby="exampleModalLabel"
+        <div class="modal fade" id="modalBuscaCliente" tabindex="-1" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -84,8 +84,8 @@
             </div>
         </div>
     </form>
-    {{-- Modal Cadastro usuario --}}
-    <div class="modal fade" id="ModaladdContato" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{-- Modal Cadastro Cliente --}}
+    {{-- <div class="modal fade" id="ModaladdContato" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -100,12 +100,30 @@
                             <input type="text" required name="nome" class="form-control" id="recipient-name">
                         </div>
                         <div class="mb-3" style="margin-top: -20px;">
+                            <label for="recipient-name" class="col-form-label">CPF/CNPJ:</label>
+                            <input type="email" name="email" class="form-control" id="recipient-name">
+                        </div>
+                        <div class="mb-3" style="margin-top: -20px;">
                             <label for="recipient-name" class="col-form-label">email:</label>
                             <input type="email" name="email" class="form-control" id="recipient-name">
                         </div>
                         <div class="mb-3" style="margin-top: -20px;">
-                            <label for="message-text" class="col-form-label">Telefone:</label>
-                            <input type="number" name="telefone" class="form-control" id="message-text">
+                            <div class="row" style="margin-top: -20px;">
+                                <div class="col-4">
+                                    <label for="message-text" class="col-form-label">Telefone 1</label>
+                                    <input type="number" name="fone1" class="form-control" id="message-text">
+                                </div>
+                                <div class="col-4">
+                                    <label for="message-text" class="col-form-label">Telefone 2</label>
+                                    <input type="number" name="celular" class="form-control" id="message-text">
+                                </div>
+                                <div class="col-4">
+                                    <label for="message-text" class="col-form-label">Celular:</label>
+                                    <input type="number" name="celular" class="form-control" id="message-text">
+                                </div>
+                            </div>
+
+
                         </div>
                         <div class="mb-3" style="margin-top: -20px;">
                             <label for="recipient-name" class="col-form-label">Cidade:</label>
@@ -133,7 +151,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> --}}
 
 
     @if ($clientes->count())
@@ -150,43 +168,97 @@
                         </button>
                         <div class="contentconspllan" style="border-radius:7px;margin-top:-1px;">
                             <div class="list-group">
-                                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                                    <div class="" style="word-break:break-all;">
-                                        <small class="text-muted"><b> E-mail:</b>
-                                            {{ $cliente->email ? $cliente->email : 'Não Informado' }}</small><br>
+                                <ul class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <li class="list-group-item">
+                                        <a style="font: italic bold 15px monospace">
+                                            {{ $cliente->tipo == 'J' ? 'CNPJ : ' : 'CPF : ' }}</a>
+                                        &nbsp;&nbsp;{{ $cliente->docto ? $cliente->docto : 'Não Informado' }}
 
-                                        <small class="text-muted"><b> Telefone 1:
-                                            </b>{{ $cliente->fone1 ? $cliente->fone1 : 'Não Informado' }}
-                                            {{-- <i
-                                                class="bi bi-pencil-square" style="float: right" data-bs-toggle="modal"
-                                                data-bs-target="#editarCliente{{ $cliente->id }}"></i> --}}</small>
-                                        <br>
-                                        <small class="text-muted"><b> Telefone 2:
-                                            </b>{{ $cliente->fone2 ? $cliente->fone2 : 'Não Informado' }}</small>
-                                        <br>
+                                    </li>
 
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <small class="text-muted"><b> Celular:
-                                                </b>{{ $cliente->celular ? $cliente->celular : 'Não Informado' }}</small><br>
+                                    <li class="list-group-item">
+                                        <a style="font: italic bold 15px monospace"> Cidade : </a>
+                                        &nbsp;&nbsp;{{ $cliente->cidade ? $cliente->cidade->nome : 'Não Informado' }}&nbsp;&nbsp;{{ $cliente->cidade ? '| UF : ' . $cliente->cidade->uf : 'UF: Não Informado' }}
 
-                                            {{-- <small class="text-muted" style="float: right;" data-bs-toggle="modal"
-                                        data-bs-target="#addObs{{ $cliente->id }}"><i
-                                            class="bi bi-plus-square"></i>} --}}
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a style="font: italic bold 15px monospace"> Bairro : </a>
+                                        &nbsp;&nbsp;{{ $cliente->bairro ? $cliente->bairro : 'Não Informado' }}
 
-                                            </small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a style="font: italic bold 15px monospace"> Rua : </a>
+                                        &nbsp;&nbsp;{{ $cliente->rua ? $cliente->rua : 'Não Informado' }}
+                                        &nbsp;&nbsp;{{ $cliente->numero ? ' | Nº : ' . $cliente->numero : '| Nº : SN' }}
+
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a style="font: italic bold 15px monospace"> E-mail : </a>&nbsp;&nbsp;
+                                        {{ $cliente->email ? $cliente->email : 'Não Informado' }}
+
+                                        <span data-bs-toggle="modal" data-bs-target="#contato{{ $cliente->id }}"
+                                            style="float: right" class="badge bg-secondary"><i data-bs-toggle="modal"
+                                                data-bs-target="#contato{{ $cliente->id }}"
+                                                class="bi bi-telephone"></i></span>
+
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span style="cursor: pointer;" class="badge bg-primary rounded-pill">Editar
+                                            Cliente</span>
+
+                                        <span style="cursor: pointer;" class="badge bg-primary rounded-pill"
+                                            data-bs-toggle="modal" data-bs-target="#addObs{{ $cliente->id }}">Adicionar
+                                            Observação</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Modal Contato-->
+                            <div class="modal fade" id="contato{{ $cliente->id }}" tabindex="-1"
+                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">{{ $cliente->nome }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
 
                                         </div>
-                                        <small class="text-muted" style="float: right;" data-bs-toggle="modal"
-                                            data-bs-target="#addObs{{ $cliente->id }}"><i
-                                                class="bi bi-plus-square"></i></small>
-                                        {{-- <small class="text-muted" style="float: right;" data-bs-toggle="modal"
-                                            data-bs-target="#deletaCliente{{ $cliente->id }}"><i
-                                                class="bi bi-x-square"></i> --}}
+                                        <div class="modal-body">
+                                            <div class="row mx-3"><b> Telefones</b></div>
+                                            <div class="list-group">
+                                                <ul class="flex-column align-items-start me-5">
+                                                    <li class="list-group-item">
+                                                        <a style="font: italic bold 15px monospace">
+                                                            Telefone 1 :</a>
+                                                        &nbsp;&nbsp;{{ $cliente->docto ? $cliente->docto : 'Não Informado' }}
 
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <a style="font: italic bold 15px monospace">
+                                                            Telefone 2 :</a>
+                                                        &nbsp;&nbsp;{{ $cliente->docto ? $cliente->docto : 'Não Informado' }}
+
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <a style="font: italic bold 15px monospace">
+                                                            Celular : </a>
+                                                        &nbsp;&nbsp;{{ $cliente->docto ? $cliente->docto : 'Não Informado' }}
+
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Sair</button>
+                                        </div>
                                     </div>
-
-                                </a>
+                                </div>
                             </div>
+
+
 
                             {{-- Modal deleta Cliente --}}
                             <div class="modal fade" id="deletaCliente{{ $cliente->id }}" tabindex="-1"
@@ -372,7 +444,7 @@
                                                 </b>{{ $info->data ? $info->data : 'Não informado ' }}</small>
                                             <button
                                                 style="float: right; border:none!important;
-                                                                                                                                                    background-color: rgb(172, 172, 172); "
+                                                                                                                                                                background-color: rgb(172, 172, 172); "
                                                 type="submit" class="js-del"
                                                 onclick="botaoInfo(<?php echo $info->id; ?>)">
 

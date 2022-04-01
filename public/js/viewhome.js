@@ -2,7 +2,7 @@
 function cli(id) {
     produto_id = id;
     gradeVefiry = false;
-  
+
 }
 function verifyGrade(id) {
     produto_id = id;
@@ -12,7 +12,7 @@ function verifyGrade(id) {
 $(function () {
     $("#search").keyup(function () {
         var busca = $("#search").val();
-        console.log(busca);
+       // console.log(busca);
         $.ajax({
             url: "/busca_produto",
             type: "GET",
@@ -51,19 +51,20 @@ $(function () {
 
                         resultado += '<div class="input-group mb-3">'
                         resultado += '<div class="input-group-text">'
-                        resultado += '<input class="form-check-input mt-0" type="checkbox" value="' + ig['id'] + '">'
+                        resultado += '<input class="form-check-input mt-0 valid_check" type="checkbox" value="'+ ig['id'] +'">'
                         resultado += '</div>'
                         resultado += '<div class="input-group-text">'
-                        resultado += '<span class="">' + ig['tam'] + '</span>'
+                        resultado += '<span class="">' + ig['tam'] +'</span>'
                         resultado += '</div>'
-                        resultado += '<input class="form-control" type="number" min="0.01" step="0.01" placeholder="Quantidade">'
+                        resultado += '<input class="form-control valid_input" type="number" min="0.01" step="0.01" placeholder="Quantidade">'
                         resultado += '</div>'
 
                     });
+
                     resultado += '</div>'
                     resultado += '<div class="modal-footer">'
-                    resultado += '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>'
-                    resultado += '<button type="submit" onclick="cli(' + element['id'] + ')" class="btn btn-primary">Adicionar</button>'
+                    resultado += '<button id="fechaModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>'
+                    resultado += '<button onclick="verifyGrade('+ element['id'] +')" type="submit" class="btn btn-primary">Adicionar</button>'
                     resultado += '</div>'
                     resultado += '</div>'
                     resultado += '</div>'
@@ -91,83 +92,83 @@ $(function () {
     });
 });
 
-    $(function () {
-        $('form[name="addItem"]').submit(function (event) {
-            event.preventDefault();
-    
-            var id = produto_id;
+$(function () {
+    $('form[name="addItem"]').submit(function (event) {
+        event.preventDefault();
 
-            $.ajax({
-                url: "/venda",
-                type: "POST",
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: {
-                    id: id,
-                    i_grade_qtd: gradeVefiry ? valida_form(id) : null,
-                },
-                dataType: 'json',
-            }).done(function (response) {
-                  console.log(response);
-                if (response['ok'] === true) {
-                    var count_itens = response['count_item'];
-                    $('.quantiCar').html(count_itens);
-    
-                    var mensagem = "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso!!!";
-                    var tipo = 'success';
-                    var tempo = 2000;
-    
-                    mostraDialogo(mensagem, tipo, tempo);
-    
-                } else if (response['ok'] == "add") {
-                    // console.log(response);
-                    var mensagem = "Adicionado mais 1 na quantidade";
-                    var tipo = 'warning';
-                    mostraDialogo(mensagem, tipo);
-                } else {
-                    var mensagem = "Não Foi Possível";
-                    var tipo = 'danger';
-    
-                    mostraDialogo(mensagem, tipo);
-                }
-    
-            });
+        var id = produto_id;
+        // console.log(id);
+        $.ajax({
+            url: "/venda",
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                id: id,
+                i_grade_qtd: gradeVefiry ? valida_form(id) : null,
+            },
+            dataType: 'json',
+        }).done(function (response) {
+          console.log(response);
+            if (response['ok'] === true) {
+                var count_itens = response['count_item'];
+                $('.quantiCar').html(count_itens);
+
+                var mensagem = "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso!!!";
+                var tipo = 'success';
+                var tempo = 2000;
+
+                mostraDialogo(mensagem, tipo, tempo);
+
+            } else if (response['ok'] == "add") {
+                // console.log(response);
+                var mensagem = "Adicionado mais 1 na quantidade";
+                var tipo = 'warning';
+                mostraDialogo(mensagem, tipo);
+            } else {
+                var mensagem = "Não Foi Possível";
+                var tipo = 'danger';
+
+                mostraDialogo(mensagem, tipo);
+            }
+
         });
     });
+});
 
-    function valida_form(id) {
+function valida_form(id) {
 
-        var camp = document.getElementById('Grade' + id);
-        var checks = camp.querySelectorAll('.valid_check');
-        if (!checks) {
-            console.log(checks);    
+    var camp = document.getElementById('Grade' + id);
+    var checks = camp.querySelectorAll('.valid_check');
+
+    var inputs = camp.querySelectorAll('.valid_input');
+    var valid = 0;
+    var dados = [];
+
+    for (let i = 0; i < checks.length; i++) {
+         console.log(checks);
+
+        if (checks[i].checked != '' && inputs[i].value != '') {
+            valid++;
+
+            dados[i] = [checks[i].value, inputs[i].value]
         }
-        
-        var inputs = camp.querySelectorAll('.valid_input');
-        var valid = 0;
-        var dados = []
-    
-    
-        for (let i = 0; i < checks.length; i++) {
-            if (checks[i].checked && inputs[i].value != '') {
-                valid++;
-                dados[i] = [checks[i].value, inputs[i].value];
-                
-            }
-        }
-        if (!valid) {
-    
-            console.log('nenhum item marcado');
-            var msg = 'Selecione o Campo selecionado';
-            var tipo = 'warning';
-            mostraDialogo(msg, tipo)
-            return false
-        }else{
-            return dados;
-        }
-    
     }
+    if (!valid) {
+
+        console.log('nenhum item marcado');
+        var msg = 'Selecione o Campo selecionado';
+        var tipo = 'warning';
+        mostraDialogo(msg, tipo)
+        return false
+    } else {
+        //  console.log(dados);
+       // console.log(dados);
+        return dados;
+    }
+
+}
 
 //Mensagem Personalizada
 function mostraDialogo(mensagem, tipo) {

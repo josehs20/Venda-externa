@@ -17,7 +17,7 @@
     <link rel="stylesheet" type="text/css" href="entrar/css/util.css">
     <link rel="stylesheet" type="text/css" href="entrar/css/main.css">
     <!--===============================================================================================-->
-
+  
     <div class="limiter">
         <div class="container-login100">
             <div class="wrap-login100">
@@ -28,11 +28,11 @@
                 <form class="login100-form validate-form" method="POST" action="{{ route('login') }}">
                     @csrf
                     <span class="login100-form-title">
-                        Sistema de Vendas 
+                        Sistema de Vendas
                     </span>
 
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-                        <input class="input100" campo @error('email') is-invalid @enderror" name="email"
+                        <input class="input100 campo @error('email') is-invalid @enderror" name="email"
                             value="{{ old('email') }}" required autocomplete="email" autofocus>
 
 
@@ -47,8 +47,9 @@
                         </span>
                     @enderror
                     <div class="wrap-input100 validate-input" data-validate="Password is required">
-                        <input placeholder="Senha" id="password" type="password" class="input100 campo @error('password') is-invalid @enderror" name="password" required
-                        autocomplete="current-password">
+                        <input placeholder="Senha" id="password" type="password"
+                            class="input100 campo @error('password') is-invalid @enderror" name="password" required
+                            autocomplete="current-password">
 
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
@@ -81,10 +82,10 @@
                     </label>
 
                     @if (Route::has('password.request'))
-                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                        Esqueceu sua senha?
-                    </a>
-                @endif
+                        <a class="btn btn-link" href="{{ route('password.request') }}">
+                            Esqueceu sua senha?
+                        </a>
+                    @endif
                 </form>
             </div>
         </div>

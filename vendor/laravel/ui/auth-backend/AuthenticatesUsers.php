@@ -31,6 +31,7 @@ trait AuthenticatesUsers
      */
     public function login(Request $request)
     {
+    
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -69,6 +70,12 @@ trait AuthenticatesUsers
      */
     protected function validateLogin(Request $request)
     {
+        $verifica = User::where('email', $request->email)->first();
+
+        if (!$verifica or $verifica->perfil != 'vendedor') {
+            
+            return $this->sendFailedLoginResponse($request);
+        }
         $request->validate([
             $this->username() => 'required|string',
             'password' => 'required|string',

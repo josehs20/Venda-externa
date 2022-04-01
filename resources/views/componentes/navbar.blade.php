@@ -26,9 +26,9 @@
 
                         <ul class="dropdown-menu">
 
-                            <li><a class="dropdown-item"
-                                    href="{{ route('vendedor.cliente.index', auth()->user()->id) }} ">Clientes</a></li>
                             <li><a class="dropdown-item" href="{{ route('venda_salva') }} ">Vendas Salvas</a></li>
+                            <li><a class="dropdown-item" href="{{ route('clientes.index') }} ">Clientes</a></li>
+                            <li><a class="dropdown-item" href="{{ route('clientes.create') }} ">Cadastrar Cliente</a></li>
 
                         </ul>
                     </div>

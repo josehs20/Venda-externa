@@ -5,14 +5,14 @@
         color: rgb(255, 255, 255);
         margin-top: -1%;
         margin-left: 1%;
-        font-size: 20px;
+        font-size: 16px;
     }
 
     @media (max-width: 700px) {
         #titlePage {
             margin-top: 10%;
             color: rgb(255, 255, 255);
-            font-size: 15px;
+            font-size: 14px;
         }
 
     }
@@ -20,7 +20,7 @@
     @media (max-width: 800px) {
         #titlePage {
             color: rgb(255, 255, 255);
-            font-size: 15px;
+            font-size: 14px;
         }
 
     }

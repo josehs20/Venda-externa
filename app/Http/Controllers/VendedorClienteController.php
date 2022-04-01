@@ -19,9 +19,9 @@ class VendedorClienteController extends Controller
      */
     public function index(Request $request, $vendedor)
     {
-       // dd($request->all());
-        $clientes = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
-        //dd($clientes);
+
+        $clientes = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
+
         return view('cliente.index', compact('clientes'));
     }
 
@@ -32,29 +32,36 @@ class VendedorClienteController extends Controller
      */
     public function create(Request $request, $vendedor)
     {
-        // dd($vendedor);
-        $cliente = VendedorCliente::create([
-            'nome' => $request->nome,
-            'email' => $request->email ? $request->email : null,
-            'telefone' => $request->telefone ? $request->telefone : null,
-            'cidade' => $request->cidade ? $request->cidade : null,
-            'rua' => $request->rua ? $request->rua : null,
-            'numero_rua' => $request->n_rua ? $request->n_rua : null,
-            'user_id' => $vendedor,
+        dd($vendedor);
+        $cliente = Cliente::create([
+
+            'loja_id' => auth()->user()->loja_id, 
+            'alltech_id' => null, 
+            'nome' => $request->nome, 
+            'docto' => $request->docto,
+            'tipo' => $request->tipo,
+            'email' => $request->email, 
+            'fone1' => $request->fone1, 
+            'fone2' => $request->fone2,
+            'celular' => $request->celular,
+            //'cidade_ibge_id' $request,
+            //'cep',
+            'bairro' => $request->bairro,
+            'rua' => $request->rua,
+            'numero' => $request->numero,
+            'compto' => $request->compto,
+
+
+
+            // 'nome' => $request->nome,
+            // 'email' => $request->email ? $request->email : null,
+            // 'telefone' => $request->telefone ? $request->telefone : null,
+            // 'cidade' => $request->cidade ? $request->cidade : null,
+            // 'rua' => $request->rua ? $request->rua : null,
+            // 'numero_rua' => $request->n_rua ? $request->n_rua : null,
+            // 'user_id' => $vendedor,
         ]);
-
-        if ($request->observacao) {
-
-            date_default_timezone_set('America/Sao_Paulo');
-            $date = date('Y-m-d H:i');
-
-            InfoCliente::create([
-                'observacao' => $request->observacao,
-                'data' => $date,
-                'vendedor_cliente_id' => $cliente->id,
-            ]);
-        }
-
+     
         Session::flash('message', "Cliente Adicionado Com Sucesso!!");
         return redirect(route('vendedor.cliente.index', auth()->user()->id));
     }

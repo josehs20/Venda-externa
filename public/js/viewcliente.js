@@ -1,65 +1,49 @@
-(function (win, doc) {
-    'use strict'
-//view cliente/vendaSalva
-function fechaModal(id) {
-    var botao = document.getElementById("fechaModalPinci");  
- console.log(botao);
-    botao.click();
-}
-function fechaModalSalvaVenda(){
-    var botao = document.getElementById("fechaModalSalva");  
-    botao.click();
-}
-function reloadpag(){
-    var botao = document.getElementById("fechaModalSalva");  
-    botao.click();
-    location.reload();
-}
-
-
-//View cliente/index
 function botaoInfo(id) {
-
+    
     info_id = id;
 }
-    function deleta_obs_ajax(event) {
-        event.preventDefault();
-
-        $.ajax({
-            url: "/deleta_obs/" + info_id,
-            type: "DELETE",
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            dataType: 'json',
-        }).done(function (response) {
-            if (response['success'] === true) {
-                document.getElementById(info_id).remove();
-                var msg = 'Observação Excluida Com Sucesso!!';
-                var tipo = 'success';
-                mostraDialogo(msg, tipo);
-            } else {
-                var msg = 'Observação já Excluida, Atualize a Página!!';
-                var tipo = 'warning';
-                mostraDialogo(msg, tipo);
-            }
-
-        });
-    }
-    if (doc.querySelector('.js-del')) {
-        var btn = doc.querySelectorAll('.js-del');
-        for (let i = 0; i < btn.length; i++) {
-            btn[i].addEventListener('click', deleta_obs_ajax, false)
+(function (win, doc) {
+    'use strict'
+    
+    
+    //View cliente/index
+        function deleta_obs_ajax(event) {
+            event.preventDefault();
+    
+            $.ajax({
+                url: "/deleta_obs/" + info_id,
+                type: "DELETE",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+            }).done(function (response) {
+                if (response['success'] === true) {
+                    document.getElementById(info_id).remove();
+                    var msg = 'Observação Excluida Com Sucesso!!';
+                    var tipo = 'success';
+                    mostraDialogo(msg, tipo);
+                } else {
+                    var msg = 'Observação já Excluida, Atualize a Página!!';
+                    var tipo = 'warning';
+                    mostraDialogo(msg, tipo);
+                }
+    
+            });
         }
-    }
-
-})(window, document);
-
+        if (doc.querySelector('.js-del')) {
+            var btn = doc.querySelectorAll('.js-del');
+            for (let i = 0; i < btn.length; i++) {
+                btn[i].addEventListener('click', deleta_obs_ajax, false)
+            }
+        }
+    
+    })(window, document);
 
 $(function () {
     $("#nomeCliente").keyup(function () {
         var busca = $("#nomeCliente").val();
-    
+
         $.ajax({
             url: "/busca_cliente",
             type: "GET",
@@ -88,6 +72,10 @@ $(function () {
         });
     });
 });
+
+function fechaModal() {
+    location.reload();
+}
 
 
 function mostraDialogo(mensagem, tipo) {

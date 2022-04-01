@@ -7,7 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cliente extends Model
 {
-    protected $fillable = ['loja_id', 'alltech_id', 'nome', 'email', 'fone1', 'fone2', 'celular'];
+    protected $fillable = [
+        'loja_id', 
+        'alltech_id', 
+        'nome', 
+        'docto',
+        'tipo',
+        'email', 
+        'fone1', 
+        'fone2',
+        'celular',
+        'cidade_ibge_id',
+        'cep',
+        'bairro',
+        'rua',
+        'numero',
+        'compto',
+    ];
     
     public function loja() {
         return $this->belongsTo('App\Models\Loja');
@@ -16,5 +32,10 @@ class Cliente extends Model
     public function infoCliente()
     {
         return $this->hasMany('App\Models\InfoCliente');
+    }
+
+    public function cidade()
+    {
+        return $this->belongsTo('App\Models\CidadeIbge', 'cidade_ibge_id', 'id');
     }
 }
