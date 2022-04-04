@@ -1,102 +1,142 @@
-validDocumento = false;
-validNome = false;
-validNumeros = [];
-
-
 $(function () {
     $('form[id="CadastroCliente"]').submit(function (event) {
         event.preventDefault();
-        
-        console.log(validDocumento, validNome, validNumeros);
+       console.log(documento());
+        if (validaInputNome() &&
+            validaInputNumeros('inputTel1') &&
+            validaInputNumeros('inputTel2') &&
+            validaInputNumeros('celular')) {
 
+            var documento = documento();
+            var nome = validaInputNome();
+            var email = $('#inputEmail').val();
+            var telefones = [validaInputNumeros('inputTel1'), validaInputNumeros('inputTel2'), validaInputNumeros('celular')]
+            var cep = $('#inputCep').val();
+            var uf = $('#inputUf').val();
+            var cidade = $('#inputCidade').val();
+            var bairro = $('#inputBairro').val();
+            var rua = $('#inputRua').val();
+            var numero = $('#inputNumero').val();
+            var complemento = $('#inputCompto').val();
 
+            // console.log(validaInputNome());
+            $.ajax({
+                url: "/clientes",
+                type: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    documento: documento,
+                    nome: nome,
+                    email: email,
+                    telefones: telefones,
+                    cep: cep,
+                    uf: uf,
+                    cidade: cidade,
+                    bairro: bairro,
+                    rua: rua,
+                    numero: numero,
+                    complemento: complemento,
+                },
+                dataType: 'json',
+            }).done(function (response) {
+                console.log(response);
+            });
+        } else {
+            console.log('sadsad');
+        }
 
     });
 });
 
 //valida nome
-function validainputNome() {
+function validaInputNome() {
     //console.log('a');
     var nome = document.getElementById('inputNome').value;
     var regex = /[0-9]/;
-    var b = regex.test(nome);
-    if (b) {
+    var contemNum = regex.test(nome);
+    if (contemNum) {
         document.getElementById('nomeValid').innerHTML = "Nome contém numero";
-        validNome = false;
-        return;
+
+        return false;
     } else {
         document.getElementById('nomeValid').innerHTML = "";
-        validNome = true;
-        return;
+        return nome;
     }
 }
-function validainputNumeros(inputId) {
+function validaInputNumeros(inputId) {
 
     var arrey = Array.from(document.getElementById(inputId).value);
     var msg = document.getElementById(inputId + "Msg");
     var counts = {};
+
     if (!arrey.length) {
         msg.innerHTML = "";
-        validNumeros[inputId] = true;
+        return true;
     }
-  
+
     arrey.forEach(function (x) {
         counts[x] = (counts[x] || 0) + 1;
-    });
-    Object.keys(counts).forEach(function (item) {
-        if (counts[item] >= 6) {
-            msg.style.color = "red";
-            msg.innerHTML = "Número inválido";
-            validNumeros[inputId] = false;
-        } else {
-            msg.innerHTML = "";
-            validNumeros[inputId] = true;
-        }
 
+        Object.keys(counts).forEach(function (item) {
+            if (Object.values(counts) >= 6) {
+                msg.style.color = "red";
+                msg.innerHTML = "Número inválido";
+                valid = false
+            } else {
+                msg.innerHTML = "";
+                valid = document.getElementById(inputId).value
+            }
+        });
     });
     if (arrey.length != false && arrey.length < 8 || arrey.length > 12) {
         msg.style.color = "red";
         msg.innerHTML = "Número inválido";
-        validNumeros[inputId] = false;
+        return false;
     }
+    return valid
+
 }
-
-
-
-$('#TipoDocumento').change(function (e) {
-    let opcaoSelecionada = this.querySelector('option:checked');
-    opcao = opcaoSelecionada.value
-    document.getElementById('tituloIputuDocumento').innerHTML = opcaoSelecionada.value
-});
-
-$('#docto').keyup(function () {
-
+function documento() {
     var input = document.getElementById("docto").value; //pega o valor digitado.
     var msg = document.getElementById('msgValid');
 
     if (input.length == 11 || input.length == 14) { //verifica se é o valor de sua preferencia. se for seleciona.
         if (input.length == 11) {
-            document.getElementById('selectCNPJ').removeAttribute("selected")
-            $("#selectCPF").attr('selected', 'selected');
+            $("#TipoDocumento").val('CPF');
             var docto = input;
             var tipoDoc = 'CPF'
             validaDocs(docto, tipoDoc)
-            return
+            return;
         }
         if (input.length == 14) {
             var docto = input;
             var tipoDoc = 'CNPJ'
-            document.getElementById('selectCPF').removeAttribute("selected")
-            $("#selectCNPJ").attr('selected', 'selected');
-            //  console.log(document.getElementById('selectCNPJ'));
+            $("#TipoDocumento").val('CNPJ');
+            //validaDocs(docto, tipoDoc)
             validaDocs(docto, tipoDoc)
-            return
+            return;
         }
     } else {
         msg.style.color = "blue"
         msg.innerHTML = "11 digitos para CPF e 14 para CNPJ"
         validDocumento = false;
     }
+}
+
+
+$('#TipoDocumento').change(function (e) {
+
+    var val = $("#TipoDocumento option:selected").val();
+    documento();
+    document.getElementById('tituloIputuDocumento').innerHTML = val
+});
+
+$('#docto').keyup(function () {
+
+    documento();
+
 });
 function validaDocs(docto, tipoDoc) {
 
@@ -104,26 +144,26 @@ function validaDocs(docto, tipoDoc) {
 
     if (tipoDoc == 'CPF') {
         if (validaCPF(docto)) {
-            console.log('cpfvalido');
             msg.style.color = "black"
             msg.innerHTML = "CPF Válido"
-            validDocumento = true
-            return
+            console.log(docto);
+            return docto;
+
         } else {
             msg.style.color = "red"
             msg.innerHTML = "CPF Inválido"
-            validDocumento = false
+            return false
         }
     }
     if (tipoDoc == 'CNPJ') {
         if (validaCNPJ(docto)) {
             msg.style.color = "black"
             msg.innerHTML = "CNPJ Válido"
-            validDocumento = true
+            return docto;
         } else {
             msg.style.color = "red"
             msg.innerHTML = "CNPJ Inválido"
-            validDocumento = false
+            return false
 
         }
     }

@@ -38,7 +38,8 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        echo json_encode($_POST['documento']);
+        return;
     }
 
     /**

@@ -6,9 +6,7 @@ use Livewire\Component;
 
 class Cep extends Component
 {
-    public $cpf;
-    public $cnpj;
-    
+
     public $validCep;
     public $validCidade;
 
@@ -18,11 +16,6 @@ class Cep extends Component
     public $rua;
     public $uf;
 
-    public function updatedCpf()
-    {
-        dd($this->cpf);
-    }
-
     public function updatedCidade()
     {
         $dados = curl_init("https://viacep.com.br/ws/$this->uf/$this->cidade/true/json/");
@@ -31,10 +24,11 @@ class Cep extends Component
         curl_close($dados);
 
         if ($result) {
+            
             $this->cep = $result[0]->cep;
             $this->validCidade = "";
-        }else {
-            $this->validCidade = "Cidade Inválida";
+        } else {
+            $this->validCidade = "Inválido";
         }
     }
 
@@ -53,13 +47,14 @@ class Cep extends Component
                 $this->uf = $result->uf;
                 $this->validCep = "";
             } catch (\Throwable $th) {
-             false;
+                false;
             }
-           
-        }else {
+        } else {
+            //dd($result);
             $this->validCep = "Cep Inválido";
         }
         // dd($result);
+        // dd($this->updatedDocs());
     }
 
     public function render()

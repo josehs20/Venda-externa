@@ -4,8 +4,7 @@ function botaoInfo(id) {
 }
 (function (win, doc) {
     'use strict'
-    
-    
+
     //View cliente/index
         function deleta_obs_ajax(event) {
             event.preventDefault();
