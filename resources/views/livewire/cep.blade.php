@@ -11,7 +11,7 @@
             -moz-appearance: textfield;
         }
 
-        #codUf {
+        #inputUf {
             text-transform: uppercase;
         }
 
@@ -75,6 +75,7 @@
                     <input id="inputCep" type="text" required wire:model.defer="cep" wire:model.lazy="cep" value="{{ $cep }}"
                         class="form-control">
                         <a style="color: red" id="validCep">{{$validCep}}</a>
+                       <input type="hidden" id="codIbgeCiadade" value="{{$codIbgeCiadade}}">
                 </div>
                 <div class="col-md-1">
                     <label for="inputCity" wire:model.defer="uf" class="form-label">UF</label>

@@ -1,14 +1,12 @@
 $(function () {
     $('form[id="CadastroCliente"]').submit(function (event) {
         event.preventDefault();
-       console.log(documento());
-        if (validaInputNome() &&
+       
+        if (documento() && validaInputNome() &&
             validaInputNumeros('inputTel1') &&
             validaInputNumeros('inputTel2') &&
             validaInputNumeros('celular')) {
 
-            var documento = documento();
-            var nome = validaInputNome();
             var email = $('#inputEmail').val();
             var telefones = [validaInputNumeros('inputTel1'), validaInputNumeros('inputTel2'), validaInputNumeros('celular')]
             var cep = $('#inputCep').val();
@@ -18,8 +16,9 @@ $(function () {
             var rua = $('#inputRua').val();
             var numero = $('#inputNumero').val();
             var complemento = $('#inputCompto').val();
+            var codIbge = $('#codIbgeCiadade').val();
 
-            // console.log(validaInputNome());
+           //  console.log(codIbge);
             $.ajax({
                 url: "/clientes",
                 type: "POST",
@@ -27,8 +26,8 @@ $(function () {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 data: {
-                    documento: documento,
-                    nome: nome,
+                    documento: documento(),
+                    nome: validaInputNome(),
                     email: email,
                     telefones: telefones,
                     cep: cep,
@@ -38,13 +37,17 @@ $(function () {
                     rua: rua,
                     numero: numero,
                     complemento: complemento,
+                    codIbge : codIbge
                 },
                 dataType: 'json',
             }).done(function (response) {
-                console.log(response);
+                if (response['success'] == true) {
+                    
+                    console.log(response['success']);
+                }
             });
         } else {
-            console.log('sadsad');
+              event.preventDefault();
         }
 
     });
@@ -107,16 +110,13 @@ function documento() {
             $("#TipoDocumento").val('CPF');
             var docto = input;
             var tipoDoc = 'CPF'
-            validaDocs(docto, tipoDoc)
-            return;
+            return validaDocs(docto, tipoDoc);
         }
         if (input.length == 14) {
             var docto = input;
             var tipoDoc = 'CNPJ'
             $("#TipoDocumento").val('CNPJ');
-            //validaDocs(docto, tipoDoc)
-            validaDocs(docto, tipoDoc)
-            return;
+            return validaDocs(docto, tipoDoc);
         }
     } else {
         msg.style.color = "blue"
@@ -146,7 +146,6 @@ function validaDocs(docto, tipoDoc) {
         if (validaCPF(docto)) {
             msg.style.color = "black"
             msg.innerHTML = "CPF Válido"
-            console.log(docto);
             return docto;
 
         } else {

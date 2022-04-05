@@ -231,19 +231,19 @@
                                                     <li class="list-group-item">
                                                         <a style="font: italic bold 15px monospace">
                                                             Telefone 1 :</a>
-                                                        &nbsp;&nbsp;{{ $cliente->docto ? $cliente->docto : 'Não Informado' }}
+                                                        &nbsp;&nbsp;{{ $cliente->fone1 ? $cliente->fone1 : 'Não Informado' }}
 
                                                     </li>
                                                     <li class="list-group-item">
                                                         <a style="font: italic bold 15px monospace">
                                                             Telefone 2 :</a>
-                                                        &nbsp;&nbsp;{{ $cliente->docto ? $cliente->docto : 'Não Informado' }}
+                                                        &nbsp;&nbsp;{{ $cliente->fone2 ? $cliente->fone2 : 'Não Informado' }}
 
                                                     </li>
                                                     <li class="list-group-item">
                                                         <a style="font: italic bold 15px monospace">
                                                             Celular : </a>
-                                                        &nbsp;&nbsp;{{ $cliente->docto ? $cliente->docto : 'Não Informado' }}
+                                                        &nbsp;&nbsp;{{ $cliente->celular ? $cliente->celular : 'Não Informado' }}
 
                                                     </li>
                                                 </ul>

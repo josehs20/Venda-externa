@@ -15,7 +15,7 @@ class Cep extends Component
     public $bairro;
     public $rua;
     public $uf;
-
+    public $codIbgeCiadade;
     public function updatedCidade()
     {
         $dados = curl_init("https://viacep.com.br/ws/$this->uf/$this->cidade/true/json/");
@@ -24,9 +24,13 @@ class Cep extends Component
         curl_close($dados);
 
         if ($result) {
-            
+
             $this->cep = $result[0]->cep;
+            $this->bairro = $result[0]->bairro;
+            $this->rua = $result[0]->logradouro;
+            $this->codIbgeCiadade = $result[0]->ibge;
             $this->validCidade = "";
+            // dd($this->codIbgeCiadade);
         } else {
             $this->validCidade = "Inválido";
         }
@@ -41,11 +45,15 @@ class Cep extends Component
 
         if ($result) {
             try {
+                $this->cep = $result->cep;
                 $this->cidade = $result->localidade;
                 $this->bairro = $result->bairro;
                 $this->rua = $result->logradouro;
                 $this->uf = $result->uf;
                 $this->validCep = "";
+                $this->codIbgeCiadade = $result->ibge;
+                // dd($this->codIbgeCiadade);
+                // dd($this->cep);
             } catch (\Throwable $th) {
                 false;
             }
