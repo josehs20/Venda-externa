@@ -3,7 +3,7 @@
 @section('content')
     @include('componentes.navbar')
     @include('componentes.titulo', [
-        'titlePage' => 'Atulizar Cliente',
+        'titlePage' => 'Editar Cliente',
     ])
 
     {{-- @if (Session::has('clienteadd'))

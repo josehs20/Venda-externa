@@ -7,6 +7,7 @@ use App\Models\Cliente;
 use App\Models\InfoCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class ClienteController extends Controller
 {
@@ -17,6 +18,7 @@ class ClienteController extends Controller
      */
     public function index(Request $request)
     {
+        dd(Storage::disk('ftp')->directories('APPVENDA'));
         $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
             ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
 
@@ -123,11 +125,10 @@ class ClienteController extends Controller
                 'numero' => $_PUT['numero'] ? intval($_PUT['numero']) : null,
                 'compto' => $_PUT['complemento'] ? $_PUT['complemento'] : null,
             ]);
+            $dados['success'] = true;
+            echo json_encode($dados);
+            Session::flash('clienteUpdate');
         }
-
-        $dados['success'] = true;
-        echo json_encode($dados);
-        Session::flash('clienteUpdate');
         return;
     }
 

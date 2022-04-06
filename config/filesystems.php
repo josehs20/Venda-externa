@@ -52,6 +52,16 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
+        
+        'ftp' => [
+            'driver'    => env('FTP_DRIVER','ftp'),
+            'host'      => env('FTP_HOST','127.0.0.1'),
+            'username'  => env('FTP_USERNAME','root'),
+            'password'  => env('FTP_PASSWORD','root'),
+            'root'      => env('FTP_ROOT', '/alltechsistemas.com/SISTEMA/CLOUD'),
+            'port'      => env('FTP_PORT', 21),
+            'timeout'   => env('FTP_TIMEOUT', 30),
+        ],
 
     ],
 

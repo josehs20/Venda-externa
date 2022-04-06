@@ -121,6 +121,12 @@
 
                                     </li>
                                     <li class="list-group-item">
+                                        <a style="font: italic bold 15px monospace"> Complemento : </a>
+                    
+                                        &nbsp;&nbsp;{{ $cliente->enderecos ? $cliente->enderecos->compto : 'Não Informado' }}
+
+                                    </li>
+                                    <li class="list-group-item">
                                         <a style="font: italic bold 15px monospace"> E-mail : </a>&nbsp;&nbsp;
                                         {{ $cliente->email ? $cliente->email : 'Não Informado' }}
 
