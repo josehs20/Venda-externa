@@ -1,12 +1,3 @@
-//evento de busca de produtos
-//var botaoBuscaProduto = document.getElementById('preventBuscaProduto');
-
-// function preventBuscaProduto(event) {
-//     event.preventDefault();
-//     console.log(botaoBuscaProduto);
-// }
-// botaoBuscaProduto.addEventListener('click', preventBuscaProduto, false);
-
 
 //menu seta <- navBar
 var btnMenu = document.querySelectorAll(".btnMenu div");
@@ -20,13 +11,19 @@ btn.addEventListener("click", function () {
 function msgContato(msg) {
 
     if (msg === 1) {
-        var msg = 'Cliente Adicionado Com sucesso!!';
+        var msg = 'Cliente Adicionado Com Sucesso!!';
         var tipo = 'success';
         setTimeout(function () {
             mostraDialogo(msg, tipo);
         }, 100);
 
-    } else if (msg === 2) {
+    } else if (msg === 1.5) {
+        var msg = 'Cliente Alterado Com Sucesso!!';
+        var tipo = 'success';
+        setTimeout(function () {
+            mostraDialogo(msg, tipo);
+        }, 100);
+    }  else if (msg === 2) {
         var msg = 'Observação Adicionada Com sucesso!!';
         var tipo = 'success';
         setTimeout(function () {

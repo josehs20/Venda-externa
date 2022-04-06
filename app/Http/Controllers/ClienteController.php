@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\CidadeIbge;
 use App\Models\Cliente;
+use App\Models\InfoCliente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class ClienteController extends Controller
 {
@@ -15,7 +17,7 @@ class ClienteController extends Controller
      */
     public function index(Request $request)
     {
-        $clientes = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)
+        $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
             ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
 
         return view('cliente.index', compact('clientes'));
@@ -28,7 +30,8 @@ class ClienteController extends Controller
      */
     public function create()
     {
-        return view('cliente.form');
+        $cliente = null;
+        return view('cliente.form', compact('cliente'));
     }
 
     /**
@@ -39,11 +42,11 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-
         $codIbge = CidadeIbge::where('codigo', trim($_POST['codIbge']))->first();
-        $dados = Cliente::create([
+
+        $cliente =  Cliente::create([
             'loja_id' => auth()->user()->loja_id,
-            'alltech_id' => '100000',
+            'alltech_id' => '0000',
             'nome' => $_POST['nome'],
             'docto' => $_POST['documento'],
             'tipo' =>  strlen($_POST['documento']) == 11 ? 'F' : 'J',
@@ -51,16 +54,19 @@ class ClienteController extends Controller
             'fone1' => strlen($_POST['telefones'][0]) > 7 ? $_POST['telefones'][0] : null,
             'fone2' => strlen($_POST['telefones'][1]) > 7 ? $_POST['telefones'][1] : null,
             'celular' => strlen($_POST['telefones'][2]) > 7 ? $_POST['telefones'][2] : null,
+        ]);
+        $cliente->enderecos()->create([
             'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
-            'cep' => intval($_POST['cep']),
+            'cep' => preg_replace("/[^0-9]/", "", $_POST['cep']),
             'bairro' => $_POST['bairro'],
             'rua' => $_POST['rua']  ? $_POST['rua']  : null,
             'numero' => $_POST['numero'] ? intval($_POST['numero']) : null,
             'compto' => $_POST['complemento'] ? $_POST['complemento'] : null,
         ]);
-            $dados['success'] = true;
 
+        $dados['success'] = true;
         echo json_encode($dados);
+        Session::flash('clienteadd');
         return;
     }
 
@@ -83,7 +89,8 @@ class ClienteController extends Controller
      */
     public function edit($id)
     {
-        //
+        $cliente = Cliente::find($id);
+        return view('cliente.formUpdate', compact('cliente'));
     }
 
     /**
@@ -95,7 +102,33 @@ class ClienteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if (!strcasecmp($_SERVER['REQUEST_METHOD'], 'PUT')) {
+            parse_str(file_get_contents('php://input'), $_PUT);
+
+            $codIbge = CidadeIbge::where('codigo', trim($_PUT['codIbge']))->first();
+
+            $cliente = Cliente::find($_PUT['id']);
+
+            $cliente->update([
+                'email' => $_PUT['email'],
+                'fone1' => strlen($_PUT['telefones'][0]) > 7 ? $_PUT['telefones'][0] : null,
+                'fone2' => strlen($_PUT['telefones'][1]) > 7 ? $_PUT['telefones'][1] : null,
+                'celular' => strlen($_PUT['telefones'][2]) > 7 ? $_PUT['telefones'][2] : null,
+            ]);
+            $cliente->enderecos()->update([
+                'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
+                'cep' => preg_replace("/[^0-9]/", "", $_PUT['cep']),
+                'bairro' => $_PUT['bairro'],
+                'rua' => $_PUT['rua']  ? $_PUT['rua']  : null,
+                'numero' => $_PUT['numero'] ? intval($_PUT['numero']) : null,
+                'compto' => $_PUT['complemento'] ? $_PUT['complemento'] : null,
+            ]);
+        }
+
+        $dados['success'] = true;
+        echo json_encode($dados);
+        Session::flash('clienteUpdate');
+        return;
     }
 
     /**
@@ -107,5 +140,17 @@ class ClienteController extends Controller
     public function destroy($id)
     {
         //
+    }
+    public function addObservacao(Request $request, $cliente)
+    {
+        $data = date('d-m-Y', strtotime($request->data_obs));
+        dd($request->all());
+        InfoCliente::create([
+            'data' => $request->data_obs ?  $data : null,
+            'observacao' => $request->observacao,
+            'cliente_id' => $cliente,
+        ]);
+        Session::flash('clienteAddObs', "Adicionado Com Sucesso!!");
+        return redirect()->back();
     }
 }

@@ -31,12 +31,12 @@ class VendaController extends Controller
     {
         $dados['produtos'] = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$_GET['busca']}%'")->orderBy('nome')->take(30)->get();
 
-        foreach ($dados['produtos'] as $p) {
-            if ($p['grades']) {
-                $p = $p['grades']['iGrades'];
-            }
-            // $dados['busca'];
-        }
+        // foreach ($dados['produtos'] as $p) {
+        //     if ($p['grades']) {
+        //         $p = $p['grades']['iGrades'];
+        //     }
+        //     // $dados['busca'];
+        // }
         echo  json_encode($dados);
     }
 
@@ -131,7 +131,7 @@ class VendaController extends Controller
             $dado['count_item'] = $count_item->carItem->count();
             $dado['produto_adicionado'] = $produto->nome;
             $dado['ok'] = true;
-            $dado['mag'] = 'produto com grade inserido';
+            $dado['msg'] = 'produto com grade inserido';
             echo json_encode($dado);
 
             return;
@@ -225,7 +225,6 @@ class VendaController extends Controller
 
                     $carrinho->carItem()->create([
                         'produto_id'    => $produto->id,
-                        'alltech_id'    => $produto->alltech_id,
                         'preco'         => $produto_preco,
                         'quantidade'    => $value[1],
                         'valor'         => $produto_preco * $value[1],

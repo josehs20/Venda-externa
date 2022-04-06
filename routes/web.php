@@ -3,6 +3,7 @@
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VendedorClienteController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,6 @@ Route::get('/', function () {
     return view('auth.login');
 });
 Auth::routes();
-
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::resource('venda', App\Http\Controllers\VendaController::class)->middleware('vendedor');
@@ -37,3 +37,4 @@ Route::put('substitui_carrinho/{carrinho_id?}', [App\Http\Controllers\VendedorCl
 Route::resource('vendedor.cliente', App\Http\Controllers\VendedorClienteController::class)->middleware('vendedor');
 
 Route::resource('clientes', App\Http\Controllers\ClienteController::class)->middleware('vendedor');
+Route::post('addObservacao/{cliente?}', [App\Http\Controllers\ClienteController::class, 'addObservacao'])->middleware('vendedor')->name('addObservacao');

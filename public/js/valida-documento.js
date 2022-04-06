@@ -1,7 +1,8 @@
+//Cria Usuário
 $(function () {
     $('form[id="CadastroCliente"]').submit(function (event) {
         event.preventDefault();
-       
+
         if (documento() && validaInputNome() &&
             validaInputNumeros('inputTel1') &&
             validaInputNumeros('inputTel2') &&
@@ -9,16 +10,15 @@ $(function () {
 
             var email = $('#inputEmail').val();
             var telefones = [validaInputNumeros('inputTel1'), validaInputNumeros('inputTel2'), validaInputNumeros('celular')]
-            var cep = $('#inputCep').val();
-            var uf = $('#inputUf').val();
-            var cidade = $('#inputCidade').val();
-            var bairro = $('#inputBairro').val();
-            var rua = $('#inputRua').val();
-            var numero = $('#inputNumero').val();
-            var complemento = $('#inputCompto').val();
-            var codIbge = $('#codIbgeCiadade').val();
-
-           //  console.log(codIbge);
+            var cep = $('#cep').val();
+            var uf = $("#uf").val();
+            var rua = $("#rua").val();
+            var bairro = $("#bairro").val();
+            var cidade = $("#cidade").val();
+            var numero = $("#numero").val();
+            var complemento = $("#compto").val();
+            var codIbge = $("#cidIbge").val();
+            console.log(codIbge);
             $.ajax({
                 url: "/clientes",
                 type: "POST",
@@ -37,21 +37,119 @@ $(function () {
                     rua: rua,
                     numero: numero,
                     complemento: complemento,
-                    codIbge : codIbge
+                    codIbge: codIbge
                 },
                 dataType: 'json',
             }).done(function (response) {
                 if (response['success'] == true) {
-                    
-                    console.log(response['success']);
+                    location.reload();
                 }
             });
         } else {
-              event.preventDefault();
+            event.preventDefault();
         }
-
     });
 });
+
+//Atualiza Usuário
+$(function () {
+    $('form[id="updateCliente"]').submit(function (event) {
+        event.preventDefault();
+
+        if (validaInputNumeros('inputTel1') &&
+            validaInputNumeros('inputTel2') &&
+            validaInputNumeros('celular')) {
+
+            var email = $('#inputEmail').val();
+            var telefones = [validaInputNumeros('inputTel1'), validaInputNumeros('inputTel2'), validaInputNumeros('celular')]
+            var cep = $('#cep').val();
+            var uf = $("#uf").val();
+            var rua = $("#rua").val();
+            var bairro = $("#bairro").val();
+            var cidade = $("#cidade").val();
+            var numero = $("#numero").val();
+            var complemento = $("#compto").val();
+            var codIbge = $("#cidIbge").val();
+            var id = $('#idCliente').val()
+            console.log(codIbge);
+            $.ajax({
+                url: "/clientes/" + id,
+                type: "PUT",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    id: id,
+                    email: email,
+                    telefones: telefones,
+                    cep: cep,
+                    uf: uf,
+                    cidade: cidade,
+                    bairro: bairro,
+                    rua: rua,
+                    numero: numero,
+                    complemento: complemento,
+                    codIbge: codIbge
+                },
+                dataType: 'json',
+            }).done(function (response) {
+                if (response['success'] == true) {
+                    location.reload();
+                }
+            });
+        } else {
+            event.preventDefault();
+        }
+    });
+});
+
+
+//valid cep
+function PesquisarCepCidade() {
+    var uf = $("#uf").val();
+    var cidade = $("#cidade").val();
+    var resultado;
+    var erro = document.getElementById("error");
+    $.ajax({
+        type: "GET",
+        url: "https://viacep.com.br/ws/" + uf + "/" + cidade + "/true/json/",
+        dataType: "json",
+    }).done(function (dados) {
+        if (dados.length) {
+            $("#rua").val("");
+            $("#bairro").val("");
+            $("#numero").val("");
+            $("#compto").val("");
+            $("#cep").val(dados[0].cep);
+            $("#cidIbge").val(dados[0].ibge);
+            erro.innerHTML = ""
+        } else {
+            erro.innerHTML = "Inválido"
+        }
+    });
+}
+function PesquisarCEP() {
+    cep = $("#cep").val();
+    var resultado;
+    var erro = document.getElementById("error");
+    $.ajax({
+        type: "GET",
+        url: "https://viacep.com.br/ws/" + cep + "/json/",
+        dataType: "json",
+        error: function () {
+            erro.innerHTML = "Inválido"
+        }
+    }).done(function (dados) {
+        $("#uf").val(dados.uf);
+        $("#rua").val(dados.logradouro);
+        $("#bairro").val(dados.bairro);
+        $("#cidade").val(dados.localidade);
+        $("#numero").val("");
+        $("#compto").val("");
+        $("#cidIbge").val(dados.ibge);
+        erro.innerHTML = ""
+    });
+}
 
 //valida nome
 function validaInputNome() {

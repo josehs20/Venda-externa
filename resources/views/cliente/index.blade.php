@@ -45,10 +45,7 @@
     <a id="buscaCliente" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBuscaCliente"><i
             class="bi-search"></i></a>
 
-    @if (Session::has('message'))
-
-        <body onload="msgContato(msg = 1)">
-        @elseif(Session::has('clienteadd'))
+    @if (Session::has('clienteAddObs'))
 
             <body onload="msgContato(msg = 2)">
             @elseif(Session::has('deleta_cliente'))
@@ -60,7 +57,7 @@
     @endif
 
     {{-- Modal search --}}
-    <form action="{{ route('vendedor.cliente.index', auth()->user()->id) }} " method="GET">
+    <form action="{{ route('clientes.index', auth()->user()->id) }} " method="GET">
         @csrf
         <div class="modal fade" id="modalBuscaCliente" tabindex="-1" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
@@ -84,75 +81,6 @@
             </div>
         </div>
     </form>
-    {{-- Modal Cadastro Cliente --}}
-    {{-- <div class="modal fade" id="ModaladdContato" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Adicionar Cliente</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="margin-top: -20px;">
-                    <form action="{{ route('vendedor.cliente.create', auth()->user()->id) }}" method="GET">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Nome:</label>
-                            <input type="text" required name="nome" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="mb-3" style="margin-top: -20px;">
-                            <label for="recipient-name" class="col-form-label">CPF/CNPJ:</label>
-                            <input type="email" name="email" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="mb-3" style="margin-top: -20px;">
-                            <label for="recipient-name" class="col-form-label">email:</label>
-                            <input type="email" name="email" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="mb-3" style="margin-top: -20px;">
-                            <div class="row" style="margin-top: -20px;">
-                                <div class="col-4">
-                                    <label for="message-text" class="col-form-label">Telefone 1</label>
-                                    <input type="number" name="fone1" class="form-control" id="message-text">
-                                </div>
-                                <div class="col-4">
-                                    <label for="message-text" class="col-form-label">Telefone 2</label>
-                                    <input type="number" name="celular" class="form-control" id="message-text">
-                                </div>
-                                <div class="col-4">
-                                    <label for="message-text" class="col-form-label">Celular:</label>
-                                    <input type="number" name="celular" class="form-control" id="message-text">
-                                </div>
-                            </div>
-
-
-                        </div>
-                        <div class="mb-3" style="margin-top: -20px;">
-                            <label for="recipient-name" class="col-form-label">Cidade:</label>
-                            <input type="text" name="cidade" class="form-control" id="recipient-name">
-                        </div>
-                        <div class="row" style="margin-top: -20px;">
-                            <div class="mb-3 col-8">
-                                <label for="recipient-name" class="col-form-label">Rua:</label>
-                                <input type="text" name="rua" class="form-control" id="recipient-name">
-                            </div>
-                            <div class="mb-3 col-4">
-                                <label for="message-text" class="col-form-label">Nº:</label>
-                                <input type="number" name="numero_rua" class="form-control" id="message-text">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="exampleFormControlTextarea1" class="form-label">Observação</label>
-                            <textarea class="form-control" name="observacao" id="exampleFormControlTextarea1" rows="2"></textarea>
-                        </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
-                    <button onclick="msgContato()" type="submit" class="btn btn-primary">Salvar</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div> --}}
-
 
     @if ($clientes->count())
         <div class="listCliente">
@@ -178,18 +106,18 @@
 
                                     <li class="list-group-item">
                                         <a style="font: italic bold 15px monospace"> Cidade : </a>
-                                        &nbsp;&nbsp;{{ $cliente->cidade ? $cliente->cidade->nome : 'Não Informado' }}&nbsp;&nbsp;{{ $cliente->cidade ? '| UF : ' . $cliente->cidade->uf : 'UF: Não Informado' }}
+                                        &nbsp;&nbsp;{{ $cliente->enderecos->cidadeIbge ? $cliente->enderecos->cidadeIbge->nome : 'Não Informado' }}&nbsp;&nbsp;{{ $cliente->enderecos ? '| UF : ' . $cliente->enderecos->cidadeIbge->uf : 'UF: Não Informado' }}
 
                                     </li>
                                     <li class="list-group-item">
                                         <a style="font: italic bold 15px monospace"> Bairro : </a>
-                                        &nbsp;&nbsp;{{ $cliente->bairro ? $cliente->bairro : 'Não Informado' }}
+                                        &nbsp;&nbsp;{{ $cliente->enderecos ? $cliente->enderecos->bairro : 'Não Informado' }}
 
                                     </li>
                                     <li class="list-group-item">
                                         <a style="font: italic bold 15px monospace"> Rua : </a>
-                                        &nbsp;&nbsp;{{ $cliente->rua ? $cliente->rua : 'Não Informado' }}
-                                        &nbsp;&nbsp;{{ $cliente->numero ? ' | Nº : ' . $cliente->numero : '| Nº : SN' }}
+                                        &nbsp;&nbsp;{{ $cliente->enderecos ? $cliente->enderecos->rua : 'Não Informado' }}
+                                        &nbsp;&nbsp;{{ $cliente->enderecos->numero ? ' | Nº : ' . $cliente->enderecos->numero : '| Nº : SN' }}
 
                                     </li>
                                     <li class="list-group-item">
@@ -203,8 +131,8 @@
 
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span style="cursor: pointer;" class="badge bg-primary rounded-pill">Editar
-                                            Cliente</span>
+                                        <a href="{{route('clientes.edit', $cliente->id)}}" style="cursor: pointer;" class="badge bg-primary rounded-pill">Editar
+                                            Cliente</a>
 
                                         <span style="cursor: pointer;" class="badge bg-primary rounded-pill"
                                             data-bs-toggle="modal" data-bs-target="#addObs{{ $cliente->id }}">Adicionar
@@ -213,7 +141,7 @@
                                 </ul>
                             </div>
 
-                            <!-- Modal Contato-->
+                            <!-- Modal Contato Cliente-->
                             <div class="modal fade" id="contato{{ $cliente->id }}" tabindex="-1"
                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -257,131 +185,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
-
-                            {{-- Modal deleta Cliente --}}
-                            <div class="modal fade" id="deletaCliente{{ $cliente->id }}" tabindex="-1"
-                                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Deseja excluir este cliente ?
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="list-group">
-
-
-                                                <div class="row" style="word-break:break-all;">
-                                                    <small class="text-muted"><b> E-mail:</b>
-                                                        {{ $cliente->email ? $cliente->email : 'Não Informado' }}</small><br>
-                                                    <small class="text-muted"><b> Telefone:
-                                                        </b>{{ $cliente->fone1 ? $cliente->fone1 : 'Não Informado' }}</small><br>
-
-                                                    <div class="d-flex w-100 justify-content-between">
-                                                        <small class="text-muted"><b> Cidade:
-                                                            </b>{{ $cliente->cidade ? $cliente->cidade : 'Não Informado' }}</small><br>
-
-                                                        </small>
-
-                                                    </div>
-
-                                                    <small class="text-muted"><b> Rua:
-                                                        </b>{{ $cliente->rua ? $cliente->rua : 'Não Informado' }}
-                                                        &nbsp;&nbsp; &nbsp;
-                                                        <b>Nº:</b>{{ $cliente->numero_rua ? $cliente->numero_rua : 'S/N' }}</small>
-
-                                                </div>
-
-
-                                            </div>
-                                            <br>
-                                            <span style="font-size: 12px;">Ao Excluir este cliente os Itens salvos também
-                                                serão excluídos!!</span>
-                                        </div>
-                                        <form
-                                            action="{{ route('vendedor.cliente.destroy', ['vendedor' => auth()->user()->id, 'cliente' => $cliente->id]) }}"
-                                            method="POST">
-                                            @method('DELETE')
-                                            @csrf
-                                            <input type="hidden" value="1" name="verify">
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Sair</button>
-                                                <button type="submit" class="btn btn-primary">Excluir</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- Fim Modal Deleta Cliente --}}
-
-                            {{-- Modal Edita usuario Cliente --}}
-                            <div class="modal fade" id="editarCliente{{ $cliente->id }}" tabindex="-1"
-                                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Editar Cliente</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <form
-                                            action="{{ route('vendedor.cliente.update', ['vendedor' => auth()->user()->id, 'cliente' => $cliente->id]) }}"
-                                            method="POST">
-                                            @method('PUT')
-                                            @csrf
-                                            <div class="modal-body" style="margin-top: -20px;">
-
-                                                <div class="mb-3">
-                                                    <label for="recipient-name" class="col-form-label">Nome:</label>
-                                                    <input type="text" required name="nome" class="form-control"
-                                                        id="recipient-name" value="{{ $cliente->nome }}">
-                                                </div>
-                                                <div class="mb-3" style="margin-top: -20px;">
-                                                    <label for="recipient-name" class="col-form-label">email:</label>
-                                                    <input type="email" name="email" class="form-control"
-                                                        id="recipient-name" value="{{ $cliente->email }}">
-                                                </div>
-                                                <div class="mb-3" style="margin-top: -20px;">
-                                                    <label for="message-text" class="col-form-label">Telefone:</label>
-                                                    <input type="number" name="telefone" class="form-control"
-                                                        id="message-text" value="{{ $cliente->telefone }}">
-                                                </div>
-                                                <div class="mb-3" style="margin-top: -20px;">
-                                                    <label for="recipient-name" class="col-form-label">Cidade:</label>
-                                                    <input type="text" name="cidade" class="form-control"
-                                                        id="recipient-name" value="{{ $cliente->cidade }}">
-                                                </div>
-                                                <div class="row" style="margin-top: -20px;">
-                                                    <div class="mb-3 col-8">
-                                                        <label for="recipient-name" class="col-form-label">Rua:</label>
-                                                        <input type="text" name="rua" class="form-control"
-                                                            id="recipient-name" value="{{ $cliente->rua }}">
-                                                    </div>
-                                                    <div class="mb-3 col-4">
-                                                        <label for="message-text" class="col-form-label">Nº:</label>
-                                                        <input type="number" name="numero_rua" class="form-control"
-                                                            id="message-text" value="{{ $cliente->numero_rua }}">
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Sair</button>
-                                                <button onclick="msgContato()" type="submit"
-                                                    class="btn btn-primary">Editar</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- Fim Modal Edita usuario Cliente --}}
-
 
                             {{-- Modal Adiciona Observação --}}
 

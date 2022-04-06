@@ -13,7 +13,7 @@
 namespace Composer;
 
 $GLOBALS['_composer_bin_dir'] = __DIR__;
-$GLOBALS['_composer_autoload_path'] = __DIR__ . '/../../../..'.'/projetos/alltechVendas/vendor/autoload.php';
+$GLOBALS['_composer_autoload_path'] = __DIR__ . '/..'.'/autoload.php';
 
 if (PHP_VERSION_ID < 80000) {
     if (!class_exists('Composer\BinProxyWrapper')) {
@@ -64,6 +64,16 @@ if (PHP_VERSION_ID < 80000) {
             public function stream_lock($operation)
             {
                 return $operation ? flock($this->handle, $operation) : true;
+            }
+
+            public function stream_seek($offset, $whence)
+            {
+                if (0 === fseek($this->handle, $offset, $whence)) {
+                    $this->position = ftell($this->handle);
+                    return true;
+                }
+
+                return false;
             }
 
             public function stream_tell()

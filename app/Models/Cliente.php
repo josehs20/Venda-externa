@@ -34,8 +34,8 @@ class Cliente extends Model
         return $this->hasMany('App\Models\InfoCliente');
     }
 
-    public function cidade()
+    public function enderecos()
     {
-        return $this->belongsTo('App\Models\CidadeIbge', 'cidade_ibge_id', 'id');
+        return $this->hasOne('App\Models\Endereco');
     }
 }

@@ -9,7 +9,6 @@ class CarrinhoItem extends Model
 {
     protected $table = 'carrinho_itens';
     protected $fillable = [
-        'alltech_id',
         'quantidade',
         'preco',
         'tipo_desconto',
