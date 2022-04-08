@@ -11,7 +11,7 @@ class Loja extends Model
 
     public function empresa()
     {
-        return $this->belongsTo('App\Model\Empresa');
+        return $this->belongsTo('App\Models\Empresa');
     }
 
     public function empresaVenda()

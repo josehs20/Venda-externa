@@ -24,7 +24,7 @@
                 -moz-appearance: textfield;
             }
 
-            #inputUf {
+            #uf {
                 text-transform: uppercase;
             }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CidadeIbge;
 use App\Models\Cliente;
 use App\Models\InfoCliente;
+use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +19,7 @@ class ClienteController extends Controller
      */
     public function index(Request $request)
     {
-        dd(Storage::disk('ftp')->directories('APPVENDA'));
+        //  dd(Storage::disk('ftp')->directories());
         $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
             ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
 
@@ -57,7 +58,7 @@ class ClienteController extends Controller
             'fone2' => strlen($_POST['telefones'][1]) > 7 ? $_POST['telefones'][1] : null,
             'celular' => strlen($_POST['telefones'][2]) > 7 ? $_POST['telefones'][2] : null,
         ]);
-        $cliente->enderecos()->create([
+        $endereco = $cliente->enderecos()->create([
             'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
             'cep' => preg_replace("/[^0-9]/", "", $_POST['cep']),
             'bairro' => $_POST['bairro'],
@@ -65,7 +66,7 @@ class ClienteController extends Controller
             'numero' => $_POST['numero'] ? intval($_POST['numero']) : null,
             'compto' => $_POST['complemento'] ? $_POST['complemento'] : null,
         ]);
-
+        $this->exportaClienteNovo($cliente, $endereco);
         $dados['success'] = true;
         echo json_encode($dados);
         Session::flash('clienteadd');
@@ -127,7 +128,9 @@ class ClienteController extends Controller
             ]);
             $dados['success'] = true;
             echo json_encode($dados);
-            Session::flash('clienteUpdate');
+
+            $cliente = Cliente::with('enderecos')->find($_PUT['id']);
+            $dados['cliente'] = $this->jsonClienteUpdateStorage($cliente);
         }
         return;
     }
@@ -153,5 +156,47 @@ class ClienteController extends Controller
         ]);
         Session::flash('clienteAddObs', "Adicionado Com Sucesso!!");
         return redirect()->back();
+    }
+
+    private function jsonClienteUpdateStorage($cliente)
+    {
+
+        $dados['id'] = $cliente->id;
+        $dados['alltech_id'] = "-" . $cliente->alltech_id;
+        $dados['loja_id'] = $cliente->loja_id;
+        $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
+        $dados['nome'] = $cliente->nome;
+        $dados['docto'] = $cliente->docto;
+        $dados['tipo'] = $cliente->tipo;
+        $dados['email'] = $cliente->email;
+        $dados['fone1'] = $cliente->fone1;
+        $dados['fone2'] = $cliente->fone2;
+        $dados['celular'] = $cliente->celular;
+        $dados['cidade_ibge'] = $cliente->enderecos->cidadeIbge->codigo;
+        $dados['cep'] = $cliente->enderecos->cep;
+        $dados['bairro'] = $cliente->enderecos->bairro;
+        $dados['rua'] = $cliente->enderecos->rua;
+        $dados['numero'] = $cliente->enderecos->numero;
+        $dados['compto'] = $cliente->enderecos->compto;
+        $dados['tipo'] = $cliente->enderecos->tipo;
+        // Storage::disk('local')->put($file, Storage::disk('ftp')->get($file));
+        $file = json_encode($dados);
+        $dir = $cliente->loja->empresa->pasta;
+        Storage::disk('local')->makeDirectory($dir);
+        $files = Storage::disk('local')->files($dir);
+        if (count($files) == 0) {
+            dd(Storage::put($dir . '/CLIENTE-1.json', $file));
+        } else {
+            foreach ($files as $key => $file) {
+                if (str_contains($file, 'CLIENTE-')) {
+                    $files[] = $file;
+                    Storage::put($dir . '/CLIENTE-' . count($files) . '.json', $file);
+                }
+            }
+        }
+
+        // $count = Storage::get(str_contains($file, '-CLIENTE-'));
+
+        return $dados;
     }
 }
