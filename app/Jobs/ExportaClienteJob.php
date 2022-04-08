@@ -8,19 +8,23 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
-class SyncClienteJob implements ShouldQueue
+
+class ExportaClienteJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
+    private $file;
+    private $dir;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($file, $dir)
     {
-        //
+        $this->file = $file;
+        $this->dir = $dir;
     }
 
     /**
@@ -30,6 +34,7 @@ class SyncClienteJob implements ShouldQueue
      */
     public function handle()
     {
-        //
+        Storage::disk('ftp')->makeDirectory($this->dir);
+        Storage::disk('ftp')->put($this->file, Storage::get($this->file));
     }
 }

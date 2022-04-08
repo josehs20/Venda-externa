@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ExportaClienteJob;
 use App\Models\CidadeIbge;
 use App\Models\Cliente;
 use App\Models\InfoCliente;
-use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -93,6 +93,9 @@ class ClienteController extends Controller
     public function edit($id)
     {
         $cliente = Cliente::find($id);
+       $file = Storage::disk('local')->files('28825657000107');
+       $a = Storage::get($file[0]);
+        dd(json_decode($a));
         return view('cliente.formUpdate', compact('cliente'));
     }
 
@@ -130,7 +133,7 @@ class ClienteController extends Controller
             echo json_encode($dados);
 
             $cliente = Cliente::with('enderecos')->find($_PUT['id']);
-            $dados['cliente'] = $this->jsonClienteUpdateStorage($cliente);
+            $this->jsonClienteUpdateStorage($cliente);
         }
         return;
     }
@@ -173,30 +176,35 @@ class ClienteController extends Controller
         $dados['fone2'] = $cliente->fone2;
         $dados['celular'] = $cliente->celular;
         $dados['cidade_ibge'] = $cliente->enderecos->cidadeIbge->codigo;
+        $dados['cidade'] = $cliente->enderecos->cidadeIbge->nome;
+        $dados['uf'] = $cliente->enderecos->cidadeIbge->uf;
         $dados['cep'] = $cliente->enderecos->cep;
         $dados['bairro'] = $cliente->enderecos->bairro;
         $dados['rua'] = $cliente->enderecos->rua;
         $dados['numero'] = $cliente->enderecos->numero;
         $dados['compto'] = $cliente->enderecos->compto;
         $dados['tipo'] = $cliente->enderecos->tipo;
-        // Storage::disk('local')->put($file, Storage::disk('ftp')->get($file));
-        $file = json_encode($dados);
+
+        $json = json_encode($dados);
         $dir = $cliente->loja->empresa->pasta;
         Storage::disk('local')->makeDirectory($dir);
         $files = Storage::disk('local')->files($dir);
+        $count = 1;
+
         if (count($files) == 0) {
-            dd(Storage::put($dir . '/CLIENTE-1.json', $file));
+            Storage::put($dir . '/CLIENTE-1.json', $json);
+            $file = $dir . '/CLIENTE-1.json';
         } else {
             foreach ($files as $key => $file) {
-                if (str_contains($file, 'CLIENTE-')) {
-                    $files[] = $file;
-                    Storage::put($dir . '/CLIENTE-' . count($files) . '.json', $file);
+                if (str_contains($file, 'CLIENTE')) {
+                    $files_cliente[] = $file;
+                    $count++;
                 }
             }
+            Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
+            $file = $dir . '/CLIENTE-' . $count . '.json';
         }
-
-        // $count = Storage::get(str_contains($file, '-CLIENTE-'));
-
-        return $dados;
+        ExportaClienteJob::dispatch($file, $dir);
+        //$file = Storage::get($dir . '/CLIENTE-' . $count . '.json', $json);
     }
 }
