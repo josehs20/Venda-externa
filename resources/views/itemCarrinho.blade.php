@@ -32,9 +32,10 @@
                                     <body onload="msgContato(msg = 13)">
     @endif
     @if (!isset($itens))
-
-        <div class="alert alert-warning mt-5" role="alert">
-            Adicione Produtos No Seu Carrinho De Vendas :)
+        <div id="contentIndex">
+            <div class="alert alert-warning mt-5" role="alert">
+                Adicione Produtos No Seu Carrinho De Vendas :)
+            </div>
         </div>
     @else
         <!-- Modal Unifica -->
@@ -167,7 +168,7 @@
                                 <i class="bi bi-cash-stack">&ensp;{{ $itens->valor_desconto }} </i>
                             </div>
                             <div class="inner">
-                                <p>&ensp;{{ $itens->tp_desconto == 'porcento_unico'? "Unificado em % $itens->desconto_qtd": ($itens->tp_desconto == 'dinheiro_unico'? "Unificado em R$ $itens->desconto_qtd": (!$itens->tp_desconto ? 'Nenhum Desconto Aplicado' : 'Desconto Dado Parcialmente')) }}
+                                <p>&ensp;{{ $itens->tp_desconto == 'porcento_unico'? "Unificado em % $itens->desconto_qtd": ($itens->tp_desconto == 'dinheiro_unico'? "Unificado em R$ $itens->desconto_qtd": (!$itens->tp_desconto? 'Nenhum Desconto Aplicado': 'Desconto Dado Parcialmente')) }}
                                 </p>
                             </div>
 
@@ -287,7 +288,7 @@
                     <li class="list-group-item d-flex justify-content-between align-items-center"
                         style="border: none; background-color: rgb(193, 194, 201)">
                         <a
-                            style="color: black; font-weight: 500; text-decoration:none; font-size:16px">{{ $item->produto->nome }}&ensp;{{$item->iGrade ? '/'. $item->iGrade->tam : ''}}</a>
+                            style="color: black; font-weight: 500; text-decoration:none; font-size:16px">{{ $item->produto->nome }}&ensp;{{ $item->iGrade ? '/' . $item->iGrade->tam : '' }}</a>
                         <a class="badge  rounded-pill" data-bs-toggle="modal"
                             data-bs-target="#deleteItemCarrinho{{ $item->id }}"><i class="bi bi-x-square"
                                 style="font-size: 22px; cursor: pointer; color:black;"></i></a>
@@ -318,7 +319,7 @@
                             <span>Desconto Unico</span>
                         @else
                             <span
-                                class="badge bg-primary rounded-pill">{{ ($itens->tp_desconto == 'porcento_unico' ? 'Porcentagem única' : ($itens->tp_desconto == 'dinheiro_unico' ? 'Unificado em dinheiro' :(!$item->qtd_desconto ? 'Não inserido': ($item->tipo_desconto == 'porcento'? '%' . $item->qtd_desconto : "R$" . $item->qtd_desconto)))) }}</span>
+                                class="badge bg-primary rounded-pill">{{ $itens->tp_desconto == 'porcento_unico'? 'Porcentagem única': ($itens->tp_desconto == 'dinheiro_unico'? 'Unificado em dinheiro': (!$item->qtd_desconto? 'Não inserido': ($item->tipo_desconto == 'porcento'? '%' . $item->qtd_desconto: "R$" . $item->qtd_desconto))) }}</span>
                         @endif
                     </li>
                     <br>

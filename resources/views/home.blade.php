@@ -17,6 +17,7 @@
 
         <body onload="msgContato(msg = 7)">
     @endif
+    <div id="contentIndex">
     <form id="elemento_ajax_html" name="addItem" method="POST" class="list">
         @csrf
         @foreach ($produtos as $produto)
@@ -98,7 +99,7 @@
                 </a>
             </li>
 
-            @for ($i = 1; $i <= 6; $i++)
+            @for ($i = 1; $i <= ($produtos->lastPage() >= 6 ? 6 : $produtos->lastPage()); $i++)
                 <!-- a Tag for another page -->
                 <li class="page-item"><a class="page-link"
                        
@@ -113,5 +114,6 @@
             </li>
         </ul>
     </nav>
+    </div>
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewhome.js') }}" defer></script>

@@ -31,7 +31,6 @@ body {
         width: 50px;
         margin-left: -10px;
     }
-
 }
 
 .bar {
@@ -51,6 +50,7 @@ body {
 }
 
 .bar-user-sair {
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -79,32 +79,38 @@ body {
     margin-left: 64px;
     margin-top: -40px;
 }
-.btnMenu{
+
+.btnMenu {
+    z-index: 90000;
     cursor: pointer;
-    div{
-    background-color: rgb(255, 255, 255);
-    width: 25px;
-    height: 3px;
-    margin: 5px;
-    transition: 1s;
+
+    div {
+        background-color: rgb(255, 255, 255);
+        width: 25px;
+        height: 3px;
+        margin: 5px;
+        transition: 1s;
     }
 }
-  .linha1{
+
+.linha1 {
     transform: rotate(-45deg) translate(-2px, 1px);
     position: relative;
     width: 15px !important;
 
 }
-.linha2{
+
+.linha2 {
     opacity: 1;
 }
-.linha3{
+
+.linha3 {
     transform: rotate(45deg) translate(-2px, -1px);
     position: relative;
     width: 15px !important;
 }
 
-.list{
+.list {
     display: flex;
     width: 100%;
     flex-wrap: wrap;
@@ -113,48 +119,82 @@ body {
     margin-top: 2%;
 }
 
-.listHome{
+.listHome {
     width: 40%;
     display: flex;
     margin: 1%;
 }
 
-.listItemCarrinho{
+.listItemCarrinho {
     margin-top: 2%;
 }
 
-.listCliente{
+.listCliente {
     margin-top: 4%;
 }
 
+#buscaCliente {
+    position: fixed;
+    top: 9.3%;
+    z-index: 100;
+    opacity: 0.7;
+    right: 0;
+    background-color: #000000;
+}
+
+.inputBuscaCliente {
+    transition: 0.5s;
+    color: rgb(0, 0, 0);
+    border-radius: 4px;
+    border-color: white;
+    width: 37%;
+    height: 33px;
+    position: fixed;
+    top: 9%;
+    z-index: 100;
+    opacity: 1.0;
+    right: 0;
+    background-color: #ffffff;
+    transform: translateX(100%);
+}
 @media (max-width: 700px) {
-    .bar{
-        margin-top:15%;
+    #contentIndex{
+        margin-top: 30%;
     }
+    .bar {
+        margin-top: 20%;
+    }
+
     .card {
         width: 90% !important;
     }
+
     .bar-pesquisa-user-carrinho {
         flex-wrap: wrap;
     }
+
     .bar-user-carrinho {
         flex-direction: row-reverse;
         justify-content: space-between;
         width: 100%;
     }
+
     .fotocarr {
         width: 38px;
         height: 30px;
     }
+
     .quanti {
         position: absolute;
         margin-left: 64px;
         margin-top: -40px;
     }
+
     .search button {
         width: 20%;
     }
-    .list{
+
+    .list {
         display: flex;
         width: 100%;
         flex-wrap: wrap;
@@ -162,25 +202,30 @@ body {
         align-items: center;
         margin-top: 18%;
     }
-    .listItemCarrinho{
+
+    .listItemCarrinho {
         margin-top: 20%;
     }
-    
-    .listHome{
+
+    .listHome {
         width: 95%;
         display: flex;
         margin-top: 2%;
     }
-    .listCliente{
+
+    .listCliente {
         margin-top: 20%;
     }
+
     .bar-user-sair {
+        margin-top: 15px;
         display: flex;
         flex-direction: column;
         justify-content: space-around;
         align-items: center;
         margin-left: 40px;
     }
+
     .collapsible {
         height: 20px;
         background-color: #777;
@@ -192,32 +237,32 @@ body {
         outline: none;
         font-size: 15px;
     }
-    
+
     .active,
     .collapsible:hover {
         background-color: #555;
     }
-    
+
     .collapsible:after {
         content: '\002B';
         color: white;
         font-weight: bold;
         float: left;
-        margin-top:-30px;
+        margin-top: -30px;
     }
-    
+
     .active:after {
         content: "\2212";
-        
+
     }
-    
+
     .contentconspllan {
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.2s ease-out;
         background-color: #a8a8a8;
     }
-    
+
     //venda Salva 
     .contentconspllanVendaSalva {
         max-height: 0;
@@ -225,6 +270,39 @@ body {
         transition: max-height 0.2s ease-out;
         background-color: #ffffff;
     }
+
+    #buscaCliente {
+        position: fixed;
+        top: 13%;
+        z-index: 100;
+        opacity: 0.7;
+        right: 0;
+        background-color: #000000;
+    }
+
+    .inputBuscaCliente {
+        transition: 0.5s;
+        color: rgb(0, 0, 0);
+        border-radius: 4px;
+        border-color: white;
+        width: 80%;
+        height: 30px;
+        position: fixed;
+        top: 13%;
+        z-index: 100;
+        opacity: 1.0;
+        right: 0;
+        background-color: #ffffff;
+        transform: translateX(100%);
+    }
+}
+
+.go-back {
+    transform: translateX(0%);
+}
+
+.go-esconde {
+    transform: translateX(100%);
 }
 
 .listCar {
@@ -232,7 +310,8 @@ body {
     display: flex;
     justify-content: space-between;
 }
-.listCar h6{
+
+.listCar h6 {
     font-size: 12px;
 }
 
@@ -320,7 +399,7 @@ body {
 }
 
 .search input {
-    height: 45px;   
+    height: 45px;
     border: none;
 }
 
@@ -339,6 +418,7 @@ body {
     border-left: 1px solid rgb(78, 78, 78);
     background: rgb(255, 255, 255)
 }
+
 .lupa-list {
     position: absolute;
     top: 5px;
@@ -349,18 +429,19 @@ body {
 
     background: rgb(255, 255, 255)
 }
+
 @media (min-width: 700px) {
-    .list-qtd{
-         width: 15% !important;
+    .list-qtd {
+        width: 15% !important;
     }
 }
 
-.imgCarr{
+.imgCarr {
     width: 25px;
     height: 23px;
 }
 
-.buttonAdd{
+.buttonAdd {
     width: 25px;
     height: 100%;
     background-color: #b87518;
@@ -368,9 +449,8 @@ body {
     border: 2.5px;
     border-radius: 5px;
     padding: 1px;
-  
-}
 
+}
 .search-cliente {
     position: relative;
     margin: 1em;
@@ -379,7 +459,7 @@ body {
 }
 
 .search-cliente input {
-    height: 45px;   
+    height: 45px;
     border: none;
 }
 
@@ -398,7 +478,8 @@ body {
     border-left: 1px solid rgb(78, 78, 78);
     background: rgb(255, 255, 255)
 }
-.lupa-salvaItem{
+
+.lupa-salvaItem {
     position: absolute;
     top: 5px;
     right: 5px;
@@ -411,8 +492,8 @@ body {
 
 @import '../../node_modules/bootstrap/scss/bootstrap.scss';
 
-.list-group{
-    width:100% !important;
+.list-group {
+    width: 100% !important;
 }
 
 
@@ -440,12 +521,12 @@ body {
     color: white;
     font-weight: bold;
     float: left;
-    margin-top:-30px;
+    margin-top: -30px;
 }
 
 .active:after {
     content: "\2212";
-    
+
 }
 
 .contentconspllan {
@@ -461,4 +542,12 @@ body {
     overflow: hidden;
     transition: max-height 0.2s ease-out;
     background-color: #ffffff;
+}
+
+.dropdown-item {
+    z-index: 1000000 !important;
+}
+
+.dropdown-menu {
+    z-index: 1000000 !important;
 }

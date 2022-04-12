@@ -9,6 +9,7 @@
 
         <body onload="msgContato(msg = 7)">
     @endif
+    <div id="contentIndex">
     @if (sizeof($carrinhos_Salvos) == 0)
         <div class="alert alert-warning mt-5" role="alert">
             Nenhuma Venda Salva :)
@@ -161,5 +162,6 @@
 
         </div>
     @endif
+    </div>
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewcliente.js') }}" defer></script>

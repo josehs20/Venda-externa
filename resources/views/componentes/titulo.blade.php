@@ -12,7 +12,7 @@
         #titlePage {
             margin-top: 10%;
             color: rgb(255, 255, 255);
-            font-size: 14px;
+            font-size: 12px;
         }
 
     }
@@ -20,7 +20,7 @@
     @media (max-width: 800px) {
         #titlePage {
             color: rgb(255, 255, 255);
-            font-size: 14px;
+            font-size: 12px;
         }
 
     }

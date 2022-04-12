@@ -19,10 +19,8 @@ class ClienteController extends Controller
      */
     public function index(Request $request)
     {
-        //  dd(Storage::disk('ftp')->directories());
         $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
             ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
-
         return view('cliente.index', compact('clientes'));
     }
 
@@ -58,7 +56,7 @@ class ClienteController extends Controller
             'fone2' => strlen($_POST['telefones'][1]) > 7 ? $_POST['telefones'][1] : null,
             'celular' => strlen($_POST['telefones'][2]) > 7 ? $_POST['telefones'][2] : null,
         ]);
-        $endereco = $cliente->enderecos()->create([
+        $cliente->enderecos()->create([
             'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
             'cep' => preg_replace("/[^0-9]/", "", $_POST['cep']),
             'bairro' => $_POST['bairro'],
@@ -66,10 +64,10 @@ class ClienteController extends Controller
             'numero' => $_POST['numero'] ? intval($_POST['numero']) : null,
             'compto' => $_POST['complemento'] ? $_POST['complemento'] : null,
         ]);
-        $this->exportaClienteNovo($cliente, $endereco);
         $dados['success'] = true;
         echo json_encode($dados);
-        Session::flash('clienteadd');
+
+        $this->jsonClienteStorageJob($cliente);
         return;
     }
 
@@ -93,9 +91,9 @@ class ClienteController extends Controller
     public function edit($id)
     {
         $cliente = Cliente::find($id);
-       $file = Storage::disk('local')->files('28825657000107');
-       $a = Storage::get($file[0]);
-        dd(json_decode($a));
+    //    $file = Storage::disk('local')->files('28825657000107');
+    //    $a = Storage::get($file[0]);
+    //     dd(json_decode($a));
         return view('cliente.formUpdate', compact('cliente'));
     }
 
@@ -133,7 +131,7 @@ class ClienteController extends Controller
             echo json_encode($dados);
 
             $cliente = Cliente::with('enderecos')->find($_PUT['id']);
-            $this->jsonClienteUpdateStorage($cliente);
+            $this->jsonClienteStorageJob($cliente);
         }
         return;
     }
@@ -161,11 +159,11 @@ class ClienteController extends Controller
         return redirect()->back();
     }
 
-    private function jsonClienteUpdateStorage($cliente)
+    private function jsonClienteStorageJob($cliente)
     {
 
         $dados['id'] = $cliente->id;
-        $dados['alltech_id'] = "-" . $cliente->alltech_id;
+        $dados['alltech_id'] = $cliente->alltech_id == '0000' ? $cliente->alltech_id : "-" . $cliente->alltech_id;
         $dados['loja_id'] = $cliente->loja_id;
         $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
         $dados['nome'] = $cliente->nome;
@@ -186,25 +184,24 @@ class ClienteController extends Controller
         $dados['tipo'] = $cliente->enderecos->tipo;
 
         $json = json_encode($dados);
+        //dd($json);
         $dir = $cliente->loja->empresa->pasta;
         Storage::disk('local')->makeDirectory($dir);
         $files = Storage::disk('local')->files($dir);
         $count = 1;
 
         if (count($files) == 0) {
-            Storage::put($dir . '/CLIENTE-1.json', $json);
-            $file = $dir . '/CLIENTE-1.json';
+            Storage::put($dir . '/CLIENTE-'.$count.'.json', $json);
+            $file = $dir . '/CLIENTE-'.$count.'.json';
         } else {
             foreach ($files as $key => $file) {
                 if (str_contains($file, 'CLIENTE')) {
-                    $files_cliente[] = $file;
                     $count++;
                 }
             }
             Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
             $file = $dir . '/CLIENTE-' . $count . '.json';
         }
-        ExportaClienteJob::dispatch($file, $dir);
-        //$file = Storage::get($dir . '/CLIENTE-' . $count . '.json', $json);
+        ExportaClienteJob::dispatch($file, $dir); 
     }
 }

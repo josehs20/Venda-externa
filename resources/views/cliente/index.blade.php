@@ -12,76 +12,33 @@
         -moz-appearance: textfield;
     }
 
-    #addContato {
-        position: fixed;
-        bottom: 60px;
-        z-index: 9999;
-        opacity: 0.7;
-        position: fixed;
-        right: 0;
-        background-color: #0d6efd;
-    }
-
-    #buscaCliente {
-        position: fixed;
-        bottom: 100px;
-        z-index: 9999;
-        opacity: 0.7;
-        position: fixed;
-        right: 0;
-        background-color: #b87518;
-    }
-
 </style>
+
 @section('content')
 
     @include('componentes.navbar')
     @include('componentes.titulo', [
         'titlePage' => 'Clientes',
     ])
-
-    <a id="addContato" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModaladdContato"><i
-            class="bi bi-person-plus"></i></a>
-    <a id="buscaCliente" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBuscaCliente"><i
-            class="bi-search"></i></a>
-
     @if (Session::has('clienteAddObs'))
 
-            <body onload="msgContato(msg = 2)">
-            @elseif(Session::has('deleta_cliente'))
+        <body onload="msgContato(msg = 2)">
+        @elseif(Session::has('deleta_cliente'))
 
-                <body onload="msgContato(msg = 5)">
-                @elseif(Session::has('updateCliente'))
+            <body onload="msgContato(msg = 5)">
+            @elseif(Session::has('updateCliente'))
 
-                    <body onload="msgContato(msg = 6)">
+                <body onload="msgContato(msg = 6)">
     @endif
 
-    {{-- Modal search --}}
-    <form action="{{ route('clientes.index', auth()->user()->id) }} " method="GET">
-        @csrf
-        <div class="modal fade" id="modalBuscaCliente" tabindex="-1" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Buscar Cliente</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
+    <form action="{{ route('clientes.index', auth()->user()->id) }}">
 
-                        <input required name="nome" type="search" class="form-control search col-12"
-                            placeholder="Buscar Cliente">
+        <input name="nome" class="inputBuscaCliente " id="inputBuscaCliente" type="text" placeholder="Buscar Cliente">
 
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
-                        <button type="submit" class="btn btn-primary">Buscar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <a id="buscaCliente" class="btn btn-primary"><i class="bi bi-arrow-left-right"></i></i></a>
     </form>
 
+    <div id="contentIndex">
     @if ($clientes->count())
         <div class="listCliente">
             <div class="container">
@@ -105,8 +62,9 @@
                                     </li>
 
                                     <li class="list-group-item">
+
                                         <a style="font: italic bold 15px monospace"> Cidade : </a>
-                                        &nbsp;&nbsp;{{ $cliente->enderecos->cidadeIbge ? $cliente->enderecos->cidadeIbge->nome : 'Não Informado' }}&nbsp;&nbsp;{{ $cliente->enderecos ? '| UF : ' . $cliente->enderecos->cidadeIbge->uf : 'UF: Não Informado' }}
+                                        &nbsp;&nbsp;{{ $cliente->enderecos && $cliente->enderecos->cidadeIbge? $cliente->enderecos->cidadeIbge->nome: 'Não Informado' }}&nbsp;&nbsp;{{ $cliente->enderecos && $cliente->enderecos->cidadeIbge? '| UF : ' . $cliente->enderecos->cidadeIbge->uf: 'UF: Não Informado' }}
 
                                     </li>
                                     <li class="list-group-item">
@@ -117,12 +75,12 @@
                                     <li class="list-group-item">
                                         <a style="font: italic bold 15px monospace"> Rua : </a>
                                         &nbsp;&nbsp;{{ $cliente->enderecos ? $cliente->enderecos->rua : 'Não Informado' }}
-                                        &nbsp;&nbsp;{{ $cliente->enderecos->numero ? ' | Nº : ' . $cliente->enderecos->numero : '| Nº : SN' }}
+                                        &nbsp;&nbsp;{{ $cliente->enderecos ? ' | Nº : ' . $cliente->enderecos->numero : '| Nº : SN' }}
 
                                     </li>
                                     <li class="list-group-item">
                                         <a style="font: italic bold 15px monospace"> Complemento : </a>
-                    
+
                                         &nbsp;&nbsp;{{ $cliente->enderecos ? $cliente->enderecos->compto : 'Não Informado' }}
 
                                     </li>
@@ -137,7 +95,8 @@
 
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <a href="{{route('clientes.edit', $cliente->id)}}" style="cursor: pointer;" class="badge bg-primary rounded-pill">Editar
+                                        <a href="{{ route('clientes.edit', $cliente->id) }}" style="cursor: pointer;"
+                                            class="badge bg-primary rounded-pill">Editar
                                             Cliente</a>
 
                                         <span style="cursor: pointer;" class="badge bg-primary rounded-pill"
@@ -253,7 +212,7 @@
                                                 </b>{{ $info->data ? $info->data : 'Não informado ' }}</small>
                                             <button
                                                 style="float: right; border:none!important;
-                                                                                                                                                                background-color: rgb(172, 172, 172); "
+                                                                                                                                                                                background-color: rgb(172, 172, 172); "
                                                 type="submit" class="js-del"
                                                 onclick="botaoInfo(<?php echo $info->id; ?>)">
 
@@ -275,6 +234,30 @@
         </div>
     @endif
 
+    {{-- paginação --}}
+    <nav class="navegacao mt-3" aria-label="Navegação">
+        <ul class="pagination" style="justify-content: center;">
+            <li class="page-item">
+                <a class="page-link" href="{{ $clientes->previousPageUrl() }}" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">voltar</span>
+                </a>
+            </li>
+
+            @for ($i = 1; $i <= ($clientes->lastPage() >= 6 ? 6 : $clientes->lastPage()); $i++)
+                <!-- a Tag for another page -->
+                <li class="page-item"><a class="page-link"
+                        href="{{ $clientes->url($i) }}">{{ $i }}</a></li>
+            @endfor
+
+            <li class="page-item">
+                <a class="page-link" href="{{ $clientes->url($clientes->lastPage()) }}" aria-label="Próximo">
+                    <span aria-hidden="true">... {{ $clientes->lastPage() }}</span>
+
+                </a>
+            </li>
+        </ul>
+    </nav>
     {{-- evento conspllan --}}
     <script>
         var coll = document.getElementsByClassName("collapsible");
@@ -292,5 +275,7 @@
             });
         }
     </script>
+   
+    </div>
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewcliente.js') }}" defer></script>

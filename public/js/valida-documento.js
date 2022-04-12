@@ -42,7 +42,24 @@ $(function () {
                 dataType: 'json',
             }).done(function (response) {
                 if (response['success'] == true) {
-                    location.reload();
+                    $('#docto').val("");  
+                    $('#inputNome').val("");  
+                     $('#inputEmail').val("");
+                     $('#inputTel1').val("");   
+                     $('#inputTel2').val("");   
+                     $('#celular').val("");              
+                     $('#cep').val("");
+                     $("#uf").val("");
+                     $("#rua").val("");
+                     $("#bairro").val("");
+                     $("#cidade").val("");
+                     $("#numero").val("");
+                     $("#compto").val("");
+                     $("#cidIbge").val("");
+                     mensagem = 'Cliente Cadastrado Com Sucesso';
+                     tipo = 'success';
+                     tempo = false;
+                     mostraDialogo(mensagem, tipo, tempo);
                 }
             });
         } else {
@@ -94,7 +111,7 @@ $(function () {
                 dataType: 'json',
             }).done(function (response) {
                 if (response['success'] == true) {
-                    mensagem = 'Cliente Atualizado com sucesso';
+                    mensagem = 'Cliente Atualizado Com Sucesso';
                     tipo = 'success';
                     tempo = false;
                     mostraDialogo(mensagem, tipo, tempo);
@@ -113,7 +130,6 @@ $(function () {
 function PesquisarCepCidade() {
     var uf = $("#uf").val();
     var cidade = $("#cidade").val();
-    var resultado;
     var erro = document.getElementById("error");
     $.ajax({
         type: "GET",
