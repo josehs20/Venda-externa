@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <!--===============================================================================================-->
+    {{-- <!--===============================================================================================-->
     <link rel="icon" type="image/png" href="entrar/images/icons/favicon.ico" />
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="entrar/vendor/bootstrap/css/bootstrap.min.css">
@@ -60,7 +60,7 @@
                         class="form-control campo @error('password') is-invalid @enderror" name="password" required
                         autocomplete="current-password"> --}}
 
-                    @error('password')
+                   {{-- @error('password')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
@@ -91,26 +91,14 @@
         </div>
     </div>
 
-
-
-
-    <!--===============================================================================================-->
-    <script src="entrar/vendor/jquery/jquery-3.2.1.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="entrar/vendor/bootstrap/js/popper.js"></script>
-    <script src="entrar/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="entrar/vendor/select2/select2.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="entrar/vendor/tilt/tilt.jquery.min.js"></script>
     <script>
         $('.js-tilt').tilt({
             scale: 1.1
         })
     </script>
     <!--===============================================================================================-->
-    <script src="entrar/js/main.js"></script>
-    {{-- <div class="div-externa-login">
+    <script src="entrar/js/main.js"></script> --}}
+  <div class="div-externa-login">
 
         <div class="div-interna-login">
             <div class="div-logo">
@@ -171,5 +159,5 @@
             </div>
 
         </div>
-    </div> --}}
+    </div>
 @endsection

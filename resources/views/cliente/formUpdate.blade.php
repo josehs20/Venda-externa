@@ -34,6 +34,7 @@
 
         <body onload="msgContato(msg = 1.5)">
     @endif
+    <div id="contentIndex">
         <div class="container" style="width: 99%; margin-top:65px;">
             <div class="card border-primary mb-3 mx-3">
                 <div class="card-header d-flex d-flex justify-content-center">
@@ -143,5 +144,6 @@
             </div>
         </div>
     </div>
+
 @endsection
 <script type="text/javascript" src="{{ asset('js/valida-documento.js') }}" defer></script>

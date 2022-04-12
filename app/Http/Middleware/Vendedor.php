@@ -18,9 +18,8 @@ class Vendedor
     {
         if (auth()->user() && auth()->user()->perfil === 'vendedor') {
             return $next($request);
-    }else {
-        return redirect('/')->with('message', 'Sem premissão de acesso');
-    }
-    
+        } else {
+            return redirect('/')->with('message', 'Sem premissão de acesso');
+        }
     }
 }
