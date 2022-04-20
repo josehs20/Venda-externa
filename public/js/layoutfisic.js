@@ -26,88 +26,96 @@ buscaCliente.addEventListener("click", function () {
     //     line.classList.toggle(line.id)
     // })
 });
-
-
-function msgContato(msg) {
-    if (msg === 2) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Observação Adicionada Com sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    } else if (msg === 3) {
-        var msg = 'Não Autorizado Custo Maior Que Venda!!';
-        var tipo = 'warning';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
-    } else if (msg === 4) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Venda Salva Com Sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    } else if (msg === 7) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Venda Cancelada Com sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    } else if (msg === 8) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Itens retornados com sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    } else if (msg === 9) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Itens retirados com sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    } else if (msg === 10) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Item Alterado Com Sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    } else if (msg === 11) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Desconto Alterado Com Sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    } else if (msg === 12) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Descontos Zerados Com Sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    } else if (msg === 13) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Quantidade Alterada Com Sucesso',
-            showConfirmButton: false,
-            timer: 1500
-        })
-
-    } else if (msg === 14) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Venda Finalizada Com Sucesso Aguarde o envio para o EGI',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    }
+function msgSuccess(msg) {
+    console.log(msg);
+    Swal.fire({
+        icon: 'success',
+        title: msg,
+        showConfirmButton: false,
+        timer: 2000
+    })
 }
+
+// function msgContato(msg) {
+//     if (msg === 2) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Observação Adicionada Com sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     } else if (msg === 3) {
+//         var msg = 'Não Autorizado Custo Maior Que Venda!!';
+//         var tipo = 'warning';
+//         setTimeout(function () {
+//             mostraDialogo(msg, tipo);
+//         }, 100);
+//     } else if (msg === 4) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Venda Salva Com Sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     } else if (msg === 7) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Venda Cancelada Com sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     } else if (msg === 8) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Itens retornados com sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     } else if (msg === 9) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Item retirados com sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     } else if (msg === 10) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Item Alterado Com Sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     } else if (msg === 11) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Desconto Alterado Com Sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     } else if (msg === 12) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Descontos Zerados Com Sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     } else if (msg === 13) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Quantidade Alterada Com Sucesso',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+
+//     } else if (msg === 14) {
+//         Swal.fire({
+//             icon: 'success',
+//             title: 'Venda Finalizada Com Sucesso Aguarde o envio para o EGI',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//     }
+// }
 
 
 //Mensagem Personalizada

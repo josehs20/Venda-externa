@@ -10,7 +10,8 @@
                 <form class="search" action="{{ route('venda.index') }}" method="GET">
                     @csrf
                     <input id="search" name="nome" type="search" class="form-control" placeholder="Buscar Produto">
-                    <button id="preventBuscaProduto" class="lupa"><i class="bi-search" style="color: black"></i></button>
+                    <button id="preventBuscaProduto" class="lupa"><i class="bi-search"
+                            style="color: black"></i></button>
                 </form>
                 <div class="home-carrinho">
                     {{-- Menu Personalizado --}}
@@ -27,10 +28,12 @@
                         <ul class="dropdown-menu">
 
                             <li><a class="dropdown-item" href="{{ route('clientes.index') }} ">Clientes</a></li>
-                            <li><a class="dropdown-item" href="{{ route('clientes.create') }} ">Cadastro De Cliente</a></li>
-                            <li><a class="dropdown-item" href="#">Vendas Finalizadas</a></li>
+                            <li><a class="dropdown-item" href="{{ route('clientes.create') }} ">Cadastro De
+                                    Cliente</a></li>
+                            <li><a class="dropdown-item" href="{{ route('vendas_finalizadas') }}">Vendas
+                                    Finalizadas</a></li>
                             <li><a class="dropdown-item" href="{{ route('venda_salva') }} ">Vendas Salvas</a></li>
-                            
+
 
                         </ul>
                     </div>
@@ -38,8 +41,10 @@
                     <a href="{{ route('itens_carrinho', ['user_id' => auth()->user()->id]) }}">
                         <img class="fotocarr" src="{{ asset('navCarr.ico') }}">
                         <h6 class="quanti" style="color:#fff">
-                            <div class="quantiCar" style="width: 25px; height: 20px; text-align:center;"><p>{{count_item(auth()->user()->id)}}</p></div>
-                            </h6>
+                            <div class="quantiCar" style="width: 25px; height: 20px; text-align:center;">
+                                <p>{{ count_item(auth()->user()->id) }}</p>
+                            </div>
+                        </h6>
                     </a>
                 </div>
             </div>
@@ -64,7 +69,7 @@
                         </a> &emsp;&emsp;&emsp;
                         <a style="color: rgb(138, 138, 138);" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
-                                                                                                                                             document.getElementById('logout-form').submit();">
+                                                                                                                                                 document.getElementById('logout-form').submit();">
                             {{ __('Sair') }}
                         </a>
 

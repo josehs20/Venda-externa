@@ -15,6 +15,7 @@ class Carrinho extends Model
        'tp_desconto',
        'valor_bruto',
        'total', 
+       'tipo_pagamento',
        'cliente_id',
        'status', 
     ];

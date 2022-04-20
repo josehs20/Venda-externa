@@ -17,10 +17,10 @@
     @include('componentes.titulo', ['titlePage' => 'Produtos'])
     @if (Session::has('cancelar_carrinho'))
 
-        <body onload="msgContato(msg = 7)">
-        @elseif (Session::has('finalizado'))
+        <body onload="msgSuccess('Venda Cancelado Com Sucesso')">
+        @elseif (Session::has('carrinho_finalizado'))
 
-            <body onload="msgContato(msg = 14)">
+            <body onload="msgSuccess('Venda Finalizado Com Sucesso')">
     @endif
     <div id="contentIndex">
         <div id="elemento_ajax_html" name="addItem" method="POST" class="list">
@@ -104,58 +104,57 @@
                         <div class="modal-dialog modal-dialog-scrollable">
                             <form id="formModalComGrade" name="addItemComGrade" method="POST" class="list">
                                 @csrf
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">{{ $produto->nome }} /
-                                        {{ $produto->grades->nome }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    @foreach ($produto->grades->igrades as $ig)
-                                        @if (array_key_exists($ig->id, $produtos_carrinho_quantidade['itemCarrinhoGrade']) && $produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id'] == $produto->id)
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-text">
-                                                    <input class="form-check-input mt-0 valid_check" type="checkbox"
-                                                        value="{{ $ig->id }}">
-                                                </div>
-                                                <div class="input-group-text">
-                                                    <span class="">{{ $ig->tam }}</span>
-                                                </div>
-                                                <input class="form-control valid_input" type="number" min="0.01" step="0.01"
-                                                    placeholder="{{ $produtos_carrinho_quantidade['itemCarrinhoGrade'][$ig->id] }}">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">{{ $produto->nome }} /
+                                            {{ $produto->grades->nome }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        @foreach ($produto->grades->igrades as $ig)
+                                            @if (array_key_exists($ig->id, $produtos_carrinho_quantidade['itemCarrinhoGrade']) && $produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id'] == $produto->id)
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-text">
+                                                        <input class="form-check-input mt-0 valid_check" type="checkbox"
+                                                            value="{{ $ig->id }}">
+                                                    </div>
+                                                    <div class="input-group-text">
+                                                        <span class="">{{ $ig->tam }}</span>
+                                                    </div>
+                                                    <input class="form-control valid_input" type="number" min="0" max="100000" step=".01"
+                                                        placeholder="{{ $produtos_carrinho_quantidade['itemCarrinhoGrade'][$ig->id] }}">
 
 
-                                                {{-- <span class="input-group-text">% {{'a'}}</span> --}}
-                                            </div>
-                                        @else
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-text">
-                                                    <input class="form-check-input mt-0 valid_check" type="checkbox"
-                                                        value="{{ $ig->id }}">
+                                                    {{-- <span class="input-group-text">% {{'a'}}</span> --}}
                                                 </div>
-                                                <div class="input-group-text">
-                                                    <span class="">{{ $ig->tam }}</span>
-                                                </div>
-                                                <input class="form-control valid_input" type="number" min="0.01" step="0.01"
-                                                    placeholder="Quantidade">
+                                            @else
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-text">
+                                                        <input class="form-check-input mt-0 valid_check" type="checkbox"
+                                                            value="{{ $ig->id }}">
+                                                    </div>
+                                                    <div class="input-group-text">
+                                                        <span class="">{{ $ig->tam }}</span>
+                                                    </div>
+                                                    <input class="form-control valid_input" type="number" min="0" max="100000" step=".01" placeholder="Quantidade">
 
 
-                                                {{-- <span class="input-group-text">% {{'a'}}</span> --}}
-                                            </div>
-                                        @endif
-                                    @endforeach
-                                    {{-- {{ dd($produto->id) }}
+                                                    {{-- <span class="input-group-text">% {{'a'}}</span> --}}
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                        {{-- {{ dd($produto->id) }}
                                     {{ dd($produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id']) }} --}}
 
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button id="fechaModal" type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Sair</button>
+                                        <button onclick="verifyGrade(<?php echo $produto->id; ?>)" type="submit"
+                                            class="btn btn-primary">Adicionar</button>
+                                    </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button id="fechaModal" type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Sair</button>
-                                    <button onclick="verifyGrade(<?php echo $produto->id; ?>)" type="submit"
-                                        class="btn btn-primary">Adicionar</button>
-                                </div>
-                            </div>
                             </form>
                         </div>
                     </div>

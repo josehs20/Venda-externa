@@ -20,15 +20,9 @@
     @include('componentes.titulo', [
         'titlePage' => 'Clientes',
     ])
-    @if (Session::has('clienteAddObs'))
+    @if (Session::has('Add_Obs'))
 
-        <body onload="msgContato(msg = 2)">
-        @elseif(Session::has('deleta_cliente'))
-
-            <body onload="msgContato(msg = 5)">
-            @elseif(Session::has('updateCliente'))
-
-                <body onload="msgContato(msg = 6)">
+    <body onload="msgSuccess('Observação Adicionada Com Sucesso')">
     @endif
 
     <form action="{{ route('clientes.index', auth()->user()->id) }}">
@@ -162,8 +156,7 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
-                                            <form action="{{ route('add_observacao', $cliente->id) }}"
-                                                method="POST">
+                                            <form action="{{ route('add_observacao', $cliente->id) }}" method="POST">
                                                 @csrf
                                                 <div class="modal-body">
 
@@ -213,7 +206,7 @@
                                                     </b>{{ $info->data ? $info->data : 'Não informado ' }}</small>
                                                 <button
                                                     style="float: right; border:none!important;
-                                                                                                                                                                                        background-color: rgb(172, 172, 172); "
+                                                                                                                                                                                            background-color: rgb(172, 172, 172); "
                                                     type="submit" class="js-del"
                                                     onclick="botaoInfo(<?php echo $info->id; ?>)">
 

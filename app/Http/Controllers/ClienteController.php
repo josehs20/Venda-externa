@@ -18,11 +18,12 @@ class ClienteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $msg = null)
     {
         $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
             ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
-        return view('cliente.index', compact('clientes'));
+            
+        return view('cliente.index', compact('clientes', 'msg'));
     }
     public function busca_cliente_ajax()
     {
@@ -203,9 +204,9 @@ class ClienteController extends Controller
             Carrinho::find($carrinho)->update(['status' => "Aberto"]);
         }
         //  dd('a');
-        Session::flash('substituicao');
+        Session::flash('success');
 
-        return redirect(route('itens_carrinho', auth()->user()->id));
+    return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Itens Substituídos Com Sucesso']));
     }
 
     public function add_observacao(Request $request, $cliente)
@@ -218,8 +219,8 @@ class ClienteController extends Controller
             'observacao' => $request->observacao,
             'cliente_id' => $cliente,
         ]);
-        Session::flash('clienteAddObs', "Adicionado Com Sucesso!!");
-        return redirect()->back();
+        Session::flash('Add_Obs');
+        return redirect(route('clientes.index'));
     }
 
     public function deleta_obs_ajax($observacao)

@@ -27,9 +27,9 @@ Route::get('/busca_produto/', [App\Http\Controllers\VendaController::class, 'bus
 Route::put('/salvar_venda',  [App\Http\Controllers\VendaController::class, 'salvar_venda'])->middleware('vendedor')->name('salvar_venda');
 Route::put('/unifica_valor_Itens/{carrinho?}', [App\Http\Controllers\VendaController::class, 'unifica_valor_Itens'])->Middleware('vendedor')->name('unifica_valor_Itens');
 Route::put('/zera_desconto/{carrinho?}', [App\Http\Controllers\VendaController::class, 'zera_desconto'])->Middleware('vendedor')->name('zera_desconto');
-Route::put('/finaliza_venda/{carrinho?}', [App\Http\Controllers\VendaController::class, 'finaliza_venda'])->Middleware('vendedor')->name('finaliza_venda');
 Route::get('/venda_finalizada/', [App\Http\Controllers\VendaController::class, 'venda_finalizada'])->Middleware('vendedor')->name('venda_finalizada');
-
+Route::put('/finaliza_venda/{carrinho?}', [App\Http\Controllers\VendaController::class, 'finaliza_venda'])->Middleware('vendedor')->name('finaliza_venda');
+Route::get('vendas_finalizadas', [App\Http\Controllers\VendaController::class, 'vendas_finalizadas'])->Middleware('vendedor')->name('vendas_finalizadas');
 //Route::resource('vendedor.cliente', App\Http\Controllers\VendedorClienteController::class)->middleware('vendedor');
 
 Route::resource('clientes', App\Http\Controllers\ClienteController::class)->middleware('vendedor');

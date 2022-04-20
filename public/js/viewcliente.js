@@ -19,14 +19,14 @@ function botaoInfo(id) {
             }).done(function (response) {
                 if (response['success'] === true) {
                     document.getElementById(info_id).remove();
-                    var msg = 'Observação Excluida Com Sucesso!!';
-                    var tipo = 'success';
-                    mostraDialogo(msg, tipo);
-                } else {
-                    var msg = 'Observação já Excluida, Atualize a Página!!';
-                    var tipo = 'warning';
-                    mostraDialogo(msg, tipo);
-                }
+              
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Observação excluida Com Sucesso',
+                        showConfirmButton: false,
+                        timer: 2000
+                    })
+                } 
     
             });
         }

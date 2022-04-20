@@ -6,7 +6,12 @@
         'titlePage' => 'Carrinho',
     ])
     {{-- Modal Desconto Unificado --}}
-    @if (Session::has('nao_autorizado'))
+    @if (Session::has('success'))
+
+        <body onload="msgSuccess('<?php echo $msg; ?>')">
+    @endif
+
+    {{-- @if (Session::has('nao_autorizado'))
 
         <body onload="msgContato(msg = 3)">
         @elseif (Session::has('carrinho_salvo'))
@@ -30,7 +35,7 @@
                                 @elseif(Session::has('quantidade_alterada'))
 
                                     <body onload="msgContato(msg = 13)">
-    @endif
+    @endif --}}
     @if (!isset($carrinho))
         <div id="contentIndex">
             <div class="alert alert-warning mt-5" role="alert">
@@ -236,15 +241,16 @@
                             </div>
 
                             <form method="POST" action="{{ route('finaliza_venda', ['carrinho' => $carrinho->id]) }}">
+                                @method('PUT')
                                 @csrf
 
-                                <span class="mx-3"><u>Salvos para {{ $carrinho->cliente->nome }}</u></span>
+                                <span class="mx-3"><b>Cliente Já Mencionado</b></span>
                                 <div class="modal-body">
 
                                     <div class="row g-2">
                                         <div class="col-4">
                                             <div class="form-floating">
-                                                <input required Readonly type="text" class="form-control"
+                                                <input name="cliente_alltech_id" required Readonly type="text" class="form-control"
                                                     value="{{ $carrinho->cliente->alltech_id }}" id="floatingInputGrid">
                                                 <label for="floatingInputGrid">Cod.</label>
                                             </div>
@@ -264,10 +270,10 @@
                                     <div class="row d-flex justify-content-center">
                                         <div class="col-10">
                                             <div class="form-floating">
-                                                <select name="tipo_desconto" class="form-select" id="floatingSelectGrid"
+                                                <select name="tipo_pagamento" class="form-select" id="floatingSelectGrid"
                                                     aria-label="Floating label select example">
-                                                    <option value="">A VISTA</option>
-                                                    <option value="">A PRAZO</option>
+                                                    <option value="AV">A VISTA</option>
+                                                    <option value="AP">A PRAZO</option>
                                                 </select>
                                                 <label for="floatingSelectGrid">Tipo</label>
                                             </div>
@@ -400,8 +406,8 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Desconto:
-                            @if ($carrinho->tp_desconto)
-                                <span>Desconto Unico</span>
+                            @if ($carrinho->tp_desconto == 'porcento_unico' or !$carrinho->tp_desconto)
+                                <span>{{!$carrinho->tp_desconto ? 'Não Aplicado' : 'Porcentagem Única'}}</span>
                             @else
                                 <span
                                     class="badge bg-primary rounded-pill">{{ $carrinho->tp_desconto == 'porcento_unico'? 'Porcentagem única': ($carrinho->tp_desconto == 'dinheiro_unico'? 'Unificado em dinheiro': (!$item->qtd_desconto? 'Não inserido': ($item->tipo_desconto == 'porcento'? '%' . $item->qtd_desconto: "R$" . $item->qtd_desconto))) }}</span>
@@ -425,12 +431,12 @@
                                     <label class="mx-2" for=""> Produto: <b>
                                             {{ $item->produto->nome }}</b></label>
                                     <hr>
-                                    <label class="mx-2" for=""> Quantidade Atual: <b>
+                                    {{-- <label class="mx-2" for=""> Quantidade Atual: <b>
                                             {{ $item->quantidade }}</b></label>
                                     <hr>
                                     <label class="mx-2" for=""> Preco: <b>R$
                                             {{ reais($item->preco) }}</b></label>
-                                    <hr>
+                                    <hr> --}}
 
 
                                     <form method="POST" action="{{ route('venda.update', ['venda' => $item->id]) }}">
@@ -477,6 +483,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-4">
+                                                        <span></span>
                                                         <div class="form-floating">
                                                             <select name="tipo_desconto" class="form-select"
                                                                 id="floatingSelectGrid"
@@ -564,7 +571,7 @@
                                 <div class="row g-2">
                                     <div class="col-4">
                                         <div class="form-floating">
-                                            <input required id="clienteCodigo" type="text" class="form-control"
+                                            <input required name="cliente_alltech_id" id="clienteCodigo" type="text" class="form-control"
                                                 value="999999" name="codigoCliente" id="floatingInputGrid"
                                                 placeholder="quantidade">
                                             <label for="floatingInputGrid">Cod.</label>
@@ -589,7 +596,7 @@
                                 <div class="row d-flex justify-content-center">
                                     <div class="col-10">
                                         <div class="form-floating">
-                                            <select name="tipoVenda" class="form-select" id="floatingSelectGrid"
+                                            <select name="tipo_pagamento" class="form-select" id="floatingSelectGrid"
                                                 aria-label="Floating label select example">
                                                 <option value="AV">A VISTA</option>
                                                 <option value="AP">A PRAZO</option>
