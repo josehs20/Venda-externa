@@ -20,7 +20,7 @@ btn.addEventListener("click", function () {
 buscaCliente.addEventListener("click", function () {
     inputBuscaCliente.classList.remove('go-esconde')
     inputBuscaCliente.classList.toggle('go-back')
- 
+
     /* forEach to make the menu an X */
     // menuIcon.forEach((line) => {
     //     line.classList.toggle(line.id)
@@ -29,20 +29,13 @@ buscaCliente.addEventListener("click", function () {
 
 
 function msgContato(msg) {
-
-    if (msg === 1) {
-        var msg = 'Cliente Adicionado Com Sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
-
-    } else if (msg === 2) {
-        var msg = 'Observação Adicionada Com sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+    if (msg === 2) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Observação Adicionada Com sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
     } else if (msg === 3) {
         var msg = 'Não Autorizado Custo Maior Que Venda!!';
         var tipo = 'warning';
@@ -50,65 +43,69 @@ function msgContato(msg) {
             mostraDialogo(msg, tipo);
         }, 100);
     } else if (msg === 4) {
-        var msg = 'Venda Salva Com sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
-    } else if (msg === 5) {
-        var msg = 'Cliente excluido com sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
-    } else if (msg === 6) {
-        var msg = 'Cliente Editado com sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+        Swal.fire({
+            icon: 'success',
+            title: 'Venda Salva Com Sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
     } else if (msg === 7) {
-        var msg = 'Venda Cancelada Com sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+        Swal.fire({
+            icon: 'success',
+            title: 'Venda Cancelada Com sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
     } else if (msg === 8) {
-        var msg = 'Itens retornados com sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+        Swal.fire({
+            icon: 'success',
+            title: 'Itens retornados com sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
     } else if (msg === 9) {
-        var msg = 'Item Retirado Com Sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+        Swal.fire({
+            icon: 'success',
+            title: 'Itens retirados com sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
     } else if (msg === 10) {
-        var msg = 'Item Alterado Com Sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+        Swal.fire({
+            icon: 'success',
+            title: 'Item Alterado Com Sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
     } else if (msg === 11) {
-        var msg = 'Desconto Alterado Com Sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+        Swal.fire({
+            icon: 'success',
+            title: 'Desconto Alterado Com Sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
     } else if (msg === 12) {
-        var msg = 'Descontos Zerados Com Sucesso!!';
-        var tipo = 'success';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+        Swal.fire({
+            icon: 'success',
+            title: 'Descontos Zerados Com Sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
     } else if (msg === 13) {
-        var msg = 'Quantidade Alterada Com Sucesso!!';
-        var tipo = 'danger';
-        setTimeout(function () {
-            mostraDialogo(msg, tipo);
-        }, 100);
+        Swal.fire({
+            icon: 'success',
+            title: 'Quantidade Alterada Com Sucesso',
+            showConfirmButton: false,
+            timer: 1500
+        })
+
+    } else if (msg === 14) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Venda Finalizada Com Sucesso Aguarde o envio para o EGI',
+            showConfirmButton: false,
+            timer: 1500
+        })
     }
 }
 

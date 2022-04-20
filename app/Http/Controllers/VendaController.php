@@ -18,13 +18,30 @@ class VendaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $msg = false)
     {
-        $produtos = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(20);
+        $produtos_carrinho_quantidade['itemCarrinho'][0] = false;
+        $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = false;
 
+        $produtos = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
+        $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
 
-        //dd($produtos[0]->grades->iGrades);
-        return view('home', compact('produtos'));
+        // dd($carrinho );
+
+        if ($carrinho) {
+            foreach ($carrinho->carItem as $key => $item) {
+
+                if ($item->i_grade_id) {
+                    $produtos_carrinho_quantidade['itemCarrinhoGrade'][$item->i_grade_id] = $item->quantidade;
+                    $produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id'] = $item->produto_id;
+                } else {
+                    $produtos_carrinho_quantidade['itemCarrinho'][$item->produto_id] = $item->quantidade;
+                    // $produtos_carrinho_quantidade['itemCarrinho'] = $item->qunatidade;
+                }
+            }
+        }
+
+        return view('home', compact('produtos', 'carrinho', 'produtos_carrinho_quantidade'));
     }
 
     public function busca_produto_ajax()
@@ -42,17 +59,12 @@ class VendaController extends Controller
 
     public function itens_carrinho($user_id = null, $msg = null)
     {
-        // dd($msg);
+
         $clientes_user = Cliente::with('infoCliente')->where('loja_id', auth()->user()->loja_id)->orderBy('nome')->paginate(50);
         // dd($clientes_user);
-        $itens = Carrinho::with('carItem')->where('user_id', $user_id)->where('status', 'Aberto')->first();
+        $carrinho = Carrinho::with('carItem')->where('user_id', $user_id)->where('status', 'Aberto')->first();
 
-        $valor_itens_total_sem_desconto = $itens ? $itens->carItem()->selectRaw("sum(preco * quantidade) total")->where('carrinho_id', $itens->id)->first() : null;
-        $valor_itens_desconto = $itens ? $itens->total : null;
-
-        $total_desconto_valor = $itens ? $itens->valor_desconto : null;
-        $tp_desconto = $itens ? $itens->tp_desconto_unificado : null;
-
+        //autoriza as msgs na view de carrinho
         if ($msg == 'deletado') {
             Session::flash('item_deletado_carrinho');
         } elseif ($msg == 'alterado') {
@@ -65,7 +77,7 @@ class VendaController extends Controller
             Session::flash('quantidade_alterada');
         }
 
-        return view('itemCarrinho', compact('itens', 'clientes_user', 'valor_itens_total_sem_desconto', 'total_desconto_valor', 'valor_itens_desconto', 'tp_desconto',));
+        return view('itemCarrinho', compact('carrinho', 'clientes_user'));
     }
 
     /**
@@ -92,6 +104,7 @@ class VendaController extends Controller
 
         //variavel para verificar se o produto contém grade ou não via ajax
         $i_grade_qtd = $_POST['i_grade_qtd'];
+        $qtd =  $_POST['qtd'];
 
         //caso carrinho não tenha nenhum carrinho aberto já é aberto automaticamente
         if (!$carrinho) {
@@ -104,7 +117,7 @@ class VendaController extends Controller
             if ($i_grade_qtd) {
                 $this->add_item_grade($i_grade_qtd, $produto, $carrinho);
             } else {
-                $this->add_item($produto, $carrinho);
+                $this->add_item($produto, $carrinho, $qtd);
             }
 
             $this->atualiza_carrinho_desconto_unico($carrinho);
@@ -118,8 +131,9 @@ class VendaController extends Controller
             $dado['msg'] = 'produto novo e carrinho aberto';
             echo json_encode($dado);
             return;
-        } elseif ($i_grade_qtd) {
-
+        }
+        if ($i_grade_qtd) {
+            //condição tem qeu ser sa
             $dado['proditem'] =   $this->add_item_grade($i_grade_qtd, $produto, $carrinho);
             // atualização de desconto unico ou sem desconto para itens diferentes que são inseridos no carrinho
             $this->atualiza_carrinho_desconto_unico($carrinho);
@@ -135,21 +149,22 @@ class VendaController extends Controller
             echo json_encode($dado);
 
             return;
-        } elseif (!$item) {
+        }
+        if (!$item) {
 
-            $this->add_item($produto, $carrinho);
+            $this->add_item($produto, $carrinho, $qtd);
 
             $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
                 ->where('status', 'Aberto')->first();
-
+            $this->atualiza_carrinho_desconto_unico($carrinho);
             $dado['count_item'] = $count_item->carItem->count();
             $dado['produto_adicionado'] = $produto->nome;
             $dado['ok'] = true;
             $dado['msg'] = "item novo sem grade";
             echo json_encode($dado);
             return;
-        } elseif ($item) {
-            $quantidade = $item->quantidade + 1;
+        } else {
+            $quantidade = $qtd;
 
             if ($item->tipo_desconto) {
 
@@ -187,18 +202,18 @@ class VendaController extends Controller
                 $dado['count_item'] = $count_item->carItem->count();
                 $dado['produto_adicionado'] = $produto->nome;
                 $dado['ok'] = "add";
-                $dado['msg'] = "mais um intem pra quantidade sem grade";
+                $dado['msg'] = "Quantidade Atualizada";
                 echo json_encode($dado);
             }
         }
     }
 
-    public function add_item($produto, $carrinho)
+    public function add_item($produto, $carrinho, $qtd)
     {
         $carrinho->carItem()->create([
             'produto_id' => $produto->id,
             'preco'      => $produto->preco,
-            'quantidade' => 1,
+            'quantidade' => $qtd,
             'valor'      => $produto->preco,
         ]);
     }
@@ -349,7 +364,7 @@ class VendaController extends Controller
             return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'alterado']));
         }
     }
-    public function zeraDesconto($carrinho)
+    public function zera_desconto($carrinho)
     {
         $carrinho = Carrinho::with('carITem')->find($carrinho);
 
@@ -387,7 +402,7 @@ class VendaController extends Controller
 
         return redirect(route('venda.index'));
     }
-    public function destroyItem($item)
+    public function destroy_item($item)
     {
         $carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
@@ -433,18 +448,10 @@ class VendaController extends Controller
         return redirect(route('itens_carrinho'));
     }
 
-    public function busca_cliente_ajax()
-    {
-        if ($_GET['nome']) {
-            $dado['result'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->paginate(20);
-            //$dado['result'] = $_GET['nome'];
-            echo json_encode($dado);
-        }
-    }
     public function atualiza_carrinho_desconto_parcial($item)
     {
 
-        $itens = CarrinhoItem::where('carrinho_id', $item->carrinho_id)->get();
+        $itens = CarrinhoItem::where('carrinho_id', $item->carrinho_id ? $item->carrinho_id : $item)->get();
 
         foreach ($itens as $item) {
             // dd($item->valor_desconto);
@@ -487,5 +494,14 @@ class VendaController extends Controller
             'valor_bruto' => array_sum($valor_itens_bruto),
             'total' => array_sum($valor_itens),
         ]);
+    }
+
+    public function finaliza_venda(Request $request, $carrinho)
+    {
+        Carrinho::find($carrinho)->update(['status' => 'fechado']);
+        Session::flash('carrinho_finalizado');
+        //vai entrar json para exportação e jobs
+        //dd($request->all());
+        return redirect(route('venda.index'));
     }
 }

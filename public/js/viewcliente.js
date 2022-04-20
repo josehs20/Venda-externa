@@ -72,8 +72,8 @@ $(function () {
     });
 });
 
-function fechaModal() {
-    location.reload();
+function continuaVenda(id) {
+    document.getElementById('fechaModalVendaSalva' + id) ? document.getElementById('fechaModalVendaSalva' + id).click() : false
 }
 
 

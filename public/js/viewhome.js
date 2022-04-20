@@ -12,92 +12,104 @@ function verifyGrade(id) {
 $(function () {
     $("#search").keyup(function () {
         var busca = $("#search").val();
-       // console.log(busca);
-        $.ajax({
-            url: "/busca_produto",
-            type: "GET",
-            data: {
-                busca: busca,
-            },
-            dataType: 'json',
-        }).done(function (response) {
-            //console.log(response);
-            //atualiza lista de busca
+        // console.log(busca);
+        if (busca.length >= 5) {
+            console.log(busca.length);
+            $.ajax({
+                url: "/busca_produto",
+                type: "GET",
+                data: {
+                    busca: busca,
+                },
+                dataType: 'json',
+            }).done(function (response) {
 
-            var resultado = "";
+                var resultado = "";
+                //monta a listagem de busca de produto
+                response['produtos'].forEach(element => {
+                    resultado += '<a class="listHome" style="cursor: pointer">'
+                    resultado += '<ul class="list-group">'
+                    resultado += '<li class="list-group-item" style="background-color: rgb(58, 36, 252)">'
+                    resultado += '<div class="listCar">'
+                    resultado += '<h6 style="color: white">' + element['nome'] + '</h6>'
 
-            //monta a listagem de busca de produto
-            response['produtos'].forEach(element => {
-                resultado += '<a class="listHome" style="cursor: pointer">'
-                resultado += '<ul class="list-group">'
-                resultado += '<li class="list-group-item" style="background-color: rgb(58, 36, 252)">'
-                resultado += '<div class="listCar">'
-                resultado += '<h6 style="color: white">' + element['nome'] + '</h6>'
-
-                if (element['grades']) {
-                    resultado += '<button type="button" class="buttonAdd" data-bs-toggle="modal" data-bs-target="#Grade' + element['id'] + '"><img id="imgg" class="imgCarr" src="addCar.ico" alt=""></button>'
+                    if (element['grades']) {
+                        resultado += '<button type="button" class="buttonAdd" data-bs-toggle="modal" data-bs-target="#Grade' + element['id'] + '"><img id="imgg" class="imgCarr" src="addCar.ico" alt=""></button>'
 
 
-                    resultado += '<div class="modal fade" id="Grade' + element['id'] + '" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">'
-                    resultado += '<div class="modal-dialog modal-dialog-scrollable">'
-                    resultado += '<div class="modal-content">'
-                    resultado += '<div class="modal-header">'
-                    resultado += '<h5 class="modal-title" id="staticBackdropLabel">' + element['nome'] + '/ ' + element['grades']['nome'] + '</h5>'
-                    resultado += '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
-                    resultado += '</div>'
-                    resultado += '<div class="modal-body">'
-
-                    element['grades']['i_grades'].forEach(ig => {
-
-                        resultado += '<div class="input-group mb-3">'
-                        resultado += '<div class="input-group-text">'
-                        resultado += '<input class="form-check-input mt-0 valid_check" type="checkbox" value="'+ ig['id'] +'">'
+                        resultado += '<div class="modal fade" id="Grade' + element['id'] + '" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">'
+                        resultado += '<div class="modal-dialog modal-dialog-scrollable">'
+                        resultado += '<div class="modal-content">'
+                        resultado += '<div class="modal-header">'
+                        resultado += '<h5 class="modal-title" id="staticBackdropLabel">' + element['nome'] + '/ ' + element['grades']['nome'] + '</h5>'
+                        resultado += '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
                         resultado += '</div>'
-                        resultado += '<div class="input-group-text">'
-                        resultado += '<span class="">' + ig['tam'] +'</span>'
+                        resultado += '<div class="modal-body">'
+
+                        element['grades']['i_grades'].forEach(ig => {
+
+                            resultado += '<div class="input-group mb-3">'
+                            resultado += '<div class="input-group-text">'
+                            resultado += '<input class="form-check-input mt-0 valid_check" type="checkbox" value="' + ig['id'] + '">'
+                            resultado += '</div>'
+                            resultado += '<div class="input-group-text">'
+                            resultado += '<span class="">' + ig['tam'] + '</span>'
+                            resultado += '</div>'
+                            resultado += '<input class="form-control valid_input" type="number" min="0.01" step="0.01" placeholder="Quantidade">'
+                            resultado += '</div>'
+
+                        });
+
                         resultado += '</div>'
-                        resultado += '<input class="form-control valid_input" type="number" min="0.01" step="0.01" placeholder="Quantidade">'
+                        resultado += '<div class="modal-footer">'
+                        resultado += '<button id="fechaModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>'
+                        resultado += '<button onclick="verifyGrade(' + element['id'] + ')" type="submit" class="btn btn-primary">Adicionar</button>'
+                        resultado += '</div>'
+                        resultado += '</div>'
+                        resultado += '</div>'
                         resultado += '</div>'
 
-                    });
+                    } else {
+                        resultado += '<button type="submit" onclick="cli(' + element['id'] + ')"class="buttonAdd"><img class="imgCarr" src="addCar.ico" alt=""></button>'
+                    }
+                    resultado += '</div>'
+                    resultado += '</li>'
+                    resultado += '<li class="list-group-item">'
+                    resultado += '<div class="listCar">'
+                    resultado += '<h6> Preço :</h6>'
+                    resultado += '<h4>' + Intl.NumberFormat('pt-br', { style: 'currency', currency: 'BRL' }).format(element['preco']) + '</h4>'
+                    resultado += '</div>'
+                    resultado += '</li>'
+                    resultado += '</ul>'
+                    resultado += '</a>'
 
-                    resultado += '</div>'
-                    resultado += '<div class="modal-footer">'
-                    resultado += '<button id="fechaModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>'
-                    resultado += '<button onclick="verifyGrade('+ element['id'] +')" type="submit" class="btn btn-primary">Adicionar</button>'
-                    resultado += '</div>'
-                    resultado += '</div>'
-                    resultado += '</div>'
-                    resultado += '</div>'
 
-                } else {
-                    resultado += '<button type="submit" onclick="cli(' + element['id'] + ')"class="buttonAdd"><img class="imgCarr" src="addCar.ico" alt=""></button>'
-                }
-                resultado += '</div>'
-                resultado += '</li>'
-                resultado += '<li class="list-group-item">'
-                resultado += '<div class="listCar">'
-                resultado += '<h6> Preço :</h6>'
-                resultado += '<h4>' + Intl.NumberFormat('pt-br', { style: 'currency', currency: 'BRL' }).format(element['preco']) + '</h4>'
-                resultado += '</div>'
-                resultado += '</li>'
-                resultado += '</ul>'
-                resultado += '</a>'
-
+                });
+                return document.getElementById("elemento_ajax_html").innerHTML = resultado;
 
             });
-            return document.getElementById("elemento_ajax_html").innerHTML = resultado;
-
-        });
+        }
     });
 });
-
+// Formulário Sem Grade
 $(function () {
-    $('form[name="addItem"]').submit(function (event) {
+    $('form[id="formModalSemGrade"]').submit(function (event) {
         event.preventDefault();
-
         var id = produto_id;
-        // console.log(id);
+        var qtd = $('#inputProdutoSemGrade' + id).val();
+
+        console.log(qtd);
+
+        if (!qtd || qtd == 0) {
+
+            Swal.fire({
+                icon: 'error',
+                title: "Quantidade Inválida",
+                showConfirmButton: false,
+                timer: 1500
+            })
+            return
+        }
         $.ajax({
             url: "/venda",
             type: "POST",
@@ -106,39 +118,98 @@ $(function () {
             },
             data: {
                 id: id,
+                qtd: qtd,
+                i_grade_qtd: null,
+            },
+            dataType: 'json',
+        }).done(function (response) {
+            console.log(response);
+            if (response['ok'] === true) {
+                var count_itens = response['count_item'];
+                $('.quantiCar').html(count_itens);
+                Swal.fire({
+                    icon: 'success',
+                    title: "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso",
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            } else if (response['ok'] == "add") {
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Quantidade Atualizada',
+                    showConfirmButton: false,
+                    timer: 2000
+                })
+
+            } else {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Não Foi Possível',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+
+            }
+            document.getElementById('fechaModal' + id) ? document.getElementById('fechaModal' + id).click() : false
+        });
+    });
+});
+//Fomulário Com  Grade
+$(function () {
+    $('form[id="formModalComGrade"]').submit(function (event) {
+        event.preventDefault();
+        var id = produto_id;
+        valida_form(id);
+        $.ajax({
+            url: "/venda",
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                id: id,
+                qtd: null,
                 i_grade_qtd: gradeVefiry ? valida_form(id) : null,
             },
             dataType: 'json',
         }).done(function (response) {
-          console.log(response);
+            console.log(response);
             if (response['ok'] === true) {
                 var count_itens = response['count_item'];
                 $('.quantiCar').html(count_itens);
-
-                var mensagem = "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso!!!";
-                var tipo = 'success';
-                var tempo = 2000;
-
-                mostraDialogo(mensagem, tipo, tempo);
-
+                Swal.fire({
+                    icon: 'success',
+                    title: "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso",
+                    showConfirmButton: false,
+                    timer: 2500
+                })
             } else if (response['ok'] == "add") {
-                // console.log(response);
-                var mensagem = "Adicionado mais 1 na quantidade";
-                var tipo = 'warning';
-                mostraDialogo(mensagem, tipo);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Quantidade Atualizada',
+                    showConfirmButton: false,
+                    timer: 2000
+                })
+
             } else {
-                var mensagem = "Não Foi Possível";
-                var tipo = 'danger';
 
-                mostraDialogo(mensagem, tipo);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Não Foi Possível',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+
             }
-
+            document.getElementById('fechaModal' + id) ? document.getElementById('fechaModal' + id).click() : false
         });
     });
 });
-
+//msg para grade e pega valores
 function valida_form(id) {
-
     var camp = document.getElementById('Grade' + id);
     var checks = camp.querySelectorAll('.valid_check');
 
@@ -147,70 +218,78 @@ function valida_form(id) {
     var dados = [];
 
     for (let i = 0; i < checks.length; i++) {
-         console.log(checks);
-
-        if (checks[i].checked != '' && inputs[i].value != '') {
+        if (inputs[i].value != '') {
             valid++;
+            if (!checks[i].checked) {
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Marque todos que tem a quantidade estabelecida',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+                checks = false;
+            }
 
             dados[i] = [checks[i].value, inputs[i].value]
         }
     }
-    if (!valid) {
+    if (!valid || !checks) {
 
-        console.log('nenhum item marcado');
-        var msg = 'Selecione o Campo selecionado';
-        var tipo = 'warning';
-        mostraDialogo(msg, tipo)
+        Swal.fire({
+            icon: 'warning',
+            title: 'Marque todos que tem a quantidade estabelecida',
+            showConfirmButton: false,
+            timer: 2500
+        })
         return false
     } else {
-        //  console.log(dados);
-       // console.log(dados);
         return dados;
     }
-
 }
+
 
 //Mensagem Personalizada
-function mostraDialogo(mensagem, tipo) {
+// function mostraDialogo(mensagem, tipo) {
 
-    // se houver outro alert desse sendo exibido, cancela essa requisição
-    if ($("#message").is(":visible")) {
-        return false;
-    }
+//     // se houver outro alert desse sendo exibido, cancela essa requisição
+//     if ($("#message").is(":visible")) {
+//         return false;
+//     }
 
-    // se não setar o tempo, o padrão é 3 segundos
-    var tempo = 2000;
+//     // se não setar o tempo, o padrão é 3 segundos
+//     var tempo = 2000;
 
 
-    // se não setar o tipo, o padrão é alert-info
-    if (!tipo) {
-        var tipo = "info";
-    }
+//     // se não setar o tipo, o padrão é alert-info
+//     if (!tipo) {
+//         var tipo = "info";
+//     }
 
-    // monta o css da mensagem para que fique flutuando na frente de todos elementos da página
-    var cssMessage = "display: block; position: fixed; top: 0; left: 20%; right: 20%; width: 60%; padding-top: 10px; z-index: 9999";
-    var cssInner = "margin: 0 auto; box-shadow: 1px 1px 5px black;";
+//     // monta o css da mensagem para que fique flutuando na frente de todos elementos da página
+//     var cssMessage = "display: block; position: fixed; top: 0; left: 20%; right: 20%; width: 60%; padding-top: 10px; z-index: 9999";
+//     var cssInner = "margin: 0 auto; box-shadow: 1px 1px 5px black;";
 
-    // monta o html da mensagem com Bootstrap
-    var dialogo = "";
-    dialogo += '<div id="message" style="' + cssMessage + '">';
-    dialogo += '    <div class="alert alert-' + tipo + ' alert-dismissable col-5" style="' + cssInner + '">';
-    dialogo += mensagem;
-    dialogo += '    </div>';
-    dialogo += '</div>';
+//     // monta o html da mensagem com Bootstrap
+//     var dialogo = "";
+//     dialogo += '<div id="message" style="' + cssMessage + '">';
+//     dialogo += '    <div class="alert alert-' + tipo + ' alert-dismissable col-5" style="' + cssInner + '">';
+//     dialogo += mensagem;
+//     dialogo += '    </div>';
+//     dialogo += '</div>';
 
-    // adiciona ao body a mensagem com o efeito de fade
-    $("body").append(dialogo);
-    $("#message").hide();
-    $("#message").fadeIn(200);
+//     // adiciona ao body a mensagem com o efeito de fade
+//     $("body").append(dialogo);
+//     $("#message").hide();
+//     $("#message").fadeIn(200);
 
-    // contador de tempo para a mensagem sumir
-    setTimeout(function () {
-        $('#message').fadeOut(300, function () {
-            $(this).remove();
-        });
-    }, tempo); // milliseconds
+//     // contador de tempo para a mensagem sumir
+//     setTimeout(function () {
+//         $('#message').fadeOut(300, function () {
+//             $(this).remove();
+//         });
+//     }, tempo); // milliseconds
 
-}
+// }
 
 

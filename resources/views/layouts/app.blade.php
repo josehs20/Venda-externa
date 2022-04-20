@@ -8,7 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>All Tech (vendas) </title>
-    <link rel="shortcut icon" href="{{asset('image/logo2.ico')}}" type="image/x-icon" />
+    <link rel="shortcut icon" href="{{asset('image/logo2.png')}}" type="image/x-icon" />
     
 
     <!-- Scripts -->

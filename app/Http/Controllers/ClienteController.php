@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ExportaClienteJob;
+use App\Models\Carrinho;
 use App\Models\CidadeIbge;
 use App\Models\Cliente;
 use App\Models\InfoCliente;
@@ -22,6 +23,19 @@ class ClienteController extends Controller
         $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
             ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
         return view('cliente.index', compact('clientes'));
+    }
+    public function busca_cliente_ajax()
+    {
+        $nome = $_GET['nome'];
+        $codigo = $_GET['codigo'];
+        if ($nome) {
+            $dados['nome'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->take(10)->get();
+        }
+        if ($codigo) {
+            $dados['codigo'] = Cliente::where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->first();
+        }
+        echo json_encode($dados);
+        return;
     }
 
     /**
@@ -91,9 +105,9 @@ class ClienteController extends Controller
     public function edit($id)
     {
         $cliente = Cliente::find($id);
-    //    $file = Storage::disk('local')->files('28825657000107');
-    //    $a = Storage::get($file[0]);
-    //     dd(json_decode($a));
+        //    $file = Storage::disk('local')->files('28825657000107');
+        //    $a = Storage::get($file[0]);
+        //     dd(json_decode($a));
         return view('cliente.formUpdate', compact('cliente'));
     }
 
@@ -146,10 +160,59 @@ class ClienteController extends Controller
     {
         //
     }
-    public function addObservacao(Request $request, $cliente)
+
+    public function venda_salva()
+    {
+
+        $carrinhos_Salvos = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Salvo')->get();
+        foreach ($carrinhos_Salvos as $key => $carrinho) {
+            $carrinho['somaItens'] = $carrinho->carItem()->selectRaw("sum(preco * quantidade) total")->get();
+        }
+        $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+
+        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->take(100)->get();
+
+        Session::flash('itens_salvo');
+
+        return view('cliente.vendaSalva', compact('carrinhos_Salvos', 'cliente_carrinho', 'clientes_user'));
+    }
+
+    public function substitui_carrinho(Request $request, $carrinho)
+    {
+        $carrinho_substituido = Carrinho::find($carrinho);
+        // dd($request->all());
+        if ($request->deleteCarrinho) {
+            $carrinho_substituido->delete();
+            Session::flash('deleta_carrinho');
+
+            return redirect(route('venda_salva'));
+        } elseif ($request->substituir) {
+            $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+            // dd($cliente_carrinho);
+            if ($cliente_carrinho->cliente) {
+                $cliente_carrinho->update(['status' => "Salvo"]);
+
+                $carrinho_substituido->update(['status' => "Aberto"]);
+            } else {
+                $cliente_carrinho->delete();
+
+                Carrinho::find($carrinho)->update(['status' => "Aberto"]);
+            }
+        } else {
+            //  dd(Carrinho::find($carrinho)->first());
+            Carrinho::find($carrinho)->update(['status' => "Aberto"]);
+        }
+        //  dd('a');
+        Session::flash('substituicao');
+
+        return redirect(route('itens_carrinho', auth()->user()->id));
+    }
+
+    public function add_observacao(Request $request, $cliente)
     {
         $data = date('d-m-Y', strtotime($request->data_obs));
-        dd($request->all());
+        // dd($request->all());
+
         InfoCliente::create([
             'data' => $request->data_obs ?  $data : null,
             'observacao' => $request->observacao,
@@ -157,6 +220,17 @@ class ClienteController extends Controller
         ]);
         Session::flash('clienteAddObs', "Adicionado Com Sucesso!!");
         return redirect()->back();
+    }
+
+    public function deleta_obs_ajax($observacao)
+    {
+        $response = InfoCliente::find($observacao)->delete();
+        if ($response) {
+            $dado['success'] = true;
+        } else {
+            $dado['success'] = false;
+        }
+        return json_encode($dado);
     }
 
     private function jsonClienteStorageJob($cliente)
@@ -191,8 +265,8 @@ class ClienteController extends Controller
         $count = 1;
 
         if (count($files) == 0) {
-            Storage::put($dir . '/CLIENTE-'.$count.'.json', $json);
-            $file = $dir . '/CLIENTE-'.$count.'.json';
+            Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
+            $file = $dir . '/CLIENTE-' . $count . '.json';
         } else {
             foreach ($files as $key => $file) {
                 if (str_contains($file, 'CLIENTE')) {
@@ -202,6 +276,6 @@ class ClienteController extends Controller
             Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
             $file = $dir . '/CLIENTE-' . $count . '.json';
         }
-        ExportaClienteJob::dispatch($file, $dir); 
+        ExportaClienteJob::dispatch($file, $dir);
     }
 }

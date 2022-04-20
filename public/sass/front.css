@@ -25,11 +25,11 @@ body {
 }
 
 .div-logo-alltech {
-  background-image: url(../image/logo1m.png);
+  background-image: url(../image/logo1.png);
   background-size: contain;
   background-repeat: no-repeat;
-  height: 45px;
-  width: 130px;
+  height: 30px;
+  width: 100px;
 }
 
 @media (max-width: 990px) {

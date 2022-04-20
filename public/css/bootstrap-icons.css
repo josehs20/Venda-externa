@@ -343,10 +343,7 @@ url(/fonts/vendor/bootstrap-icons/bootstrap-icons.woff?4e80a14a205e5b6212ffc52fc
 .bi-cart-x::before { content: "\f241"; }
 .bi-cart::before { content: "\f242"; }
 .bi-cart2::before { content: "\f243"; }
-.bi-cart2 { font-size: 45px; color: black; }
-.bi-cart3::before {
-  background-color: white;
-}
+.bi-cart3::before { content: "\f244"; }
 .bi-cart4::before { content: "\f245"; }
 .bi-cash-stack::before { content: "\f246"; }
 .bi-cash::before { content: "\f247"; }
@@ -911,10 +908,6 @@ url(/fonts/vendor/bootstrap-icons/bootstrap-icons.woff?4e80a14a205e5b6212ffc52fc
 .bi-list-stars::before { content: "\f476"; }
 .bi-list-task::before { content: "\f477"; }
 .bi-list-ul::before { content: "\f478"; }
-.bi-list-ul {
-  color: black;
-  font-size: 50px;
- }
 .bi-list::before { content: "\f479"; }
 .bi-lock-fill::before { content: "\f47a"; }
 .bi-lock::before { content: "\f47b"; }
@@ -1243,7 +1236,7 @@ url(/fonts/vendor/bootstrap-icons/bootstrap-icons.woff?4e80a14a205e5b6212ffc52fc
 .bi-telephone-plus::before { content: "\f5be"; }
 .bi-telephone-x-fill::before { content: "\f5bf"; }
 .bi-telephone-x::before { content: "\f5c0"; }
-.bi-telephone::before { content: "\f5c1"; color: black; cursor: pointer;}
+.bi-telephone::before { content: "\f5c1"; }
 .bi-terminal-fill::before { content: "\f5c2"; }
 .bi-terminal::before { content: "\f5c3"; }
 .bi-text-center::before { content: "\f5c4"; }

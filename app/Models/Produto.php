@@ -21,6 +21,15 @@ class Produto extends Model
         return $this->belongsTo('App\Models\Grade', 'grade_id', 'id');
     }
 
+    public function carrinhoItem()
+    {
+       return $this->hasOne('App\Models\CarrinhoItem');
+    }
+    public function carrinho()
+    {
+       return $this->belongsTo('App\Models\Carrinho', 'carrinho_id', 'id');
+    }
+
     public function descricaoProduto() {
         switch($this->situacao) {
             case 'A': return 'Ativo';
