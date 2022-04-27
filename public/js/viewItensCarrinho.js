@@ -5,6 +5,82 @@ var botaoBuscaClienteNomefinaliza = document.getElementById('botaoBuscaClienteNo
 var clienteCodigoConsulta = document.getElementById('clienteCodigo');
 
 
+//habilita avista ou a prazo
+function verificaAvistaAprazo(value) {
+    var input = document.getElementById("inputParcelas");
+    console.log(input);
+    if (value == 'AP') {
+        input.disabled = false;
+    } else if (value == 'AV') {
+        input.disabled = true;
+        input.value = 1;
+    }
+}
+function verificaDesconto(value, valorTotal, qtd_desconto_antigo) {
+    var input = document.getElementById("inputDesconto");
+    if (value == 'porcento') {
+        input.disabled = false;
+    } else if (value == 'dinheiro') {
+        input.disabled = false;
+
+
+    } else if (value == 0) {
+        input.disabled = true;
+        input.value = "";
+    }
+    calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, value)
+}
+function calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, tp_desconto) {
+    var qtd_desconto = document.getElementById("inputDesconto").value;
+    if (qtd_desconto) {
+        var tp_desconto = $('#tp_desconto_sobre_venda_modal').val();
+        var valorDesconto = tp_desconto == 'porcento' ? (valorTotal / 100) * qtd_desconto : qtd_desconto;
+        console.log(valorDesconto);
+
+        var novoValorTotalModal = valorTotal - valorDesconto;
+        var novoValorDescontoModal = parseFloat(valorDesconto) + qtd_desconto_antigo;
+       
+        atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto)
+
+    } else {
+
+        var novoValorTotalModal = valorTotal;
+        var novoValorDescontoModal = qtd_desconto_antigo;
+
+        atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto = null)
+    }
+
+}
+
+function atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto) {
+
+    document.getElementById('valorTotalModal').textContent = novoValorTotalModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
+    document.getElementById('valorDescontoModal').textContent = novoValorDescontoModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
+
+    $('#hiddenValorTotalModal').val(novoValorTotalModal);
+    $('#hiddenValorDescontoModal').val(novoValorDescontoModal);
+    $('#hiddenValorDescontoSobreVendaModal').val(valorDesconto);
+
+}
+$(function () {
+    $('form[name="formFinalizaVenda"]').submit(function (event) {
+        event.preventDefault();
+        var parcelas = document.getElementById("inputParcelas").value;
+        if (parcelas < 1 || parcelas % 1 != 0) {
+            console.log(parcelas);
+            Swal.fire({
+                icon: 'error',
+                title: 'Quantidade de parcelas Inválida',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }else{
+            console.log(document.getElementById('formFinalizaVendaSubmit').submit());
+        }
+
+    });
+});
+
 //consulta cliente pelo codigo para finalizar a venda
 $(function () {
     $("#clienteCodigo").keyup(function () {
@@ -50,7 +126,7 @@ $(function () {
             if (!response['codigo']) {
                 $("#clienteNomeVenda").val("VENDA A VISTA")
                 $("#clienteCodigo").val("999999")
-                document.getElementById('nomeValid').innerHTML = "";            
+                document.getElementById('nomeValid').innerHTML = "";
             } else {
                 $("#clienteNomeVenda").val(response['codigo']['nome'])
                 document.getElementById('nomeValid').innerHTML = "";
@@ -112,7 +188,7 @@ $(function () {
     $('form[id="buscaAlltech_idClienteVendaAjax"]').submit(function (event) {
         event.preventDefault();
         var cliente = cliente_consulta_finaliza;
-       
+
         $.ajax({
             url: "/busca_cliente",
             type: "GET",

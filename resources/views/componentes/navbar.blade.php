@@ -26,15 +26,12 @@
                         </a>
 
                         <ul class="dropdown-menu">
-
                             <li><a class="dropdown-item" href="{{ route('clientes.index') }} ">Clientes</a></li>
                             <li><a class="dropdown-item" href="{{ route('clientes.create') }} ">Cadastro De
                                     Cliente</a></li>
                             <li><a class="dropdown-item" href="{{ route('vendas_finalizadas') }}">Vendas
                                     Finalizadas</a></li>
                             <li><a class="dropdown-item" href="{{ route('venda_salva') }} ">Vendas Salvas</a></li>
-
-
                         </ul>
                     </div>
 
@@ -69,7 +66,7 @@
                         </a> &emsp;&emsp;&emsp;
                         <a style="color: rgb(138, 138, 138);" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
-                                                                                                                                                 document.getElementById('logout-form').submit();">
+                                                                                                                                                     document.getElementById('logout-form').submit();">
                             {{ __('Sair') }}
                         </a>
 

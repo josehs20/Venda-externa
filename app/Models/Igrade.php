@@ -26,8 +26,8 @@ class Igrade extends Model
         return $this->belongsTo('App\Models\Produto');
     }
 
-    public function grades() {
-        return $this->belongsTo('App\Models\Grades');
+    public function grade() {
+        return $this->hasOne('App\Models\Grade', 'id', 'grade_id');
     }
 
 }

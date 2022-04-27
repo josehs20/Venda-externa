@@ -45,7 +45,7 @@
                                                     <b>{{ reais($c->valor_bruto) }}</b>
                                                 </h6>
                                                 <h6 class="col-5">Descontos Totais: R$
-                                                    <b>{{ $c->valor_desconto }}</b>
+                                                    <b>{{ $c->valor_desconto + $c->valor_desconto_sb_venda }}</b>
                                                 </h6>
                                             </div>
                                             <table class="table table-striped">

@@ -36,8 +36,7 @@
                                         data-bs-target="#Grade{{ $produto->id }}"><img id="imgg" class="imgCarr"
                                             src="addCar.ico" alt=""></button>
                                 @else
-                                    {{-- <button type="submit" onclick="cli(< echo $produto->id; ?>)" class="buttonAdd"><img
-                                            id="imgg" class="imgCarr" src="addCar.ico" alt=""></button> --}}
+                                   
                                     <button type="button" class="buttonAdd" data-bs-toggle="modal"
                                         data-bs-target="#SemGrade{{ $produto->id }}"><img id="imgg" class="imgCarr"
                                             src="addCar.ico" alt="">
@@ -75,7 +74,7 @@
                                         <div class="input-group-text">
                                             <span>Quantidade</span>
                                         </div>
-                                        {{-- {{dd($produtos_carrinho_quantidade['itemCarrinho'])}} --}}
+                                       
                                         @if (array_key_exists($produto->id, $produtos_carrinho_quantidade['itemCarrinho']))
                                             <input id="inputProdutoSemGrade<?php echo $produto->id; ?>" class="form-control"
                                                 type="number" min="0" max="100000" step=".01"
@@ -87,7 +86,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button i type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
+                                    <button id="fechaModalSemGrade<?php echo $produto->id; ?>" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
                                     <button onclick="cli(<?php echo $produto->id; ?>)" type="submit"
                                         class="btn btn-primary">Adicionar</button>
                                 </div>
@@ -139,17 +138,13 @@
                                                     </div>
                                                     <input class="form-control valid_input" type="number" min="0" max="100000" step=".01" placeholder="Quantidade">
 
-
-                                                    {{-- <span class="input-group-text">% {{'a'}}</span> --}}
                                                 </div>
                                             @endif
                                         @endforeach
-                                        {{-- {{ dd($produto->id) }}
-                                    {{ dd($produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id']) }} --}}
 
                                     </div>
                                     <div class="modal-footer">
-                                        <button id="fechaModal" type="button" class="btn btn-secondary"
+                                        <button id="fechaModalComGrade<?php echo $produto->id; ?>" type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">Sair</button>
                                         <button onclick="verifyGrade(<?php echo $produto->id; ?>)" type="submit"
                                             class="btn btn-primary">Adicionar</button>

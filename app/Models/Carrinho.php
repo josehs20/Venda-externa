@@ -8,18 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class Carrinho extends Model
 {
     protected $fillable = [
-       'id',
-       'user_id',
-       'valor_desconto', 
-       'desconto_qtd',
-       'tp_desconto',
-       'valor_bruto',
-       'total', 
-       'tipo_pagamento',
-       'cliente_id',
-       'status', 
+        'id',
+        'user_id',
+        'valor_desconto',
+        'desconto_qtd',
+        'tp_desconto',
+        'valor_bruto',
+        'total',
+        'tipo_pagamento',
+        'cliente_id',
+        'status',
+        'parcelas',
+        'tp_desconto_sb_venda',
+        'valor_desconto_sb_venda',
+        'desconto_qtd_sb_venda',
+
     ];
-    
+
     public function carItem()
     {
         return $this->hasMany('App\Models\CarrinhoItem');
@@ -29,6 +34,11 @@ class Carrinho extends Model
     // {
     //     return $this->hasMany('App\Models\Produto');
     // }
+
+    public function usuario()
+    {
+        return $this->belongsTo('App\Models\User', 'user_id', 'id');
+    }
 
     public function vendedorCliente()
     {

@@ -42,12 +42,17 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function vendedorCliente()
-    {
-        return $this->hasMany('App\Models\VendedorCliente');
+    public function loja() {
+        return $this->belongsTo('App\Models\Loja');
     }
-  
+
     public function vendedor() {
         return $this->perfil == 'vendedor';
     }
+
+
+    // public function carrinho()
+    // {
+    //     return $this->belongsTo('App\Models\Carrinho');
+    // }
 }

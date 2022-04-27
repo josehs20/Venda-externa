@@ -50,7 +50,13 @@ $(function () {
                     title: "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso",
                     showConfirmButton: false,
                     timer: 2500
+
                 })
+
+                document.getElementById('fechaModalSemGrade' + id).click()
+
+
+
             } else if (response['ok'] == "add") {
 
                 Swal.fire({
@@ -59,7 +65,7 @@ $(function () {
                     showConfirmButton: false,
                     timer: 2000
                 })
-
+                document.getElementById('fechaModalSemGrade' + id).click()
             } else {
 
                 Swal.fire({
@@ -122,7 +128,7 @@ $(function () {
                 })
 
             }
-            document.getElementById('fechaModal' + id) ? document.getElementById('fechaModal' + id).click() : false
+            document.getElementById('fechaModalComGrade' + id) ? document.getElementById('fechaModalComGrade' + id).click() : false
         });
     });
 });
@@ -156,7 +162,7 @@ function valida_form(id) {
                     timer: 2500
                 })
                 checks = false;
-            }else{
+            } else {
 
                 dados[i] = [checks[i].value, inputs[i].value]
             }

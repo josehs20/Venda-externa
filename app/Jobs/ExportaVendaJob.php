@@ -10,12 +10,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 
-
-class ExportaClienteJob implements ShouldQueue
+class ExportaVendaJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     private $file;
     private $dir;
+
     /**
      * Create a new job instance.
      *
@@ -34,10 +35,10 @@ class ExportaClienteJob implements ShouldQueue
      */
     public function handle()
     {
-        //monta diretorio da empresa no ftp caso não tenha 
-        Storage::disk('ftp')->makeDirectory($this->dir);
+         //monta diretorio da empresa no ftp caso não tenha 
+         Storage::disk('ftp')->makeDirectory($this->dir);
 
-        //pega da storage local e exporta para ftp
-        Storage::disk('ftp')->put($this->file, Storage::get($this->file));
+         //pega da storage local e exporta para ftp
+         Storage::disk('ftp')->put($this->file, Storage::get($this->file));
     }
 }

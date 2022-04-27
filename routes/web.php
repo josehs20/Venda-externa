@@ -22,12 +22,12 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::resource('venda', App\Http\Controllers\VendaController::class)->middleware('vendedor');
 Route::delete('/deleta_item_carrinho/{item?}', [App\Http\Controllers\VendaController::class, 'destroy_item'])->middleware('vendedor')->name('destroy_item');
-Route::get('/itens_carrinho/{user_id?}/{msg?}', [App\Http\Controllers\VendaController::class, 'itens_carrinho'])->Middleware('vendedor')->name('itens_carrinho');
-Route::get('/busca_produto/', [App\Http\Controllers\VendaController::class, 'busca_produto_ajax'])->Middleware('vendedor')->name('busca_produto_ajax');
+Route::get('/itens_carrinho', [App\Http\Controllers\VendaController::class, 'itens_carrinho'])->Middleware('vendedor')->name('itens_carrinho');
+Route::get('/busca_produto', [App\Http\Controllers\VendaController::class, 'busca_produto_ajax'])->Middleware('vendedor')->name('busca_produto_ajax');
 Route::put('/salvar_venda',  [App\Http\Controllers\VendaController::class, 'salvar_venda'])->middleware('vendedor')->name('salvar_venda');
 Route::put('/unifica_valor_Itens/{carrinho?}', [App\Http\Controllers\VendaController::class, 'unifica_valor_Itens'])->Middleware('vendedor')->name('unifica_valor_Itens');
 Route::put('/zera_desconto/{carrinho?}', [App\Http\Controllers\VendaController::class, 'zera_desconto'])->Middleware('vendedor')->name('zera_desconto');
-Route::get('/venda_finalizada/', [App\Http\Controllers\VendaController::class, 'venda_finalizada'])->Middleware('vendedor')->name('venda_finalizada');
+Route::get('/venda_finalizada', [App\Http\Controllers\VendaController::class, 'venda_finalizada'])->Middleware('vendedor')->name('venda_finalizada');
 Route::put('/finaliza_venda/{carrinho?}', [App\Http\Controllers\VendaController::class, 'finaliza_venda'])->Middleware('vendedor')->name('finaliza_venda');
 Route::get('vendas_finalizadas', [App\Http\Controllers\VendaController::class, 'vendas_finalizadas'])->Middleware('vendedor')->name('vendas_finalizadas');
 //Route::resource('vendedor.cliente', App\Http\Controllers\VendedorClienteController::class)->middleware('vendedor');

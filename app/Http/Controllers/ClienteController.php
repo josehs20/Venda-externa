@@ -22,7 +22,7 @@ class ClienteController extends Controller
     {
         $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
             ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
-            
+
         return view('cliente.index', compact('clientes', 'msg'));
     }
     public function busca_cliente_ajax()
@@ -59,7 +59,7 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         $codIbge = CidadeIbge::where('codigo', trim($_POST['codIbge']))->first();
-
+//dd($codIbge);
         $cliente =  Cliente::create([
             'loja_id' => auth()->user()->loja_id,
             'alltech_id' => '0000',
@@ -119,6 +119,7 @@ class ClienteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function update(Request $request, $id)
     {
         if (!strcasecmp($_SERVER['REQUEST_METHOD'], 'PUT')) {
@@ -148,6 +149,59 @@ class ClienteController extends Controller
             $cliente = Cliente::with('enderecos')->find($_PUT['id']);
             $this->jsonClienteStorageJob($cliente);
         }
+        return;
+    }
+
+    //Faz o json, envia para storage para assim ser enviado para o ftp
+    public function jsonClienteStorageJob($cliente)
+    {
+
+        $dados['id'] = $cliente->id;
+        $dados['alltech_id'] = $cliente->alltech_id == '0000' ? $cliente->alltech_id : "-" . $cliente->alltech_id;
+        $dados['loja_id'] = $cliente->loja_id;
+        $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
+        $dados['nome'] = $cliente->nome;
+        $dados['docto'] = $cliente->docto;
+        $dados['tipo'] = $cliente->tipo;
+        $dados['email'] = $cliente->email;
+        $dados['fone1'] = $cliente->fone1;
+        $dados['fone2'] = $cliente->fone2;
+        $dados['celular'] = $cliente->celular;
+        $dados['cidade_ibge'] = $cliente->enderecos->cidadeIbge->codigo;
+        $dados['cidade'] = $cliente->enderecos->cidadeIbge->nome;
+        $dados['uf'] = $cliente->enderecos->cidadeIbge->uf;
+        $dados['cep'] = $cliente->enderecos->cep;
+        $dados['bairro'] = $cliente->enderecos->bairro;
+        $dados['rua'] = $cliente->enderecos->rua;
+        $dados['numero'] = $cliente->enderecos->numero;
+        $dados['compto'] = $cliente->enderecos->compto;
+        $dados['tipo'] = $cliente->enderecos->tipo;
+
+        $json = json_encode($dados);
+        //dd($json);
+        $dir = $cliente->loja->empresa->pasta;
+        Storage::disk('local')->makeDirectory($dir);
+        $files = Storage::disk('local')->files($dir);
+        $count = 1;
+
+        if (count($files) == 0) {
+
+            Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
+            $file = $dir . '/CLIENTE-' . $count . '.json';
+        } else {
+
+            foreach ($files as $key => $file) {
+                if (str_contains($file, 'CLIENTE')) {
+                    $count++;
+                }
+            }
+
+            Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
+            $file = $dir . '/CLIENTE-' . $count . '.json';
+        }
+        
+        //Class de Jobs para exportação 
+        ExportaClienteJob::dispatch($file, $dir);
         return;
     }
 
@@ -206,7 +260,7 @@ class ClienteController extends Controller
         //  dd('a');
         Session::flash('success');
 
-    return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Itens Substituídos Com Sucesso']));
+        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Itens Substituídos Com Sucesso']));
     }
 
     public function add_observacao(Request $request, $cliente)
@@ -232,51 +286,5 @@ class ClienteController extends Controller
             $dado['success'] = false;
         }
         return json_encode($dado);
-    }
-
-    private function jsonClienteStorageJob($cliente)
-    {
-
-        $dados['id'] = $cliente->id;
-        $dados['alltech_id'] = $cliente->alltech_id == '0000' ? $cliente->alltech_id : "-" . $cliente->alltech_id;
-        $dados['loja_id'] = $cliente->loja_id;
-        $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
-        $dados['nome'] = $cliente->nome;
-        $dados['docto'] = $cliente->docto;
-        $dados['tipo'] = $cliente->tipo;
-        $dados['email'] = $cliente->email;
-        $dados['fone1'] = $cliente->fone1;
-        $dados['fone2'] = $cliente->fone2;
-        $dados['celular'] = $cliente->celular;
-        $dados['cidade_ibge'] = $cliente->enderecos->cidadeIbge->codigo;
-        $dados['cidade'] = $cliente->enderecos->cidadeIbge->nome;
-        $dados['uf'] = $cliente->enderecos->cidadeIbge->uf;
-        $dados['cep'] = $cliente->enderecos->cep;
-        $dados['bairro'] = $cliente->enderecos->bairro;
-        $dados['rua'] = $cliente->enderecos->rua;
-        $dados['numero'] = $cliente->enderecos->numero;
-        $dados['compto'] = $cliente->enderecos->compto;
-        $dados['tipo'] = $cliente->enderecos->tipo;
-
-        $json = json_encode($dados);
-        //dd($json);
-        $dir = $cliente->loja->empresa->pasta;
-        Storage::disk('local')->makeDirectory($dir);
-        $files = Storage::disk('local')->files($dir);
-        $count = 1;
-
-        if (count($files) == 0) {
-            Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
-            $file = $dir . '/CLIENTE-' . $count . '.json';
-        } else {
-            foreach ($files as $key => $file) {
-                if (str_contains($file, 'CLIENTE')) {
-                    $count++;
-                }
-            }
-            Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
-            $file = $dir . '/CLIENTE-' . $count . '.json';
-        }
-        ExportaClienteJob::dispatch($file, $dir);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ExportaVendaJob;
 use App\Models\Carrinho;
 use App\Models\CarrinhoItem;
 use App\Models\Cliente;
@@ -9,7 +10,7 @@ use App\Models\Igrade;
 use App\Models\Produto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Facades\Storage;
 
 class VendaController extends Controller
 {
@@ -63,7 +64,14 @@ class VendaController extends Controller
         // dd($clientes_user);
         $carrinho = Carrinho::with('carItem')->where('user_id', $user_id)->where('status', 'Aberto')->first();
 
-        return view('itemCarrinho', compact('carrinho', 'clientes_user', 'msg'));
+        return view('vendedor.itemCarrinho', compact('carrinho', 'clientes_user', 'msg'));
+    }
+
+    public function vendas_finalizadas()
+    {
+        $carrinho = Carrinho::with('carITem')->where('user_id', auth()->user()->id)->where('status', 'fechado')->get();
+
+        return view('vendedor.vendas-finalizadas', compact('carrinho'));
     }
 
     /**
@@ -269,7 +277,7 @@ class VendaController extends Controller
             ]);
             $valor_itens_bruto[] = $item->valor;
         }
-        $desconto_final = $request->tipo_unificado == 'porcento' ? ($request->qtd_unificado / 100) * (array_sum($valor_itens_bruto)) : $request->qtd_desconto;
+        $desconto_final = $request->tipo_unificado == 'porcento' ? ($request->qtd_unificado / 100) * (array_sum($valor_itens_bruto)) : $request->qtd_unificado;
         $valor_final_item = array_sum($valor_itens_bruto) - $desconto_final;
         //  dd($desconto_final);
         $carrinho->update([
@@ -487,21 +495,86 @@ class VendaController extends Controller
     public function finaliza_venda(Request $request, $carrinho)
     {
         $cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $request->cliente_alltech_id)->first();
-        
+
         Carrinho::find($carrinho)->update([
-            'status' => 'fechado', 
+            'status' => 'fechado',
             'cliente_id' => $cliente->id,
-            'tipo_pagamento' => $request->tipo_pagamento]);
+            'total' => $request->hiddenInputValorTotalModal,
+            'tipo_pagamento' => $request->tipo_pagamento,
+            'parcelas' => $request->parcelas ? $request->parcelas : 1,
+            'tp_desconto_sb_venda' => $request->tp_desconto_sb_venda == "0" ? null : $request->tp_desconto_sb_venda,
+            'valor_desconto_sb_venda' => $request->hiddenInputValorDescontoSobreVendaModal,
+            'desconto_qtd_sb_venda' => $request->qtd_desconto_sobre_venda,
+        ]);
 
+        $carrinho = Carrinho::find($carrinho);
+        //monta json para exportação
+        $this->jsonVendaStorageJob($carrinho);
         //vai entrar função json para exportação da venda e jobs
-
         Session::flash('carrinho_finalizado');
         return redirect(route('venda.index'));
     }
-    public function vendas_finalizadas()
-    {
-       $carrinho = Carrinho::with('carITem')->where('user_id', auth()->user()->id)->where('status', 'fechado')->get();
 
-       return view('vendedor.vendas-finalizadas', compact('carrinho'));
+    public function jsonVendaStorageJob($carrinho)
+    {
+        $dados['id'] = $carrinho->id;
+        $dados['status'] = $carrinho->status;
+        $dados['loja_alltech_id'] = $carrinho->usuario->loja->alltech_id;
+        $dados['id_vendedor'] = $carrinho->usuario->id;
+        $dados['nome_vendedor'] = $carrinho->usuario->name;
+        $dados['cliente_alltech_id'] = $carrinho->cliente->alltech_id;
+        $dados['emissao'] = $carrinho->updated_at->format('Ymd');
+        $dados['qtd_desc'] = $carrinho->desconto_qtd;
+        $dados['tipo_desc'] = ($carrinho->tp_desconto == 'parcial') ? 'parcial' : (($carrinho->tp_desconto == 'porcento_unico') ? '%' : '$');
+        $dados['v_desc'] = $carrinho->valor_desconto;
+        $dados['v_bruto'] = $carrinho->valor_bruto;
+        $dados['v_total'] = $carrinho->total;
+        $dados['tipo_pg'] = $carrinho->tipo_pagamento;
+        $dados['parcelas'] = $carrinho->parcelas;
+        $dados['tp_desc_sb_venda'] = ($carrinho->tp_desconto_sb_venda && $carrinho->tp_desconto_sb_venda == 'porcento') ? '%' : (($carrinho->tp_desconto_sb_venda && $carrinho->tp_desconto_sb_venda == 'dinheiro') ? '$' : null);
+        $dados['qtd_desc_sb_venda'] = $carrinho->desconto_qtd_sb_venda ? $carrinho->desconto_qtd_sb_venda : null;
+        $dados['v_desc_sb_venda'] = $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : null;
+
+        $i = 1;
+        foreach ($carrinho->carItem as $key => $item) {
+
+            $dados['itens'][$i]['produto_alltech_id'] = $item->produto->alltech_id;
+            $dados['itens'][$i]['alltech_id_grade'] = $item->i_grade_id ? $item->iGrade->id_grade_alltech_id : null;
+            $dados['itens'][$i]['alltech_id_i_grade'] = $item->i_grade_id ? $item->iGrade->alltech_id : null;
+            $dados['itens'][$i]['preco'] = $item->preco;
+            $dados['itens'][$i]['quantidade'] = $item->quantidade;
+            $dados['itens'][$i]['tipo_desconto'] = ($item->tipo_desconto && $item->tipo_desconto == 'porcento') ? '%' : (($item->tipo_desconto && $item->tipo_desconto == 'dinheiro') ? '$' : null);
+            $dados['itens'][$i]['qtd_desconto'] = $item->qtd_desconto;
+            $dados['itens'][$i]['valor_desconto'] = $item->valor_desconto;
+            $dados['itens'][$i]['valor_item'] = $item->valor;
+
+            $i++;
+        }
+        //monnta arquivo para exportação em job
+        $json = json_encode($dados);
+        $dir = $carrinho->usuario->loja->empresa->pasta;
+
+        Storage::disk('local')->makeDirectory($dir);
+        $files = Storage::disk('local')->files($dir);
+        $count = 1;
+
+        if (count($files) == 0) {
+
+            Storage::put($dir . '/VONLINE-' . $count . '.json', $json);
+            $file = $dir . '/VONLINE-' . $count . '.json';
+        } else {
+
+            foreach ($files as $key => $file) {
+                if (str_contains($file, 'VONLINE')) {
+                    $count++;
+                }
+            }
+
+            Storage::put($dir . '/VONLINE-' . $count . '.json', $json);
+            $file = $dir . '/VONLINE-' . $count . '.json';
+        }
+        //Class de Jobs para exportação 
+        // ExportaVendaJob::dispatch($file, $dir);
+        return;
     }
 }

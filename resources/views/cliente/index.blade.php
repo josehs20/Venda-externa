@@ -98,6 +98,8 @@
                                     </li>
                                     {{-- </ul> --}}
                                 </div>
+                           
+                            
 
                                 <!-- Modal Contato Cliente-->
                                 <div class="modal fade" id="contato{{ $cliente->id }}" tabindex="-1"

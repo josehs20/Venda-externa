@@ -11,31 +11,6 @@
         <body onload="msgSuccess('<?php echo $msg; ?>')">
     @endif
 
-    {{-- @if (Session::has('nao_autorizado'))
-
-        <body onload="msgContato(msg = 3)">
-        @elseif (Session::has('carrinho_salvo'))
-
-            <body onload="msgContato(msg = 4)">
-            @elseif(Session::has('substituicao'))
-
-                <body onload="msgContato(msg = 8)">
-                @elseif(Session::has('item_deletado_carrinho'))
-
-                    <body onload="msgContato(msg = 9)">
-                    @elseif(Session::has('item_alterado_carrinho'))
-
-                        <body onload="msgContato(msg = 10)">
-                        @elseif(Session::has('item_unificado_carrinho'))
-
-                            <body onload="msgContato(msg = 11)">
-                            @elseif(Session::has('item_zerado_carrinho'))
-
-                                <body onload="msgContato(msg = 12)">
-                                @elseif(Session::has('quantidade_alterada'))
-
-                                    <body onload="msgContato(msg = 13)">
-    @endif --}}
     @if (!isset($carrinho))
         <div id="contentIndex">
             <div class="alert alert-warning mt-5" role="alert">
@@ -230,49 +205,98 @@
                             <div class="row mx-1">
                                 <div class="col-5">
                                     <h6 class="">Total: R$
-                                        <b>{{ reais($carrinho->total) }}</b>
+                                        <b id="valorTotalModal">{{ reais($carrinho->total) }}</b>
                                     </h6>
                                 </div>
                                 <div class="col-7">
                                     <h6 class="">Desconto: R$
-                                        <b>{{ reais($carrinho->valor_desconto) }}</b>
+                                        <b id="valorDescontoModal">{{ reais($carrinho->valor_desconto) }}</b>
                                     </h6>
                                 </div>
                             </div>
 
-                            <form method="POST" action="{{ route('finaliza_venda', ['carrinho' => $carrinho->id]) }}">
+                            <form method="POST" name="formFinalizaVenda" action="{{ route('finaliza_venda', ['carrinho' => $carrinho->id]) }}">
                                 @method('PUT')
                                 @csrf
+                                <input type="hidden" name="hiddenInputValorTotalModal" id="hiddenValorTotalModal"
+                                    value="<?php echo $carrinho->total; ?>">
+                                <input type="hidden" name="hiddenInputValorDescontoModal" id="hiddenValorDescontoModal"
+                                    value="<?php echo $carrinho->valor_desconto; ?>">
+                                <input type="hidden" name="hiddenInputValorDescontoSobreVendaModal"
+                                    id="hiddenValorDescontoSobreVendaModal" value="">
 
                                 <span class="mx-3"><b>Cliente Já Mencionado</b></span>
                                 <div class="modal-body">
 
                                     <div class="row g-2">
-                                        <div class="col-4">
-                                            <div class="form-floating">
-                                                <input name="cliente_alltech_id" required Readonly type="text" class="form-control"
-                                                    value="{{ $carrinho->cliente->alltech_id }}" id="floatingInputGrid">
-                                                <label for="floatingInputGrid">Cod.</label>
-                                            </div>
-                                        </div>
                                         <div class="col-8">
                                             <div class="form-floating">
                                                 <input id="clienteNomeVenda" Readonly type="text" class="form-control"
                                                     required value="{{ $carrinho->cliente->nome }}"
                                                     id="floatingInputGrid">
                                                 <label for="floatingInputGrid">Cliente</label>
+
                                             </div>
                                             <span id="nomeValid"></span>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="form-floating">
+                                                <input name="cliente_alltech_id" required Readonly type="text"
+                                                    class="form-control" value="{{ $carrinho->cliente->alltech_id }}"
+                                                    id="floatingInputGrid">
+                                                <label for="floatingInputGrid">Cod.</label>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <br>
-                                    <div class="row d-flex justify-content-center">
-                                        <div class="col-10">
+                                    <span style="font-size: 14px;" class="mx-1"><u>Deseja aplicar desconto sobre a
+                                            venda?</u></span>
+                                    <br><br>
+                                    <div class="row g-2">
+                                        <div class="col-8">
                                             <div class="form-floating">
-                                                <select name="tipo_pagamento" class="form-select" id="floatingSelectGrid"
+                                                <input disabled
+                                                onkeyup="calculoDescontoSobreVenda(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
+                                                    name="qtd_desconto_sobre_venda" type="number" class="form-control"
+                                                    min="0.01" step="0.01" value="{{ $carrinho->qtd_unificado }}"
+                                                    id="inputDesconto">
+                                                <label for="floatingInputGrid">Desconto</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <span></span>
+                                            <div class="form-floating">
+                                                <select name="tp_desconto_sb_venda" class="form-select"
+                                                    id="tp_desconto_sobre_venda_modal"
+                                                    onchange="verificaDesconto(this.value, <?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
                                                     aria-label="Floating label select example">
-                                                    <option value="AV">A VISTA</option>
+                                                    <option selected value="0">selecione...</option>
+                                                    <option value="porcento">%</option>
+                                                    <option value="dinheiro">R$</option>
+                                                </select>
+                                                <label for="floatingSelectGrid">Tipo</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <br>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="form-floating">
+                                                <input name="parcelas" disabled min="1" type="text" class="form-control"
+                                                    placeholder="1" value="1" id="inputParcelas">
+                                                <label for="floatingInputGrid">Parcelas</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-floating">
+                                                <select name="tipo_pagamento" class="form-select"
+                                                    id="floatingSelectGrid" aria-label="Floating label select example"
+                                                    onchange="verificaAvistaAprazo(this.value)">
+                                                    <option value="AV">À VISTA</option>
                                                     <option value="AP">A PRAZO</option>
                                                 </select>
                                                 <label for="floatingSelectGrid">Tipo</label>
@@ -407,7 +431,7 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Desconto:
                             @if ($carrinho->tp_desconto == 'porcento_unico' or !$carrinho->tp_desconto)
-                                <span>{{!$carrinho->tp_desconto ? 'Não Aplicado' : 'Porcentagem Única'}}</span>
+                                <span>{{ !$carrinho->tp_desconto ? 'Não Aplicado' : 'Porcentagem Única' }}</span>
                             @else
                                 <span
                                     class="badge bg-primary rounded-pill">{{ $carrinho->tp_desconto == 'porcento_unico'? 'Porcentagem única': ($carrinho->tp_desconto == 'dinheiro_unico'? 'Unificado em dinheiro': (!$item->qtd_desconto? 'Não inserido': ($item->tipo_desconto == 'porcento'? '%' . $item->qtd_desconto: "R$" . $item->qtd_desconto))) }}</span>
@@ -554,26 +578,36 @@
                                 aria-label="Close"></button>
                         </div>
                         <br>
-                        <div class="row">
-                            <h6 class="col-5 mx-3">Total: R$
-                                <b>{{ reais($carrinho->total) }}</b>
-                            </h6>
-                            <h6 class="col-5 mx-3">Desconto: R$
-                                <b>{{ reais($carrinho->valor_desconto) }}</b>
-                            </h6>
+                        <div class="row mx-1">
+                                <div class="col-5">
+                                    <h6 class="">Total: R$
+                                        <b id="valorTotalModal">{{ reais($carrinho->total) }}</b>
+                                    </h6>
+                                </div>
+                                <div class="col-7">
+                                    <h6 class="">Desconto: R$
+                                        <b id="valorDescontoModal">{{ reais($carrinho->valor_desconto) }}</b>
+                                    </h6>
+                                </div>
+                            </div>
 
-                        </div>
-
-                        <form method="POST" action="{{ route('finaliza_venda', ['carrinho' => $carrinho->id]) }}">
+                        <form id="formFinalizaVendaSubmit" method="POST" name="formFinalizaVenda" action="{{ route('finaliza_venda', ['carrinho' => $carrinho->id]) }}">
                             @method('PUT')
                             @csrf
+                            <input type="hidden" name="hiddenInputValorTotalModal" id="hiddenValorTotalModal"
+                                value="<?php echo $carrinho->total; ?>">
+                            <input type="hidden" name="hiddenInputValorDescontoModal" id="hiddenValorDescontoModal"
+                                value="<?php echo $carrinho->valor_desconto; ?>">
+                            <input type="hidden" name="hiddenInputValorDescontoSobreVendaModal"
+                                id="hiddenValorDescontoSobreVendaModal" value="">
+
                             <div class="modal-body">
                                 <div class="row g-2">
                                     <div class="col-4">
                                         <div class="form-floating">
-                                            <input required name="cliente_alltech_id" id="clienteCodigo" type="text" class="form-control"
-                                                value="999999" name="codigoCliente" id="floatingInputGrid"
-                                                placeholder="quantidade">
+                                            <input required name="cliente_alltech_id" id="clienteCodigo" type="text"
+                                                class="form-control" value="999999" name="codigoCliente"
+                                                id="floatingInputGrid" placeholder="quantidade">
                                             <label for="floatingInputGrid">Cod.</label>
                                         </div>
                                     </div>
@@ -591,21 +625,61 @@
                                         data-bs-target="#modalbuscaClienteNomeVendaAjax"><i class="bi-search"
                                             style="color: rgb(255, 255, 255)"></i></a>
                                 </div>
-
                                 <br>
-                                <div class="row d-flex justify-content-center">
-                                    <div class="col-10">
+
+                                <span style="font-size: 14px;" class="mx-1"><u>Deseja aplicar desconto sobre a
+                                        venda?</u></span>
+                                <br><br>
+
+                                <div class="row g-2">
+                                    <div class="col-8">
                                         <div class="form-floating">
-                                            <select name="tipo_pagamento" class="form-select" id="floatingSelectGrid"
+                                            <input disabled required
+                                                onkeyup="calculoDescontoSobreVenda(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
+                                                name="qtd_desconto_sobre_venda" type="number" class="form-control"
+                                                min="0.01" step="0.01"
+                                                id="inputDesconto">
+                                            <label for="floatingInputGrid">Desconto</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-floating">
+                                            <select name="tp_desconto_sb_venda" class="form-select"
+                                                id="tp_desconto_sobre_venda_modal"
+                                                onchange="verificaDesconto(this.value, <?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
                                                 aria-label="Floating label select example">
-                                                <option value="AV">A VISTA</option>
-                                                <option value="AP">A PRAZO</option>
+                                                <option selected value="0">selecione...</option>
+                                                <option value="porcento">%</option>
+                                                <option value="dinheiro">R$</option>
                                             </select>
                                             <label for="floatingSelectGrid">Tipo</label>
                                         </div>
                                     </div>
                                 </div>
 
+
+                                <br>
+                                <br>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="form-floating">
+                                            <input disabled required name="parcelas" type="text" class="form-control"
+                                                placeholder="1" value="1" id="inputParcelas">
+                                            <label for="floatingInputGrid">Parcelas</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-floating">
+                                            <select name="tipo_pagamento" class="form-select"
+                                                id="floatingSelectGrid" aria-label="Floating label select example"
+                                                onchange="verificaAvistaAprazo(this.value)">
+                                                <option value="AV">À VISTA</option>
+                                                <option value="AP">A PRAZO</option>
+                                            </select>
+                                            <label for="floatingSelectGrid">Tipo</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="modal-footer">
@@ -668,5 +742,6 @@
 
     @endif
     {{-- Fim tabela de itens --}}
+
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewItensCarrinho.js') }}" defer></script>
