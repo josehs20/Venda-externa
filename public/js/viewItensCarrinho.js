@@ -4,6 +4,19 @@ var botaoBuscaClienteAjax = document.getElementById('botaoBuscaClienteAjax');
 var botaoBuscaClienteNomefinaliza = document.getElementById('botaoBuscaClienteNomeAjax');
 var clienteCodigoConsulta = document.getElementById('clienteCodigo');
 
+//habilita desconto
+function habilitaDescontoEditarItem(value) {
+    var input = document.getElementById("inputDescontoEditarItem");
+   
+    if (value == 'porcento') {
+        input.disabled = false;
+    } else if (value == 'dinheiro') {
+        input.disabled = false;
+    } else if (value == 0) {
+        input.disabled = true;
+        input.value = "";
+    }
+}
 
 //habilita avista ou a prazo
 function verificaAvistaAprazo(value) {

@@ -455,14 +455,7 @@
                                     <label class="mx-2" for=""> Produto: <b>
                                             {{ $item->produto->nome }}</b></label>
                                     <hr>
-                                    {{-- <label class="mx-2" for=""> Quantidade Atual: <b>
-                                            {{ $item->quantidade }}</b></label>
-                                    <hr>
-                                    <label class="mx-2" for=""> Preco: <b>R$
-                                            {{ reais($item->preco) }}</b></label>
-                                    <hr> --}}
-
-
+                           
                                     <form method="POST" action="{{ route('venda.update', ['venda' => $item->id]) }}">
                                         @method('PUT')
                                         @csrf
@@ -478,11 +471,11 @@
                                                 </div>
                                                 <div class="col-4">
                                                     <div class="form-floating">
-                                                        <select name="tipo_qtd" class="form-select"
+                                                        <select name="tipo_qtd" disabled class="form-select"
                                                             id="floatingSelectGrid"
                                                             aria-label="Floating label select example">
-                                                            <option value="UN">UN</option>
-                                                            <option value="CX">CX</option>
+                                                            <option selected value="UN">UN</option>
+                                                            {{-- <option value="CX">CX</option> --}}
                                                         </select>
                                                         <label for="floatingSelectGrid">Tipo</label>
                                                     </div>
@@ -499,20 +492,20 @@
                                                 <div class="row g-2">
                                                     <div class="col-8">
                                                         <div class="form-floating">
-                                                            <input name="qtd_desconto" type="number" class="form-control"
+                                                            <input disabled name="qtd_desconto" type="number" class="form-control"
                                                                 min="0.01" step="0.01"
                                                                 value="{{ $carrinho->qtd_unificado }}"
-                                                                id="floatingInputGrid" placeholder="Desconto Geral">
+                                                                id="inputDescontoEditarItem" placeholder="Desconto Geral">
                                                             <label for="floatingInputGrid">Desconto</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-4">
                                                         <span></span>
                                                         <div class="form-floating">
-                                                            <select name="tipo_desconto" class="form-select"
+                                                            <select onchange="habilitaDescontoEditarItem(this.value)" name="tipo_desconto" class="form-select"
                                                                 id="floatingSelectGrid"
                                                                 aria-label="Floating label select example">
-                                                                <option disabled selected>selecione...</option>
+                                                                <option value="">selecione...</option>
                                                                 <option value="porcento">%</option>
                                                                 <option value="dinheiro">R$</option>
                                                             </select>
