@@ -234,6 +234,7 @@
                                                 <input id="clienteNomeVenda" Readonly type="text" class="form-control"
                                                     required value="{{ $carrinho->cliente->nome }}"
                                                     id="floatingInputGrid">
+                                                  
                                                 <label for="floatingInputGrid">Cliente</label>
 
                                             </div>

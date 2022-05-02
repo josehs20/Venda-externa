@@ -494,11 +494,12 @@ class VendaController extends Controller
 
     public function finaliza_venda(Request $request, $carrinho)
     {
-        $cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $request->cliente_alltech_id)->first();
+        $cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('docto', $request->cliente_alltech_id)->orWhere('alltech_id', $request->cliente_alltech_id)->first();
+       // dd($cliente);
 
         Carrinho::find($carrinho)->update([
             'status' => 'fechado',
-            'cliente_id' => $cliente->id,
+            'cliente_id' => $cliente ? $cliente->id : '0000',
             'total' => $request->hiddenInputValorTotalModal,
             'tipo_pagamento' => $request->tipo_pagamento,
             'parcelas' => $request->parcelas ? $request->parcelas : 1,

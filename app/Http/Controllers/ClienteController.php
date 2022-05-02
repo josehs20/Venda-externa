@@ -59,10 +59,12 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         $codIbge = CidadeIbge::where('codigo', trim($_POST['codIbge']))->first();
-//dd($codIbge);
+
+        
+
         $cliente =  Cliente::create([
             'loja_id' => auth()->user()->loja_id,
-            'alltech_id' => '0000',
+            'alltech_id' => $_POST['documento'],
             'nome' => $_POST['nome'],
             'docto' => $_POST['documento'],
             'tipo' =>  strlen($_POST['documento']) == 11 ? 'F' : 'J',
@@ -155,9 +157,8 @@ class ClienteController extends Controller
     //Faz o json, envia para storage para assim ser enviado para o ftp
     public function jsonClienteStorageJob($cliente)
     {
-
         $dados['id'] = $cliente->id;
-        $dados['alltech_id'] = $cliente->alltech_id == '0000' ? $cliente->alltech_id : "-" . $cliente->alltech_id;
+        $dados['alltech_id'] = strlen($cliente->alltech_id)  >= '11' ? $cliente->alltech_id : "-" . $cliente->alltech_id;
         $dados['loja_id'] = $cliente->loja_id;
         $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
         $dados['nome'] = $cliente->nome;
