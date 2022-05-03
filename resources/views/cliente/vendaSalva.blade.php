@@ -47,7 +47,7 @@
                                                     <b>{{ reais($carrinho['somaItens'][0]['total']) }}</b>
                                                 </h6>
                                                 <h6 class="col-5">Descontos Totais: R$
-                                                    <b>{{ $carrinho['valor_desconto'] }}</b>
+                                                    <b>{{ $carrinho['valor_desconto'] ? reais($carrinho['valor_desconto']) : '0,00'}}</b>
                                                 </h6>
                                             </div>
                                             <table class="table table-striped">

@@ -1,3 +1,5 @@
+const { toInteger } = require("lodash");
+
 //para modal salvar itens
 var botaoBuscaClienteAjax = document.getElementById('botaoBuscaClienteAjax');
 
@@ -33,40 +35,45 @@ function verificaDesconto(value, valorTotal, qtd_desconto_antigo) {
     var input = document.getElementById("inputDesconto");
     if (value == 'porcento') {
         input.disabled = false;
+
     } else if (value == 'dinheiro') {
         input.disabled = false;
-
 
     } else if (value == 0) {
         input.disabled = true;
         input.value = "";
     }
+   
     calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, value)
 }
 function calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, tp_desconto) {
     var qtd_desconto = document.getElementById("inputDesconto").value;
+  //  console.log(qtd_desconto);
     if (qtd_desconto) {
         var tp_desconto = $('#tp_desconto_sobre_venda_modal').val();
         var valorDesconto = tp_desconto == 'porcento' ? (valorTotal / 100) * qtd_desconto : qtd_desconto;
-        console.log(valorDesconto);
+       
+        //caso valor seja undefined
+        !qtd_desconto_antigo ? qtd_desconto_antigo = 0 : false;
 
         var novoValorTotalModal = valorTotal - valorDesconto;
-        var novoValorDescontoModal = parseFloat(valorDesconto) + qtd_desconto_antigo;
-       
+        var novoValorDescontoModal = qtd_desconto_antigo + parseFloat(valorDesconto);
+  
         atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto)
 
     } else {
-
+        
         var novoValorTotalModal = valorTotal;
-        var novoValorDescontoModal = qtd_desconto_antigo;
+        var novoValorDescontoModal =   !qtd_desconto_antigo ? qtd_desconto_antigo = 0 : qtd_desconto_antigo;
 
         atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto = null)
     }
-
+    
 }
 
 function atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto) {
-
+    console.log(novoValorDescontoModal);
+   // console.log(parseFloat(novoValorDescontoModal));
     document.getElementById('valorTotalModal').textContent = novoValorTotalModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
     document.getElementById('valorDescontoModal').textContent = novoValorDescontoModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
 

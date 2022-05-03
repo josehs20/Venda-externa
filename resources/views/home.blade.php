@@ -34,12 +34,12 @@
                                 @if ($produto->grades)
                                     <button type="button" class="buttonAdd" data-bs-toggle="modal"
                                         data-bs-target="#Grade{{ $produto->id }}"><img id="imgg" class="imgCarr"
-                                            src="addCar.ico" alt=""></button>
+                                            src="{{asset('addCar.ico')}}" alt=""></button>
                                 @else
-                                   
+                                  
                                     <button type="button" class="buttonAdd" data-bs-toggle="modal"
                                         data-bs-target="#SemGrade{{ $produto->id }}"><img id="imgg" class="imgCarr"
-                                            src="addCar.ico" alt="">
+                                            src="{{asset('addCar.ico')}}"  alt="">
                                 @endif
 
                             </div>

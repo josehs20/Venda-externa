@@ -202,7 +202,7 @@ class ClienteController extends Controller
         }
         
         //Class de Jobs para exportação 
-        ExportaClienteJob::dispatch($file, $dir);
+        //ExportaClienteJob::dispatch($file, $dir);
         return;
     }
 

@@ -88,7 +88,7 @@
 
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <a href="{{ route('clientes.edit', $cliente->id) }}" style="cursor: pointer;"
+                                        <a href="{{ route('clientes.edit', $cliente->id) }}" style="cursor: pointer; text-decoration:none;"
                                             class="badge bg-primary rounded-pill">Editar
                                             Cliente</a>
 
@@ -273,5 +273,7 @@
         </script>
 
     </div>
+
+    
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewcliente.js') }}" defer></script>

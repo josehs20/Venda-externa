@@ -85,7 +85,7 @@
                         @method('PUT')
                         @csrf
                         <input type="hidden" name="verify" value="1">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
                         <button type="submit" class="btn btn-primary">Sim</button>
                     </form>
                 </div>
@@ -111,7 +111,7 @@
                         @method('DELETE')
                         @csrf
                         <input type="hidden" name="verify" value="1">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
                         <button type="submit" class="btn btn-primary">Sim</button>
                     </form>
                 </div>
@@ -334,7 +334,7 @@
                                 Carrinho já esta salvo para <b>{{ $carrinho->cliente->nome }}</b>, deseja continuar?
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
                                 <input type="hidden" name="cliente_id" value="{{ $carrinho->cliente_id }}" />
                                 <button type="submit" class="btn btn-primary">Sim</button>
                             </div>
@@ -600,7 +600,7 @@
                                     <div class="col-4">
                                         <div class="form-floating">
                                             <input required name="cliente_alltech_id" id="clienteCodigo" type="text"
-                                                class="form-control" value="999999" name="codigoCliente"
+                                                class="form-control" value="{{$carrinho->cliente_id ? $carrinho->cliente->alltech_id : '999999'}}" name="codigoCliente"
                                                 id="floatingInputGrid" placeholder="quantidade">
                                             <label for="floatingInputGrid">Cod.</label>
                                         </div>
