@@ -699,7 +699,7 @@
                                 aria-label="Close"></button>
                         </div>
 
-                        <form action="{{ route('busca_cliente_ajax') }}" method="GET" class="search-cliente">
+                        <form id="formSalvaItensCliente" method="GET" class="search-cliente">
                             @csrf
                             <input id="buscaNomeClienteVendaAjax" type="text" class="form-control" placeholder="nome">
                             <button id="botaoBuscaClienteNomeAjax" class="lupa"><i class="bi-search"
