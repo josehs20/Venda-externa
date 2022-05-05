@@ -47,7 +47,8 @@ class ClienteController extends Controller
     public function create()
     {
         $cliente = null;
-        return view('cliente.form', compact('cliente'));
+        // return view('cliente.form', compact('cliente'));
+        return view('cliente.create', compact('cliente'));
     }
 
     /**
@@ -60,7 +61,7 @@ class ClienteController extends Controller
     {
         $codIbge = CidadeIbge::where('codigo', trim($_POST['codIbge']))->first();
 
-        
+
 
         $cliente =  Cliente::create([
             'loja_id' => auth()->user()->loja_id,
@@ -108,10 +109,9 @@ class ClienteController extends Controller
     public function edit($id)
     {
         $cliente = Cliente::find($id);
-        //    $file = Storage::disk('local')->files('28825657000107');
-        //    $a = Storage::get($file[0]);
-        //     dd(json_decode($a));
-        return view('cliente.formUpdate', compact('cliente'));
+
+
+        return view('cliente.edit', compact('cliente'));
     }
 
     /**
@@ -132,6 +132,7 @@ class ClienteController extends Controller
             $cliente = Cliente::find($_PUT['id']);
 
             $cliente->update([
+                'nome' => $_PUT['nome'],
                 'email' => $_PUT['email'],
                 'fone1' => strlen($_PUT['telefones'][0]) > 7 ? $_PUT['telefones'][0] : null,
                 'fone2' => strlen($_PUT['telefones'][1]) > 7 ? $_PUT['telefones'][1] : null,
@@ -148,7 +149,7 @@ class ClienteController extends Controller
             $dados['success'] = true;
             echo json_encode($dados);
 
-            $cliente = Cliente::with('enderecos')->find($_PUT['id']);
+          
             $this->jsonClienteStorageJob($cliente);
         }
         return;
@@ -158,7 +159,7 @@ class ClienteController extends Controller
     public function jsonClienteStorageJob($cliente)
     {
         $dados['id'] = $cliente->id;
-        $dados['alltech_id'] = strlen($cliente->alltech_id)  >= '11' ? $cliente->alltech_id : "-" . $cliente->alltech_id;
+        $dados['alltech_id'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? "-" . $cliente->alltech_id : $cliente->alltech_id;
         $dados['loja_id'] = $cliente->loja_id;
         $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
         $dados['nome'] = $cliente->nome;
@@ -200,7 +201,7 @@ class ClienteController extends Controller
             Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
             $file = $dir . '/CLIENTE-' . $count . '.json';
         }
-        
+
         //Class de Jobs para exportação 
         //ExportaClienteJob::dispatch($file, $dir);
         return;

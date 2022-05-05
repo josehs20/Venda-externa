@@ -28,8 +28,23 @@ body {
   background-image: url(../image/logo1.png);
   background-size: contain;
   background-repeat: no-repeat;
-  height: 30px;
+  height: 40px;
   width: 100px;
+}
+
+.bar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+  height: 30%;
+  background-color: #474663;
 }
 
 @media (max-width: 990px) {
@@ -52,6 +67,7 @@ body {
       -ms-flex-align: center;
           align-items: center;
   width: 100%;
+  height: 25%;
   background-color: #474663;
 }
 
@@ -66,6 +82,7 @@ body {
       -ms-flex-align: center;
           align-items: center;
   width: 100%;
+  margin-top: 2%;
 }
 
 .bar-user-sair {
@@ -169,14 +186,6 @@ body {
   margin: 1%;
 }
 
-.listItemCarrinho {
-  margin-top: 2%;
-}
-
-.listCliente {
-  margin-top: 4%;
-}
-
 #buscaCliente {
   position: fixed;
   top: 9.3%;
@@ -186,7 +195,7 @@ body {
   background-color: #000000;
 }
 
-.inputBuscaCliente {
+.inputDivBuscaCliente {
   -webkit-transition: 0.5s;
   transition: 0.5s;
   color: black;
@@ -204,15 +213,42 @@ body {
           transform: translateX(100%);
 }
 
-@media (max-width: 700px) {
-  #contentIndex {
-    margin-top: 30%;
-  }
+.inputBuscaCliente {
+  position: fixed;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.contentItnsCarrinho {
+  margin-top: 7%;
+}
+
+@media all and (orientation: landscape) and (min-width: 500px) and (max-width: 900px) {
   .bar {
-    margin-top: 20%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    width: 100%;
+    height: 35%;
+    background-color: #474663;
+  }
+}
+
+@media screen and (min-width: 500px) and (max-width: 930px) {
+  .bar {
+    margin-top: 10%;
+  }
+  .contentItnsCarrinho {
+    margin-top: 27%;
   }
   .card {
-    width: 90% !important;
+    width: 88% !important;
   }
   .bar-pesquisa-user-carrinho {
     -ms-flex-wrap: wrap;
@@ -235,7 +271,7 @@ body {
   .quanti {
     position: absolute;
     margin-left: 64px;
-    margin-top: -40px;
+    margin-top: -38px;
   }
   .search button {
     width: 20%;
@@ -255,18 +291,12 @@ body {
             align-items: center;
     margin-top: 18%;
   }
-  .listItemCarrinho {
-    margin-top: 20%;
-  }
   .listHome {
     width: 95%;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
     margin-top: 2%;
-  }
-  .listCliente {
-    margin-top: 20%;
   }
   .bar-user-sair {
     margin-top: 15px;
@@ -323,6 +353,125 @@ body {
     transition: max-height 0.2s ease-out;
     background-color: #ffffff;
   }
+}
+
+@media screen and (min-width: 0px) and (max-width: 499px) {
+  .bar {
+    margin-top: 20%;
+    height: 20%;
+  }
+  .contentItnsCarrinho {
+    margin-top: 30%;
+  }
+  .card {
+    width: 88% !important;
+  }
+  .bar-pesquisa-user-carrinho {
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+  }
+  .bar-user-carrinho {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+        -ms-flex-direction: row-reverse;
+            flex-direction: row-reverse;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    width: 100%;
+  }
+  .fotocarr {
+    width: 38px;
+    height: 30px;
+  }
+  .quanti {
+    position: absolute;
+    margin-left: 64px;
+    margin-top: -38px;
+  }
+  .search button {
+    width: 20%;
+  }
+  .list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    margin-top: 18%;
+  }
+  .listHome {
+    width: 95%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-top: 2%;
+  }
+  .bar-user-sair {
+    margin-top: 15px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -ms-flex-pack: distribute;
+        justify-content: space-around;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    margin-left: 40px;
+  }
+  .collapsible {
+    height: 20px;
+    background-color: #777;
+    color: white;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+  }
+  .active,
+  .collapsible:hover {
+    background-color: #555;
+  }
+  .collapsible:after {
+    content: '\002B';
+    color: white;
+    font-weight: bold;
+    float: left;
+    margin-top: -30px;
+  }
+  .active:after {
+    content: "\2212";
+  }
+  .contentconspllan {
+    max-height: 0;
+    overflow: hidden;
+    -webkit-transition: max-height 0.2s ease-out;
+    transition: max-height 0.2s ease-out;
+    background-color: #a8a8a8;
+  }
+  .contentconspllanVendaSalva {
+    max-height: 0;
+    overflow: hidden;
+    -webkit-transition: max-height 0.2s ease-out;
+    transition: max-height 0.2s ease-out;
+    background-color: #ffffff;
+  }
+}
+
+@media (max-width: 369px) {
   #buscaCliente {
     position: fixed;
     top: 13%;
@@ -331,11 +480,11 @@ body {
     right: 0;
     background-color: #000000;
   }
-  .inputBuscaCliente {
-    -webkit-transition: 0.5s;
-    transition: 0.5s;
+  .inputDivBuscaCliente {
+    -webkit-transition: 1.0s;
+    transition: 1.0s;
     color: black;
-    border-radius: 4px;
+    border-radius: 5px;
     border-color: white;
     width: 80%;
     height: 30px;
@@ -348,6 +497,48 @@ body {
     -webkit-transform: translateX(100%);
             transform: translateX(100%);
   }
+  .inputBuscaCliente {
+    position: fixed;
+    width: 100%;
+    margin-left: 20px;
+  }
+}
+
+@media screen and (min-width: 370px) and (max-width: 800px) {
+  #buscaCliente {
+    position: fixed;
+    top: 13%;
+    z-index: 100;
+    opacity: 0.7;
+    right: 0;
+    background-color: #000000;
+  }
+  .inputDivBuscaCliente {
+    -webkit-transition: 1.0s;
+    transition: 1.0s;
+    color: black;
+    border-radius: 5px;
+    border-color: white;
+    width: 80%;
+    height: 30px;
+    position: fixed;
+    top: 13%;
+    z-index: 100;
+    opacity: 1.0;
+    right: 0;
+    background-color: #ffffff;
+    -webkit-transform: translateX(100%);
+            transform: translateX(100%);
+  }
+  .inputBuscaCliente {
+    position: fixed;
+    border-radius: 5px;
+    margin-top: 1px;
+    margin-right: 100px;
+    height: 30px;
+    border-color: white;
+  }
+  /*fim media 900px*/
 }
 
 .go-back {

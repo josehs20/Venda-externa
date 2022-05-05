@@ -16,23 +16,24 @@
 
 @section('content')
 
-    @include('componentes.navbar')
-    @include('componentes.titulo', [
-        'titlePage' => 'Clientes',
-    ])
+ 
     @if (Session::has('Add_Obs'))
 
     <body onload="msgSuccess('Observação Adicionada Com Sucesso')">
     @endif
 
     <form action="{{ route('clientes.index', auth()->user()->id) }}">
-
-        <input name="nome" class="inputBuscaCliente " id="inputBuscaCliente" type="text" placeholder="Buscar Cliente">
-
+<div class="inputDivBuscaCliente" id="inputBuscaCliente">
+    
+    <button class="btn" type="submit" style="font-size: 10px" > <i style="font-size: 18px" class="bi bi-search"></i></button>
+        <input name="nome" class="inputBuscaCliente"  type="text" placeholder="Buscar Cliente">
+    </div>
         <a id="buscaCliente" class="btn btn-primary"><i class="bi bi-arrow-left-right"></i></i></a>
     </form>
 
-    <div id="contentIndex">
+
+        @include('componentes.navbar')
+        <br><br><br><br><br>
         @if ($clientes->count())
             <div class="listCliente">
                 <div class="container">
@@ -271,8 +272,6 @@
                 });
             }
         </script>
-
-    </div>
 
     
 @endsection

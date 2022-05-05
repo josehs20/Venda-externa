@@ -6,8 +6,8 @@ var botaoBuscaClienteNomefinaliza = document.getElementById('botaoBuscaClienteNo
 var clienteCodigoConsulta = document.getElementById('clienteCodigo');
 
 //habilita desconto
-function habilitaDescontoEditarItem(value) {
-    var input = document.getElementById("inputDescontoEditarItem");
+function habilitaDescontoEditarItem(value, inputId) {
+    var input = document.getElementById("inputDescontoEditarItem" + inputId);
 
     if (value == 'porcento') {
         input.disabled = false;

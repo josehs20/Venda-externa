@@ -2,12 +2,13 @@
 
 
 @section('content')
-    @include('componentes.navbar')
-    @include('componentes.titulo', [
-        'titlePage' => 'Vendas Finalizadas',
-    ])
+ 
 
     <div id="contentIndex">
+        @include('componentes.navbar')
+        @include('componentes.titulo', [
+            'titlePage' => 'Vendas Finalizadas',
+        ])
         @if (sizeof($carrinho) == 0)
             <div class="alert alert-warning mt-5" role="alert">
                 Nenhuma Venda Finalizada

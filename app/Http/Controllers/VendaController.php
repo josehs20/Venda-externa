@@ -37,7 +37,7 @@ class VendaController extends Controller
                     $produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id'] = $item->produto_id;
                 } else {
                     $produtos_carrinho_quantidade['itemCarrinho'][$item->produto_id] = $item->quantidade;
-                    // $produtos_carrinho_quantidade['itemCarrinho'] = $item->qunatidade;
+                  
                 }
             }
         }

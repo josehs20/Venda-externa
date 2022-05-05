@@ -20,8 +20,19 @@ body {
     background-image: url(../image/logo1.png);
     background-size: contain;
     background-repeat: no-repeat;
-    height: 30px;
+    height: 40px;
     width: 100px;
+}
+
+
+.bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 30%;
+    background-color: #474663;
+
 }
 
 @media (max-width: 990px) {
@@ -38,6 +49,7 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
+    height: 25%;
     background-color: #474663;
 
 }
@@ -47,6 +59,7 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
+    margin-top: 2%;
 }
 
 .bar-user-sair {
@@ -125,13 +138,6 @@ body {
     margin: 1%;
 }
 
-.listItemCarrinho {
-    margin-top: 2%;
-}
-
-.listCliente {
-    margin-top: 4%;
-}
 
 #buscaCliente {
     position: fixed;
@@ -142,7 +148,7 @@ body {
     background-color: #000000;
 }
 
-.inputBuscaCliente {
+.inputDivBuscaCliente {
     transition: 0.5s;
     color: rgb(0, 0, 0);
     border-radius: 4px;
@@ -157,16 +163,45 @@ body {
     background-color: #ffffff;
     transform: translateX(100%);
 }
-@media (max-width: 700px) {
-    #contentIndex{
-        margin-top: 30%;
-    }
+
+.inputBuscaCliente {
+    position: fixed;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.contentItnsCarrinho {
+    margin-top: 7%;
+}
+
+@media all and (orientation:landscape) and (min-width: 500px) and (max-width: 900px) {
+
     .bar {
-        margin-top: 20%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 35%;
+        background-color: #474663;
+
+    }
+
+
+}
+
+//media navbar
+@media screen and (min-width: 500px) and (max-width: 930px) {
+
+    .bar {
+        margin-top: 10%;
+    }
+
+    .contentItnsCarrinho {
+        margin-top: 27%;
     }
 
     .card {
-        width: 90% !important;
+        width: 88% !important;
     }
 
     .bar-pesquisa-user-carrinho {
@@ -187,7 +222,7 @@ body {
     .quanti {
         position: absolute;
         margin-left: 64px;
-        margin-top: -40px;
+        margin-top: -38px;
     }
 
     .search button {
@@ -203,18 +238,10 @@ body {
         margin-top: 18%;
     }
 
-    .listItemCarrinho {
-        margin-top: 20%;
-    }
-
     .listHome {
         width: 95%;
         display: flex;
         margin-top: 2%;
-    }
-
-    .listCliente {
-        margin-top: 20%;
     }
 
     .bar-user-sair {
@@ -270,6 +297,122 @@ body {
         transition: max-height 0.2s ease-out;
         background-color: #ffffff;
     }
+}
+
+//media navbar
+@media screen and (min-width: 0px) and (max-width: 499px) {
+    
+
+   
+    .bar {
+        margin-top: 20%;
+        height: 20%;
+    }
+
+    .contentItnsCarrinho {
+        margin-top: 30%;
+    }
+
+    .card {
+        width: 88% !important;
+    }
+
+    .bar-pesquisa-user-carrinho {
+        flex-wrap: wrap;
+    }
+
+    .bar-user-carrinho {
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .fotocarr {
+        width: 38px;
+        height: 30px;
+    }
+
+    .quanti {
+        position: absolute;
+        margin-left: 64px;
+        margin-top: -38px;
+    }
+
+    .search button {
+        width: 20%;
+    }
+
+    .list {
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        margin-top: 18%;
+    }
+
+    .listHome {
+        width: 95%;
+        display: flex;
+        margin-top: 2%;
+    }
+    .bar-user-sair {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        margin-left: 40px;
+    }
+
+    .collapsible {
+        height: 20px;
+        background-color: #777;
+        color: white;
+        padding: 18px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+    }
+
+    .active,
+    .collapsible:hover {
+        background-color: #555;
+    }
+
+    .collapsible:after {
+        content: '\002B';
+        color: white;
+        font-weight: bold;
+        float: left;
+        margin-top: -30px;
+    }
+
+    .active:after {
+        content: "\2212";
+
+    }
+
+    .contentconspllan {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease-out;
+        background-color: #a8a8a8;
+    }
+
+    //venda Salva 
+    .contentconspllanVendaSalva {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease-out;
+        background-color: #ffffff;
+    }
+}
+
+
+@media (max-width: 369px) {
 
     #buscaCliente {
         position: fixed;
@@ -280,10 +423,10 @@ body {
         background-color: #000000;
     }
 
-    .inputBuscaCliente {
-        transition: 0.5s;
+    .inputDivBuscaCliente {
+        transition: 1.0s;
         color: rgb(0, 0, 0);
-        border-radius: 4px;
+        border-radius: 5px;
         border-color: white;
         width: 80%;
         height: 30px;
@@ -295,7 +438,62 @@ body {
         background-color: #ffffff;
         transform: translateX(100%);
     }
+
+    .inputBuscaCliente {
+        position: fixed;
+        width: 100%;
+        margin-left: 20px;
+
+    }
+
+
 }
+
+@media screen and (min-width: 370px) and (max-width: 800px) {
+
+    #buscaCliente {
+        position: fixed;
+        top: 13%;
+        z-index: 100;
+        opacity: 0.7;
+        right: 0;
+        background-color: #000000;
+    }
+
+    .inputDivBuscaCliente {
+        transition: 1.0s;
+        color: rgb(0, 0, 0);
+        border-radius: 5px;
+        border-color: white;
+        width: 80%;
+        height: 30px;
+        position: fixed;
+        top: 13%;
+        z-index: 100;
+        opacity: 1.0;
+        right: 0;
+        background-color: #ffffff;
+        transform: translateX(100%);
+    }
+
+    .inputBuscaCliente {
+        position: fixed;
+        border-radius: 5px;
+        margin-top: 1px;
+        margin-right: 100px;
+        height: 30px;
+        border-color: white;
+
+    }
+
+
+
+
+
+
+    /*fim media 900px*/
+}
+
 
 .go-back {
     transform: translateX(0%);
@@ -451,6 +649,7 @@ body {
     padding: 1px;
 
 }
+
 .search-cliente {
     position: relative;
     margin: 1em;

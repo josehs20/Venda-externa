@@ -44,7 +44,7 @@ $(function () {
             console.log(response);
             if (response['ok'] === true) {
                 var count_itens = response['count_item'];
-                $('.quantiCar').html(count_itens);
+                $('#countItensCar').html(count_itens);
                 Swal.fire({
                     icon: 'success',
                     title: "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso",
@@ -102,7 +102,7 @@ $(function () {
             console.log(response);
             if (response['ok'] === true) {
                 var count_itens = response['count_item'];
-                $('.quantiCar').html(count_itens);
+                $('#countItensCar').html(count_itens);
                 Swal.fire({
                     icon: 'success',
                     title: "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso",
@@ -174,3 +174,18 @@ function valida_form(id) {
         return dados;
     }
 }
+
+function inputGradeqtdInteiro(value) {
+    
+    var checkbox = document.getElementById("checkboxInputGrade" + value)
+   // console.log(value);
+    var input = document.getElementById("inputGradeqtdInteiro" + value);
+ 
+    if (checkbox.checked) {
+        input.disabled = false;
+
+    } else {
+        input.disabled = true;
+    }
+}
+

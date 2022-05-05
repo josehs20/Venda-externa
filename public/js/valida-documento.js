@@ -1,3 +1,4 @@
+
 //Cria Usuário
 $(function () {
     $('form[id="CadastroCliente"]').submit(function (event) {
@@ -42,27 +43,27 @@ $(function () {
                 dataType: 'json',
             }).done(function (response) {
                 if (response['success'] == true) {
-                    $('#docto').val("");  
-                    $('#inputNome').val("");  
-                     $('#inputEmail').val("");
-                     $('#inputTel1').val("");   
-                     $('#inputTel2').val("");   
-                     $('#celular').val("");              
-                     $('#cep').val("");
-                     $("#uf").val("");
-                     $("#rua").val("");
-                     $("#bairro").val("");
-                     $("#cidade").val("");
-                     $("#numero").val("");
-                     $("#compto").val("");
-                     $("#cidIbge").val("");
-                   
-                     Swal.fire({
+                    $('#docto').val("");
+                    $('#inputNome').val("");
+                    $('#inputEmail').val("");
+                    $('#inputTel1').val("");
+                    $('#inputTel2').val("");
+                    $('#celular').val("");
+                    $('#cep').val("");
+                    $("#uf").val("");
+                    $("#rua").val("");
+                    $("#bairro").val("");
+                    $("#cidade").val("");
+                    $("#numero").val("");
+                    $("#compto").val("");
+                    $("#cidIbge").val("");
+
+                    Swal.fire({
                         icon: 'success',
                         title: 'Cliente Cadastrado Com Sucesso',
                         showConfirmButton: false,
                         timer: 1500
-                      })
+                    })
                 }
             });
         } else {
@@ -90,8 +91,9 @@ $(function () {
             var numero = $("#numero").val();
             var complemento = $("#compto").val();
             var codIbge = $("#cidIbge").val();
-            var id = $('#idCliente').val()
-            console.log(codIbge);
+            var id = $('#idCliente').val();
+            var nome = $('#inputNome').val();
+       
             $.ajax({
                 url: "/clientes/" + id,
                 type: "PUT",
@@ -109,7 +111,8 @@ $(function () {
                     rua: rua,
                     numero: numero,
                     complemento: complemento,
-                    codIbge: codIbge
+                    codIbge: codIbge,
+                    nome : nome,
                 },
                 dataType: 'json',
             }).done(function (response) {
@@ -124,8 +127,8 @@ $(function () {
                         title: 'Cliente Atualizado Com Sucesso',
                         showConfirmButton: false,
                         timer: 1500
-                      })
-                 
+                    })
+
                 }
             });
         } else {
@@ -133,12 +136,40 @@ $(function () {
         }
     });
 });
+//arruma inputes quando entra da página para update
+window.onload = function () {
+    var dados = {
+        uf: $('#uf').val(),
+        cidade: $('#cidade').val(),
+        inputNome: $('#inputNome').val(),
+        bairro: $('#bairro').val(),
+        rua: $('#rua').val(),
+        compto: $('#compto').val(),
+
+    }
+
+    for (const key in dados) {
+        removeCarcterEspecial(dados[key], key)
+
+    }
+
+    return;
+}
+
+function removeCarcterEspecial(letra, id) {
+
+    $('#' + id).val(letra.normalize("NFD").replace(/[^\w\s]/gi, "").toUpperCase());
+
+}
+
+
+
 
 
 //valid cep
 function PesquisarCepCidade() {
     var uf = $("#uf").val();
-    var cidade = $("#cidade").val();
+    var cidade = $('#cidade').val($('#cidade').val().normalize("NFD").replace(/[^\w\s]/gi, "").toUpperCase());
     var erro = document.getElementById("error");
     $.ajax({
         type: "GET",
@@ -146,11 +177,8 @@ function PesquisarCepCidade() {
         dataType: "json",
     }).done(function (dados) {
         if (dados.length) {
-            $("#rua").val("");
-            $("#bairro").val("");
-            $("#numero").val("");
-            $("#compto").val("");
-            $("#cep").val(dados[0].cep);
+
+            $("#cep").val(dados[0].cep.normalize("NFD").replace(/[^\w\s]/gi, ""));
             $("#cidIbge").val(dados[0].ibge);
             erro.innerHTML = ""
         } else {
@@ -159,34 +187,32 @@ function PesquisarCepCidade() {
     });
 }
 function PesquisarCEP() {
-    cep = $("#cep").val();
-    var resultado;
+    var cep = $("#cep").val();
     var erro = document.getElementById("error");
-    $.ajax({
-        type: "GET",
-        url: "https://viacep.com.br/ws/" + cep + "/json/",
-        dataType: "json",
-        error: function () {
-            erro.innerHTML = "Inválido"
-        }
-    }).done(function (dados) {
-        $("#uf").val(dados.uf);
-        $("#rua").val(dados.logradouro);
-        $("#bairro").val(dados.bairro);
-        $("#cidade").val(dados.localidade);
-        $("#numero").val("");
-        $("#compto").val("");
-        $("#cidIbge").val(dados.ibge);
-        erro.innerHTML = ""
-    });
+    if (cep.length > 7) {
+        $.ajax({
+            type: "GET",
+            url: "https://viacep.com.br/ws/" + cep + "/json/",
+            dataType: "json",
+            error: function () {
+                erro.innerHTML = "Inválido"
+            }
+        }).done(function (dados) {
+            $("#uf").val(dados.uf);
+            $("#cidade").val(dados.localidade.normalize("NFD").replace(/[^\w\s]/gi, "").toUpperCase());
+            $("#cidIbge").val(dados.ibge);
+            erro.innerHTML = ""
+        });
+    }
 }
 
 //valida nome
 function validaInputNome() {
-    //console.log('a');
+
     var nome = document.getElementById('inputNome').value;
     var regex = /[0-9]/;
     var contemNum = regex.test(nome);
+
     if (contemNum) {
         document.getElementById('nomeValid').innerHTML = "Nome contém numero";
 
@@ -348,45 +374,3 @@ function validaCNPJ(CNPJ) {
     resultado = (((primeiroDigito * 10) + segundoDigito)) == digito ? true : false;
     return resultado;
 }
-//Mensagem Personalizada
-// function mostraDialogo(mensagem, tipo, tempo) {
-
-//     // se houver outro alert desse sendo exibido, cancela essa requisição
-//     if ($("#message").is(":visible")) {
-//         return false;
-//     }
-
-//     // se não setar o tempo, o padrão é 3 segundos
-//     if (!tempo) {
-//         var tempo = 2000;
-//     }
-
-//     // se não setar o tipo, o padrão é alert-info
-//     if (!tipo) {
-//         var tipo = "info";
-//     }
-
-//     // monta o css da mensagem para que fique flutuando na frente de todos elementos da página
-//     var cssMessage = "display: block; position: fixed; top: 0; left: 20%; right: 20%; width: 60%; padding-top: 10px; z-index: 9999";
-//     var cssInner = "margin: 0 auto; box-shadow: 1px 1px 5px black;";
-
-//     // monta o html da mensagem com Bootstrap
-//     var dialogo = "";
-//     dialogo += '<div id="message" style="' + cssMessage + '">';
-//     dialogo += '    <div class="alert alert-' + tipo + ' alert-dismissable col-10" style="' + cssInner + '">';
-//     dialogo += mensagem;
-//     dialogo += '    </div>';
-//     dialogo += '</div>';
-
-//     // adiciona ao body a mensagem com o efeito de fade
-//     $("body").append(dialogo);
-//     $("#message").hide();
-//     $("#message").fadeIn(200);
-
-//     // contador de tempo para a mensagem sumir
-//     setTimeout(function () {
-//         $('#message').fadeOut(300, function () {
-//             $(this).remove();
-//         });
-//     }, tempo); // milliseconds
-// }
