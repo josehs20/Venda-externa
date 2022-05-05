@@ -4,7 +4,7 @@
   
    
 
-        @include('componentes.navbar')
+        @include('componentes.navbar', ['titulo' => 'Cadastro'])
         <br><br><br><br><br>
         <div class="container" >
             <div class="card border-primary mb-3 mx-3">

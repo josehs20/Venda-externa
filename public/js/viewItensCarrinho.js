@@ -162,10 +162,14 @@ function fechaModalfinalizaVenda(event) {
     document.getElementById('closeModalFinalizaVenda').click();
 }
 
+function buscaClienteNomeVendaAjax(event) {
+    document.getElementById('closeModalbuscaClienteNomeVendaAjax').click();
+    document.getElementById('abrirModalFinalizaVendaSemCliente').click();
+}
 $(function () {
     $("#buscaNomeClienteVendaAjax").keyup(function () {
         var busca = $("#buscaNomeClienteVendaAjax").val();
-console.log(busca);
+        
         if (busca.length > 4) {
 
 
@@ -241,12 +245,14 @@ botaoBuscaClienteNomefinaliza.addEventListener('click', botaoBuscaClienteNomefin
 //busca alltech_id
 function buttonAlltech_id(id) {
     cliente_consulta_finaliza = id;
+
 }
+
 $(function () {
     $('form[id="buscaAlltech_idClienteVendaAjax"]').submit(function (event) {
         event.preventDefault();
         var cliente = cliente_consulta_finaliza;
-
+        console.log(cliente);
         $.ajax({
             url: "/busca_cliente",
             type: "GET",
@@ -345,8 +351,10 @@ $(function () {
     });
 });
 
-function fechaModalUnificaDesconto() {
-    var botao = document.getElementById("fechaModalUnificaDesconto");
-
+function abremodalConfDesconto() {
+    var botao = document.getElementById("closemodalDesconto");
     botao.click();
+}
+function abremodalDesconto(params) {
+    document.getElementById('modalUnificaclick').click()
 }

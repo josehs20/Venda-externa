@@ -15,16 +15,15 @@
 
     </style>
 
-    @if (Session::has('cancelar_carrinho'))
-
-        <body onload="msgSuccess('Venda Cancelado Com Sucesso')">
-        @elseif (Session::has('carrinho_finalizado'))
-
-            <body onload="msgSuccess('Venda Finalizado Com Sucesso')">
-    @endif
-
-    @include('componentes.navbar')
+    @include('componentes.navbar', ['titulo' => 'Produtos'])
     <br><br><br>
+    @if (Session::has('success'))
+
+        <body onload="msgSuccess('<?php echo Session::get('success'); ?>')">
+        {{-- @elseif (Session::has('carrinho_finalizado'))
+
+            <body onload="msgSuccess('Venda Finalizado Com Sucesso')"> --}}
+    @endif
     {{-- @include('componentes.titulo', ['titlePage' => 'Produtos']) --}}
 
     <div id="elemento_ajax_html" name="addItem" method="POST" class="list">

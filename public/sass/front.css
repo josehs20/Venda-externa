@@ -646,7 +646,7 @@ body {
   position: relative;
   -webkit-box-shadow: 5px 2px 8px black;
           box-shadow: 5px 2px 8px black;
-  width: 45%;
+  width: 100%;
 }
 
 .search input {

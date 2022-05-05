@@ -18,12 +18,12 @@
 
     </style>
 
-    @include('componentes.navbar')
+    @include('componentes.navbar', ['titulo' => 'Editar'])
     <br><br><br><br><br>
     <div class="container">
         <div class="card border-primary mb-3 mx-3">
             <div class="card-header d-flex d-flex justify-content-center">
-                <h5>Cadastro de Cliente</h5>
+                <h5>Editar Cliente</h5>
             </div>
 
             <form id="updateCliente" class="row g-3 d-flex justify-content-center px-2">

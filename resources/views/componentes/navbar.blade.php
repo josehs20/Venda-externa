@@ -1,4 +1,3 @@
-<script src="https://kit.fontawesome.com/3b1ca000cb.js"></script>
 <style>
     * {
         margin: 0;
@@ -248,7 +247,7 @@
             width: 80%;
         }
 
-        #lupa {
+        /* #lupa {
             margin: 3px 0px 0px -40px;
             cursor: pointer;
             border-left: 1px solid rgb(78, 78, 78);
@@ -258,7 +257,7 @@
             display: flex;
             justify-content: center;
             align-items: center
-        }
+        } */
 
         /* formatação do conteúdo  */
         #lupa:after {
@@ -458,8 +457,14 @@
             <img src="{{ asset('image/logo2.png') }}" alt="">
         </a>
         <div class="search__bar__header">
-            <input type="text" />
-            <div id="lupa"></div>
+            {{-- <input type="text" />
+            <div id="lupa"></div> --}}
+            <form class="search" action="{{ route('venda.index') }}" method="GET">
+                @csrf
+                <input id="search" name="nome" type="search" class="form-control" placeholder="Buscar Produto">
+                <button id="preventBuscaProduto" class="lupa"><i class="bi-search"
+                        style="color: black"></i></button>
+            </form>
         </div>
         <a href="{{ route('itens_carrinho', ['user_id' => auth()->user()->id]) }}" class="cart__header__desktop">
             <i style="color: white;" class="fas fa-shopping-cart"></i>
@@ -468,34 +473,43 @@
     </nav>
 </header>
 <div class="main__navigations">
+
     <div class="main__navigations__div">
+        <li class="main__navigations__div__li save__from__left mx-3"><a class="anchor__remains__same"
+                style="font-weight: bold; color:rgb(0, 0, 0); font-size:14px;">
+                {{$titulo}}</a></li>
         <ul class="main__navigations__div__ul">
+
             <li class="main__navigations__div__li on__mobile_d_none" style="font-weight: bold;"><a
                     style="font-weight: bold; color:white;" href="{{ route('venda.index') }}">Home</a></li>
             <li class="main__navigations__div__li on__mobile_d_none">
                 <a class="categ" style="font-weight: bold; color:white;">Menu <i
                         class="fas fa-caret-down"></i></a>
                 <div class="div__categories__items">
-                    <p><a href="">Produtos</a></p>
+                    <p><a href="{{ route('venda.index') }}">Produtos</a></p>
                     <p><a href="{{ route('clientes.index') }}">Clientes</a></p>
                     <p><a href="{{ route('clientes.create') }}">Cadastro De Cliente</a></p>
                     <p><a href="{{ route('vendas_finalizadas') }}">Vendas Finalizadas</a></p>
                     <p><a href="{{ route('venda_salva') }}">Vendas Salvas</a></p>
                 </div>
             </li>
-            <li class="main__navigations__div__li save__from__left"><a href="" class="anchor__remains__same"
+
+            <li class="main__navigations__div__li save__from__left"><a class="anchor__remains__same"
                     style="font-weight: bold; color:white;"><i style="color: #d1d1d1;" class="fas fa-user"></i>
                     Olá, {{ auth()->user()->name }}</a></li>
-            <li class="main__navigations__div__li">
+
+
+            <li class="main__navigations__div__li on__mobile_d_none">
                 <a href="{{ route('logout') }}" class="anchor__remains__same"
                     style="padding-bottom: 0;font-weight: bold; color:rgb(255, 255, 255);"
                     href="{{ route('logout') }}" onclick="event.preventDefault();
-                     document.getElementById('logout-form').submit();">
+                             document.getElementById('logout-form').submit();">
                     {{ __('Sair') }} <i style="color: rgb(209, 209, 209)" class="fas fa-sign-out-alt"></i> </a>
             </li>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                 @csrf
             </form>
+
             <div class="bars save__from__right">
                 <div class="line1"></div>
                 <div class="line2"></div>
@@ -518,12 +532,19 @@
                 <p><a href="{{ route('venda_salva') }}">Vendas Salvas</a></p>
             </div>
         </li>
+        <li class="main__navigations__div__li">
+            <a href="{{ route('logout') }}" class="anchor__remains__same"
+                style="padding-bottom: 0;font-weight: bold; color:rgb(255, 255, 255);" href="{{ route('logout') }}"
+                onclick="event.preventDefault();
+                 document.getElementById('logout-form').submit();">
+                {{ __('Sair') }} <i style="color: rgb(209, 209, 209)" class="fas fa-sign-out-alt"></i> </a>
+        </li>
     </div>
 </div>
 
 <div class="mobile__nav__fade__and__show__circle"></div>
 
-
+<script type="text/javascript" src="{{ asset('js/layoutfisic.js') }}" defer></script>
 
 <script>
     $(".bars").click(() => {

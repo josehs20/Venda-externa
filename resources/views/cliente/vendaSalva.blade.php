@@ -3,14 +3,15 @@
 @section('content')
 
   
+    
+    @include('componentes.navbar', ['titulo' => 'Salvos'])
+    <br><br><br><br><br>
+
     @if (Session::has('deleta_carrinho'))
 
         <body onload="msgContato(msg = 7)">
     @endif
 
-    @include('componentes.navbar')
-    <br><br><br>
-    
         @if (sizeof($carrinhos_Salvos) == 0)
             <div class="alert alert-warning mt-5" role="alert">
                 Nenhuma Venda Salva :)

@@ -237,13 +237,8 @@ class ClienteController extends Controller
     public function substitui_carrinho(Request $request, $carrinho)
     {
         $carrinho_substituido = Carrinho::find($carrinho);
-        // dd($request->all());
-        if ($request->deleteCarrinho) {
-            $carrinho_substituido->delete();
-            Session::flash('deleta_carrinho');
-
-            return redirect(route('venda_salva'));
-        } elseif ($request->substituir) {
+  
+       if ($request->substituir) {
             $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
             // dd($cliente_carrinho);
             if ($cliente_carrinho->cliente) {
@@ -260,9 +255,9 @@ class ClienteController extends Controller
             Carrinho::find($carrinho)->update(['status' => "Aberto"]);
         }
         //  dd('a');
-        Session::flash('success');
+        Session::flash('success', 'Itens Substituídos Com Sucesso');
 
-        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Itens Substituídos Com Sucesso']));
+        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
     }
 
     public function add_observacao(Request $request, $cliente)
@@ -275,7 +270,7 @@ class ClienteController extends Controller
             'observacao' => $request->observacao,
             'cliente_id' => $cliente,
         ]);
-        Session::flash('Add_Obs');
+        Session::flash('success', 'Observacao adicionada');
         return redirect(route('clientes.index'));
     }
 

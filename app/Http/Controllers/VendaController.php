@@ -63,7 +63,7 @@ class VendaController extends Controller
         $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->paginate(50);
        
         $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-     
+ 
         return view('vendedor.itemCarrinho', compact('carrinho', 'clientes_user', 'msg'));
     }
 
@@ -287,8 +287,8 @@ class VendaController extends Controller
             'valor_bruto' => array_sum($valor_itens_bruto),
             'total' => $valor_final_item,
         ]);
-        Session::flash('success');
-        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Desconto Unificado Com Sucesso']));
+        Session::flash('success', 'Desconto Unificado Com Sucesso');
+        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
     }
 
     /**
@@ -337,8 +337,8 @@ class VendaController extends Controller
             ]);
 
             $this->atualiza_carrinho_desconto_unico($carrinho);
-            Session::flash('success');
-            return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Item Alterado Com Sucesso']));
+            Session::flash('success', 'Item Alterado Com Sucesso');
+            return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
         } else {
 
             $item->update([
@@ -355,8 +355,8 @@ class VendaController extends Controller
                 'valor'          => $valor_final_item,
             ]);
             $this->atualiza_carrinho_desconto_parcial($item);
-            Session::flash('success');
-            return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Item Alterado Com Sucesso']));
+            Session::flash('success', 'Item Alterado Com Sucesso');
+            return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
         }
     }
     public function zera_desconto($carrinho)
@@ -379,8 +379,8 @@ class VendaController extends Controller
             'valor_desconto' => null,
             'total' => array_sum($valor_itens),
         ]);
-        Session::flash('success');
-        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Desconto Zerado Com Sucesso']));
+        Session::flash('success', 'Desconto Zerado Com Sucesso');
+        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
     }
 
     /**
@@ -393,7 +393,7 @@ class VendaController extends Controller
     {
         Carrinho::find($venda)->delete();
 
-        Session::flash('cancelar_carrinho');
+        Session::flash('success', 'Venda Cancelado Com Sucesso');
 
         return redirect(route('venda.index'));
     }
@@ -403,15 +403,16 @@ class VendaController extends Controller
 
         if ($carrinho->carItem()->count() === 1) {
             $carrinho->delete();
+            Session::flash('success', 'Todos Itens Retirados');
             return redirect(route('venda.index'));
         } else {
             if (CarrinhoItem::find($item)) {
                 CarrinhoItem::find($item)->delete();
                 $this->atualiza_carrinho_desconto_unico($carrinho);
 
-                Session::flash('success');
+                Session::flash('success', 'Item Retirado Com Sucesso');
 
-                return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Item Deletado Com Sucesso']));
+                return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
             }
         }
     }
@@ -439,8 +440,9 @@ class VendaController extends Controller
                 'cliente_id' => $carrinho_aberto->cliente_id ? $carrinho_aberto->cliente_id : $request->cliente_id,
             ]);
         }
-        Session::flash('success');
-        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id, 'msg' => 'Itens Salvos Com Sucesso']));
+        Session::flash('success', 'Itens Salvos Com Sucesso');
+      
+        return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
     }
 
     public function atualiza_carrinho_desconto_parcial($item)
@@ -511,7 +513,7 @@ class VendaController extends Controller
         //monta json para exportação
         $this->jsonVendaStorageJob($carrinho);
         //vai entrar função json para exportação da venda e jobs
-        Session::flash('carrinho_finalizado');
+        Session::flash('success', 'Venda Finalizada Com Sucesso');
         return redirect(route('venda.index'));
     }
 
