@@ -29,11 +29,13 @@ class ClienteController extends Controller
     {
         $nome = $_GET['nome'];
         $codigo = $_GET['codigo'];
-        if ($nome) {
+
+        if ($nome || $nome === "") {
             $dados['nome'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->take(10)->get();
         }
         if ($codigo) {
-            $dados['codigo'] = Cliente::where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->first();
+            //$cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
+            $dados['codigo'] = Cliente::where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
         }
         echo json_encode($dados);
         return;
@@ -60,8 +62,13 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         $codIbge = CidadeIbge::where('codigo', trim($_POST['codIbge']))->first();
+        $verifyExists = Cliente::where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_POST['documento'])->orWhere('docto', $_POST['documento'])->first();
 
-
+        if ($verifyExists) {
+            $dados['success'] = false;
+            echo json_encode($verifyExists);
+            return;
+        }
 
         $cliente =  Cliente::create([
             'loja_id' => auth()->user()->loja_id,
@@ -149,7 +156,7 @@ class ClienteController extends Controller
             $dados['success'] = true;
             echo json_encode($dados);
 
-          
+
             $this->jsonClienteStorageJob($cliente);
         }
         return;
@@ -158,6 +165,7 @@ class ClienteController extends Controller
     //Faz o json, envia para storage para assim ser enviado para o ftp
     public function jsonClienteStorageJob($cliente)
     {
+
         $dados['id'] = $cliente->id;
         $dados['alltech_id'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? "-" . $cliente->alltech_id : $cliente->alltech_id;
         $dados['loja_id'] = $cliente->loja_id;
@@ -237,8 +245,8 @@ class ClienteController extends Controller
     public function substitui_carrinho(Request $request, $carrinho)
     {
         $carrinho_substituido = Carrinho::find($carrinho);
-  
-       if ($request->substituir) {
+
+        if ($request->substituir) {
             $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
             // dd($cliente_carrinho);
             if ($cliente_carrinho->cliente) {

@@ -2,13 +2,18 @@
 
 @section('content')
 
+    <style>
+        .carregando {
+            display: none;
+        }
 
+    </style>
     @include('componentes.navbar', ['titulo' => 'Itens'])
     <br><br><br><br>
 
     @if (Session::has('success'))
 
-        <body onload="msgSuccess('<?php echo Session::get('success')?>')">
+        <body onload="msgSuccess('<?php echo Session::get('success'); ?>')">
     @endif
 
     @if (!isset($carrinho))
@@ -53,9 +58,8 @@
 
                         </div>
                         <div class="modal-footer">
-                            <a onclick="abremodalConfDesconto()" data-bs-toggle="modal"
-                                data-bs-target="#confzerarDesconto" style="width:140px;" type="button"
-                                class="btn btn-danger col-5 mx-2">
+                            <a onclick="abremodalConfDesconto()" data-bs-toggle="modal" data-bs-target="#confzerarDesconto"
+                                style="width:140px;" type="button" class="btn btn-danger col-5 mx-2">
                                 Zerar Desconto
                             </a>
                             <button type="submit" class="btn btn-primary">Confirmar</button>
@@ -84,7 +88,8 @@
                         @method('PUT')
                         @csrf
                         <input type="hidden" name="verify" value="1">
-                        <button onclick="abremodalDesconto()" type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
+                        <button onclick="abremodalDesconto()" type="button" class="btn btn-danger"
+                            data-bs-dismiss="modal">Não</button>
                         <button type="submit" class="btn btn-primary">Sim</button>
                     </form>
                 </div>
@@ -167,7 +172,8 @@
 
         {{-- Fim cards iniciais --}}
         <div class="row d-flex justify-content-center">
-            <button id="modalUnificaclick" type="button" class="btn btn-primary col-5 mx-2" data-bs-toggle="modal" data-bs-target="#modalUnifica">
+            <button id="modalUnificaclick" type="button" class="btn btn-primary col-5 mx-2" data-bs-toggle="modal"
+                data-bs-target="#modalUnifica">
                 Desconto
             </button>
 
@@ -345,7 +351,6 @@
                     </div>
                 </div>
             @else
-            
                 <button id="abrirModalFinalizaVendaSemCliente" type="button" class="btn btn-success col-5 mx-2"
                     data-bs-toggle="modal" data-bs-target="#modalFinalizaVendaSemCliente">
                     Finalizar
@@ -355,7 +360,8 @@
                 </button>
             @endif
         </div>
-        {{-- Modal Salvar Itens --}}
+
+        {{-- Modal Salvar Itens Sem Clientes --}}
         <div class="modal fade" id="salvarItens" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
@@ -373,6 +379,10 @@
                     <form action="{{ route('salvar_venda') }}" method="POST" class="modal-body">
                         @method('PUT')
                         @csrf
+                        <div class="carregando">
+                            <img style="width: 50%; heigth: 50%;"  src="{{asset('carregando.gif')}}" alt="">
+                            <h6>Buscando Clientes....</h6>
+                        </div>
                         <a id="lisClientesModal">
                             <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>
                             <ul class="list-group">
@@ -468,10 +478,19 @@
                                             <div class="row g-2">
                                                 <div class="col-8">
                                                     <div class="form-floating">
-                                                        <input name="quantidade" type="number" class="form-control"
-                                                            min="0.01" step="0.01" value="{{ $item->quantidade }}"
-                                                            id="floatingInputGrid" placeholder="quantidade">
-                                                        <label for="floatingInputGrid">Quantidade</label>
+                                                        {{-- Verifica tipo de qauntidade --}}
+                                                        @if ('u' == 'un')
+                                                            <input name="quantidade" type="number" class="form-control"
+                                                                min="0" step="1" value="{{ $item->quantidade }}"
+                                                                id="floatingInputGrid" placeholder="quantidade">
+                                                            <label for="floatingInputGrid">Quantidadeasd</label>
+                                                        @else
+                                                            <input name="quantidade" type="number" class="form-control"
+                                                                min="0" step="0.001" value="{{ $item->quantidade }}"
+                                                                id="floatingInputGrid" placeholder="quantidade">
+                                                            <label for="floatingInputGrid">Quantidade12</label>
+                                                        @endif
+
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
@@ -494,6 +513,7 @@
                                                     necessário
                                                     zerar o desconto.</span>
                                             @else
+                                                {{-- --porcentagem --}}
                                                 <div class="row g-2">
                                                     <div class="col-8">
                                                         <div class="form-floating">
@@ -582,129 +602,138 @@
             <div class="modal fade" id="modalFinalizaVendaSemCliente" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-lg"">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Finalizar Venda
-                            </h5><br>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <br>
-                        <div class="row mx-1">
-                            <div class="col-5">
-                                <h6 class="">Total: R$
-                                    <b id="valorTotalModal">{{ reais($carrinho->total) }}</b>
-                                </h6>
-                            </div>
-                            <div class="col-7">
-                                <h6 class="">Desconto: R$
-                                    <b id="valorDescontoModal">{{ reais($carrinho->valor_desconto) }}</b>
-                                </h6>
-                            </div>
-                        </div>
-
-                        <form id="formFinalizaVendaSubmit" method="POST" name="formFinalizaVenda"
-                            action="{{ route('finaliza_venda', ['carrinho' => $carrinho->id]) }}">
-                            @method('PUT')
-                            @csrf
-                            <input type="hidden" name="hiddenInputValorTotalModal" id="hiddenValorTotalModal"
-                                value="<?php echo $carrinho->total; ?>">
-                            <input type="hidden" name="hiddenInputValorDescontoModal" id="hiddenValorDescontoModal"
-                                value="<?php echo $carrinho->valor_desconto; ?>">
-                            <input type="hidden" name="hiddenInputValorDescontoSobreVendaModal"
-                                id="hiddenValorDescontoSobreVendaModal" value="">
-
-                            <div class="modal-body">
-                                <div class="row g-2">
-                                    <div class="col-4">
-                                        <div class="form-floating">
-                                            <input required name="cliente_alltech_id" id="clienteCodigo" type="text"
-                                                class="form-control"
-                                                value="{{ $carrinho->cliente_id ? $carrinho->cliente->alltech_id : '999999' }}"
-                                                name="codigoCliente" id="floatingInputGrid" placeholder="quantidade">
-                                            <label for="floatingInputGrid">Cod.</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-8">
-                                        <div class="form-floating">
-                                            <input id="clienteNomeVenda" required Readonly type="text"
-                                                class="form-control" required name="nomeCLienteFinaliza"
-                                                value="Venda A Vista" id="floatingInputGrid" placeholder="quantidade">
-                                            <label for="floatingInputGrid">Cliente</label>
-                                        </div>
-                                        <span id="nomeValid"></span>
-                                    </div>
-
-                                    <a onclick="fechaModalfinalizaVenda()" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#modalbuscaClienteNomeVendaAjax"><i class="bi-search"
-                                            style="color: rgb(255, 255, 255)"></i></a>
-                                </div>
-                                <br>
-
-                                <span style="font-size: 14px;" class="mx-1"><u>Deseja aplicar desconto
-                                        sobre a
-                                        venda?</u></span>
-                                <br><br>
-
-                                <div class="row g-2">
-                                    <div class="col-8">
-                                        <div class="form-floating">
-                                            <input disabled required
-                                                onkeyup="calculoDescontoSobreVenda(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
-                                                name="qtd_desconto_sobre_venda" type="number" class="form-control"
-                                                min="0.01" step="0.01" id="inputDesconto">
-                                            <label for="floatingInputGrid">Desconto</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="form-floating">
-                                            <select name="tp_desconto_sb_venda" class="form-select"
-                                                id="tp_desconto_sobre_venda_modal"
-                                                onchange="verificaDesconto(this.value, <?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
-                                                aria-label="Floating label select example">
-                                                <option selected value="0">selecione...</option>
-                                                <option value="porcento">%</option>
-                                                <option value="dinheiro">R$</option>
-                                            </select>
-                                            <label for="floatingSelectGrid">Tipo</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <br>
-                                <br>
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <div class="form-floating">
-                                            <input disabled required name="parcelas" type="text" class="form-control"
-                                                placeholder="1" value="1" id="inputParcelas">
-                                            <label for="floatingInputGrid">Parcelas</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-floating">
-                                            <select name="tipo_pagamento" class="form-select" id="floatingSelectGrid"
-                                                aria-label="Floating label select example"
-                                                onchange="verificaAvistaAprazo(this.value)">
-                                                <option value="AV">À VISTA</option>
-                                                <option value="AP">A PRAZO</option>
-                                            </select>
-                                            <label for="floatingSelectGrid">Tipo</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" id="closeModalFinalizaVenda" class="btn btn-secondary"
-                                    data-bs-dismiss="modal" aria-label="Close">Sair</button>
-
-                                <button type="submit" class="btn btn-primary">Finalizar</button>
-                            </div>
-                        </form>
+                                                <div class="       modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Finalizar Venda
+                        </h5><br>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+                    <br>
+                    <div class="row mx-1">
+                        <div class="col-5">
+                            <h6 class="">Total: R$
+                                <b id="valorTotalModal">{{ reais($carrinho->total) }}</b>
+                            </h6>
+                        </div>
+                        <div class="col-7">
+                            <h6 class="">Desconto: R$
+                                <b id="valorDescontoModal">{{ reais($carrinho->valor_desconto) }}</b>
+                            </h6>
+                        </div>
+                    </div>
+
+                    <form id="formFinalizaVendaSubmit" method="POST" name="formFinalizaVenda"
+                        action="{{ route('finaliza_venda', ['carrinho' => $carrinho->id]) }}">
+                        @method('PUT')
+                        @csrf
+                        <input type="hidden" name="hiddenInputValorTotalModal" id="hiddenValorTotalModal"
+                            value="<?php echo $carrinho->total; ?>">
+                        <input type="hidden" name="hiddenInputValorDescontoModal" id="hiddenValorDescontoModal"
+                            value="<?php echo $carrinho->valor_desconto; ?>">
+                        <input type="hidden" name="hiddenInputValorDescontoSobreVendaModal"
+                            id="hiddenValorDescontoSobreVendaModal" value="">
+
+                        <div class="modal-body">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <div class="form-floating">
+                                        <input required name="cliente_alltech_id" id="clienteCodigo" type="number" step="1"
+                                            class="form-control"
+                                            value="{{ $carrinho->cliente_id ? $carrinho->cliente->alltech_id : '999999' }}"
+                                            name="codigoCliente" id="floatingInputGrid" placeholder="quantidade">
+                                        <label for="floatingInputGrid">Cod.</label>
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="form-floating">
+                                        {{-- id="clienteNomeVenda" --}}
+
+                                        <input onclick="selectClienteFinalizaVenda()" id="clienteNomeVenda"
+                                            list="listaClientes" required type="text" class="form-control" required
+                                            name="nomeCLienteFinaliza" value="VENDA A VISTA">
+                                        <label for="floatingInputGrid">Cliente</label>
+                                        <datalist id="listaClientes">
+                                            @foreach ($clientes_user as $cliente)
+                                                <option value="{{ $cliente->nome }}">{{ $cliente->alltech_id }}</option>
+                                            @endforeach
+
+                                        </datalist>
+                                    </div>
+
+
+                                    <span id="nomeValid"></span>
+                                </div>
+
+                                <a onclick="fechaModalfinalizaVenda()" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#modalbuscaClienteNomeVendaAjax"><i class="bi-search"
+                                        style="color: rgb(255, 255, 255)"></i></a>
+                            </div>
+                            <br>
+
+                            <span style="font-size: 14px;" class="mx-1"><u>Deseja aplicar desconto
+                                    sobre a
+                                    venda?</u></span>
+                            <br><br>
+
+                            <div class="row g-2">
+                                <div class="col-8">
+                                    <div class="form-floating">
+                                        <input disabled required
+                                            onkeyup="calculoDescontoSobreVenda(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
+                                            name="qtd_desconto_sobre_venda" type="number" class="form-control" min="0.01"
+                                            step="1" id="inputDesconto">
+                                        <label for="floatingInputGrid">Desconto</label>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-floating">
+                                        <select name="tp_desconto_sb_venda" class="form-select"
+                                            id="tp_desconto_sobre_venda_modal"
+                                            onchange="verificaDesconto(this.value, <?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
+                                            aria-label="Floating label select example">
+                                            <option selected value="0">selecione...</option>
+                                            <option value="porcento">%</option>
+                                            <option value="dinheiro">R$</option>
+                                        </select>
+                                        <label for="floatingSelectGrid">Tipo</label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <br>
+                            <br>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="form-floating">
+                                        <input disabled required name="parcelas" type="text" class="form-control"
+                                            placeholder="1" value="1" id="inputParcelas">
+                                        <label for="floatingInputGrid">Parcelas</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-floating">
+                                        <select name="tipo_pagamento" class="form-select" id="floatingSelectGrid"
+                                            aria-label="Floating label select example"
+                                            onchange="verificaAvistaAprazo(this.value)">
+                                            <option value="AV">À VISTA</option>
+                                            <option value="AP">A PRAZO</option>
+                                        </select>
+                                        <label for="floatingSelectGrid">Tipo</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" id="closeModalFinalizaVenda" class="btn btn-secondary"
+                                data-bs-dismiss="modal" aria-label="Close">Sair</button>
+
+                            <button type="submit" class="btn btn-primary">Finalizar</button>
+                        </div>
+                    </form>
                 </div>
+            </div>
             </div>
             {{-- fim Modal finaliza venda Sem Cliente --}}
 
@@ -714,11 +743,12 @@
                 <div class="modal-dialog modal-lg modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Clientess</h5>
-                            <button onclick="buscaClienteNomeVendaAjax()" type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                            <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>
+                            <button onclick="buscaClienteNomeVendaAjax()" type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
+                        {{-- usa o mesmo id para salvar clientes porque é a mesma busca que faz no controller via ajax --}}
                         <form id="formSalvaItensCliente" method="GET" class="search-cliente">
                             @csrf
                             <input id="buscaNomeClienteVendaAjax" type="text" class="form-control" placeholder="nome">
@@ -727,12 +757,16 @@
                         </form>
                         <form id="buscaAlltech_idClienteVendaAjax" method="GET" class="modal-body">
                             @csrf
+                            <div class="carregando">
+                                <img style="width: 50%; heigth: 50%;" src="{{ asset('carregando.gif') }}" alt="">
+                                <h6>Buscando Clientes....</h6>
+                            </div>
                             <a id="MontaBuscaClienteFinaliza">
 
                                 <ul class="list-group">
                                     @foreach ($clientes_user as $cliente)
-                                        <li style="text-align:justify; overflow-x: auto; overflow-y: hidden; overflow-y: hidden;"
-                                            class="list-group-item d-flex justify-content-between align-items-center">
+                                        <li style="text-align:justify; overflow-x: auto; overflow-y: hidden; overflow-y: hidden; width: 93%;"
+                                            class="list-group-item d-flex justify-content-between align-items-center mx-2">
                                             {{ $cliente->nome }}
                                             <button type="submit" name="cliente_id"
                                                 onclick="buttonAlltech_id(<?php echo $cliente->alltech_id; ?>)" class="lupa-list"><i
@@ -744,8 +778,8 @@
                             </a>
                         </form>
                         <div class="modal-footer">
-                            <button onclick="buscaClienteNomeVendaAjax()" id="closeModalbuscaClienteNomeVendaAjax" type="button" class="btn btn-secondary"
-                                data-bs-dismiss="modal">Sair</button>
+                            <button onclick="buscaClienteNomeVendaAjax()" id="closeModalbuscaClienteNomeVendaAjax"
+                                type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
                         </div>
 
                     </div>
@@ -760,4 +794,5 @@
     </div>
 
 @endsection
+
 <script type="text/javascript" src="{{ asset('js/viewItensCarrinho.js') }}" defer></script>

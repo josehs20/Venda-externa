@@ -45,12 +45,22 @@ $(function () {
             if (response['ok'] === true) {
                 var count_itens = response['count_item'];
                 $('#countItensCar').html(count_itens);
-                Swal.fire({
-                    icon: 'success',
-                    title: "Produto " + response['produto_adicionado'] + " Adicionado Com Sucesso",
-                    showConfirmButton: false,
-                    timer: 2500
 
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Produto ' + response['produto_adicionado'] + ' Adicionado Com Sucesso'
                 })
 
                 document.getElementById('fechaModalSemGrade' + id).click()
@@ -59,18 +69,29 @@ $(function () {
 
             } else if (response['ok'] == "add") {
 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Quantidade Atualizada',
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
                     showConfirmButton: false,
-                    timer: 2000
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
                 })
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Quantidade Atualizada'
+                })
+
                 document.getElementById('fechaModalSemGrade' + id).click()
             } else {
 
                 Swal.fire({
                     icon: 'error',
-                    title: 'Não Foi Possível',
+                    title: 'Não Foi Possível Verifique com a empresa sobre o produto',
                     showConfirmButton: false,
                     timer: 1500
                 })
@@ -109,20 +130,46 @@ $(function () {
                     showConfirmButton: false,
                     timer: 2500
                 })
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Produto ' + response['produto_adicionado'] + ' Adicionado Com Sucesso'
+                })
             } else if (response['ok'] == "add") {
 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Quantidade Atualizada',
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
                     showConfirmButton: false,
-                    timer: 2000
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Quantidade Atualizada'
                 })
 
             } else {
 
                 Swal.fire({
                     icon: 'error',
-                    title: 'Não Foi Possível',
+                    title: 'Não Foi Possível Emtre em contato com a sua empresa',
                     showConfirmButton: false,
                     timer: 1500
                 })

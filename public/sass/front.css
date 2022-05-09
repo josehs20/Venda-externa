@@ -188,11 +188,12 @@ body {
 
 #buscaCliente {
   position: fixed;
-  top: 9.3%;
-  z-index: 100;
-  opacity: 0.7;
   right: 0;
-  background-color: #000000;
+  top: 30%;
+  width: 3em;
+  margin-top: -2.5em;
+  background-color: black;
+  z-index: 150;
 }
 
 .inputDivBuscaCliente {
@@ -207,10 +208,13 @@ body {
   top: 9%;
   z-index: 100;
   opacity: 1.0;
-  right: 0;
   background-color: #ffffff;
   -webkit-transform: translateX(100%);
           transform: translateX(100%);
+  position: fixed;
+  right: 0;
+  top: 30%;
+  margin-top: -2.5em;
 }
 
 .inputBuscaCliente {
@@ -474,11 +478,12 @@ body {
 @media (max-width: 369px) {
   #buscaCliente {
     position: fixed;
-    top: 13%;
-    z-index: 100;
-    opacity: 0.7;
     right: 0;
-    background-color: #000000;
+    top: 25%;
+    width: 3em;
+    margin-top: -2.5em;
+    background-color: black;
+    z-index: 150;
   }
   .inputDivBuscaCliente {
     -webkit-transition: 1.0s;
@@ -488,30 +493,30 @@ body {
     border-color: white;
     width: 80%;
     height: 30px;
-    position: fixed;
-    top: 13%;
     z-index: 100;
     opacity: 1.0;
-    right: 0;
     background-color: #ffffff;
     -webkit-transform: translateX(100%);
             transform: translateX(100%);
+    position: fixed;
+    right: 0;
+    top: 25%;
   }
   .inputBuscaCliente {
     position: fixed;
     width: 100%;
-    margin-left: 20px;
   }
 }
 
 @media screen and (min-width: 370px) and (max-width: 800px) {
   #buscaCliente {
     position: fixed;
-    top: 13%;
-    z-index: 100;
-    opacity: 0.7;
     right: 0;
-    background-color: #000000;
+    top: 24%;
+    width: 3em;
+    margin-top: -2.5em;
+    background-color: black;
+    z-index: 150;
   }
   .inputDivBuscaCliente {
     -webkit-transition: 1.0s;
@@ -521,14 +526,14 @@ body {
     border-color: white;
     width: 80%;
     height: 30px;
-    position: fixed;
-    top: 13%;
     z-index: 100;
     opacity: 1.0;
-    right: 0;
     background-color: #ffffff;
     -webkit-transform: translateX(100%);
             transform: translateX(100%);
+    position: fixed;
+    right: 0;
+    top: 24%;
   }
   .inputBuscaCliente {
     position: fixed;
@@ -12758,5 +12763,12 @@ fieldset:disabled .btn {
 
 .dropdown-menu {
   z-index: 1000000 !important;
+}
+
+.iconeSearchCliente {
+  font-size: 1rem;
+  color: #333;
+  top: 10%;
+  right: 0;
 }
 /*# sourceMappingURL=front.css.map */

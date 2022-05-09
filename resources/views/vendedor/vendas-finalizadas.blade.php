@@ -3,13 +3,11 @@
 
 @section('content')
  
-
-    <div id="contentIndex">
         @include('componentes.navbar', ['titulo' => 'Finalizadas'])
-   
+        <br><br><br><br><br>
         @if (sizeof($carrinho) == 0)
             <div class="alert alert-warning mt-5" role="alert">
-                Nenhuma Venda Finalizada
+                Nenhuma Venda Finalizada !
             </div>
         @else
             <div class="listCliente">
@@ -91,5 +89,5 @@
 
             </div>
         @endif
-    </div>
+    
 @endsection

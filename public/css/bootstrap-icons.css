@@ -997,7 +997,7 @@ url(/fonts/vendor/bootstrap-icons/bootstrap-icons.woff?4e80a14a205e5b6212ffc52fc
 .bi-people-fill::before { content: "\f4cf"; }
 .bi-people::before { content: "\f4d0"; }
 .bi-percent::before { content: "\f4d1"; }
-.bi-person-badge-fill::before { content: "\f4d2"; }
+.bi-person-badge-fill::before { content: "\f4d2";}
 .bi-person-badge::before { content: "\f4d3"; }
 .bi-person-bounding-box::before { content: "\f4d4"; }
 .bi-person-check-fill::before { content: "\f4d5"; }
@@ -1419,7 +1419,7 @@ url(/fonts/vendor/bootstrap-icons/bootstrap-icons.woff?4e80a14a205e5b6212ffc52fc
 .bi-magic::before { content: "\f675"; }
 .bi-person-rolodex::before { content: "\f676"; }
 .bi-person-video::before { content: "\f677"; }
-.bi-person-video2::before { content: "\f678"; }
+.bi-person-video2::before { content: "\f678"; color: #ffa340;}
 .bi-person-video3::before { content: "\f679"; }
 .bi-person-workspace::before { content: "\f67a"; }
 .bi-radioactive::before { content: "\f67b"; }

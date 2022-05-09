@@ -6,26 +6,26 @@ var fechaInputBuscaCliente = document.getElementById('fechaCliente');
 var btnMenu = document.querySelectorAll(".btnMenu div");
 var btn = document.getElementById("btnMenu");
 
-//realiza a seta
-btn.addEventListener("click", function () {
-    btnMenu.forEach((linha) => {
-        linha.classList.toggle(linha.id);
-    });
-    inputBuscaCliente.classList.remove('go-back')
-    inputBuscaCliente.classList.toggle('go-esconde')
-});
+// //realiza a seta
+// btn.addEventListener("click", function () {
+//     btnMenu.forEach((linha) => {
+//         linha.classList.toggle(linha.id);
+//     });
+//     inputBuscaCliente.classList.remove('go-back')
+//     inputBuscaCliente.classList.toggle('go-esconde')
+// });
 
 
-//aparece input busca cliente
-buscaCliente.addEventListener("click", function () {
-    inputBuscaCliente.classList.remove('go-esconde')
-    inputBuscaCliente.classList.toggle('go-back')
-
+// //aparece input busca cliente
+// buscaCliente.addEventListener("click", function () {
+//     inputBuscaCliente.classList.remove('go-esconde')
+//     inputBuscaCliente.classList.toggle('go-back')
+// console.log(buscaCliente);
     /* forEach to make the menu an X */
     // menuIcon.forEach((line) => {
     //     line.classList.toggle(line.id)
     // })
-});
+//});
 function msgSuccess(msg) {
     console.log(msg);
     Swal.fire({

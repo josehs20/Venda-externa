@@ -81,24 +81,83 @@ function atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoVa
     $('#hiddenValorDescontoSobreVendaModal').val(valorDesconto);
 
 }
+
+
+
 $(function () {
     $('form[name="formFinalizaVenda"]').submit(function (event) {
         event.preventDefault();
         var parcelas = document.getElementById("inputParcelas").value;
-        if (parcelas < 1 || parcelas % 1 != 0) {
-            console.log(parcelas);
-            Swal.fire({
-                icon: 'error',
-                title: 'Quantidade de parcelas Inválida',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        } else {
-            console.log(document.getElementById('formFinalizaVendaSubmit').submit());
-        }
+        var cod = $("#clienteCodigo").val();
+        var nome = $("#clienteNomeVenda").val();
+        $.ajax({
+            url: "/busca_cliente",
+            type: "GET",
+            data: {
+                codigo: cod,
+                nome: false,
+                id: false
+            },
+            dataType: 'json',
+        }).done(function (response) {
+
+            if (response.codigo && response.codigo.nome == nome) {
+
+                if (parcelas < 1 || parcelas % 1 != 0) {
+                    console.log(parcelas);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Quantidade de parcelas Inválida',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+
+                    console.log(document.getElementById('formFinalizaVendaSubmit').submit());
+
+                }
+            } else {
+                document.getElementById('nomeValid').innerHTML = "Codigo ou nome não exitem";
+            }
+
+
+        });
+
+
 
     });
 });
+
+//pega valor no datalist 
+$(function () {
+    $("#clienteNomeVenda").on('change', function () {
+        var _this = $(this);
+
+        $('#listaClientes').find('option').each((index, el) => {
+
+            if (_this.val() === el.value) {
+
+                // prompt('', el.value + ' ' + el.label);
+                // console.log('', el.value + ' ' + el.label);
+                $('#clienteCodigo').val(el.label)
+
+            }
+        });
+    });
+})
+
+function selectClienteFinalizaVenda() {
+    if ($("#clienteNomeVenda").val() == "VENDA A VISTA") {
+        $("#clienteNomeVenda").val("");
+
+    }
+
+};
+// function apagaCodigoConflitoDeBusca(params) {
+//     $("#clienteCodigo").val("");
+// }
+
+
 
 //consulta cliente pelo codigo para finalizar a venda
 $(function () {
@@ -143,9 +202,8 @@ $(function () {
         }).done(function (response) {
             console.log(response);
             if (!response['codigo']) {
-                $("#clienteNomeVenda").val("VENDA A VISTA")
-                $("#clienteCodigo").val("999999")
-                document.getElementById('nomeValid').innerHTML = "";
+
+                document.getElementById('nomeValid').innerHTML = "Cliente ou codigo não existem";
             } else {
                 $("#clienteNomeVenda").val(response['codigo']['nome'])
                 document.getElementById('nomeValid').innerHTML = "";
@@ -166,14 +224,16 @@ function buscaClienteNomeVendaAjax(event) {
     document.getElementById('closeModalbuscaClienteNomeVendaAjax').click();
     document.getElementById('abrirModalFinalizaVendaSemCliente').click();
 }
+
+// busca cliente por tecla digitada para finalizar venda
 $(function () {
     $("#buscaNomeClienteVendaAjax").keyup(function () {
         var busca = $("#buscaNomeClienteVendaAjax").val();
-        
-        if (busca.length > 4) {
 
+        if (busca.length > 10) {
 
-            console.log(busca);
+            document.getElementById('MontaBuscaClienteFinaliza').innerHTML = '';
+            $(".carregando").show();
             $.ajax({
                 url: "/busca_cliente",
                 type: "GET",
@@ -183,21 +243,33 @@ $(function () {
                     id: false,
                 },
                 dataType: 'json',
+                success: function (result) {
+                    $(".carregando").hide();
+                },
             }).done(function (response) {
-                console.log(response);
 
-                var clientes = response['nome'];
-                var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
-                monta_consulta += '<ul class="list-group">';
+                if (response.nome.length) {
+                    var clientes = response['nome'];
+                    var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
+                    monta_consulta += '<ul class="list-group">';
 
-                clientes.forEach(element => {
+                    clientes.forEach(element => {
 
-                    monta_consulta += '<li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;" class="list-group-item d-flex justify-content-between align-items-center">' + element['nome']
-                    monta_consulta += '<button type="submit" name="cliente_id" onclick="buttonAlltech_id(' + element['alltech_id'] + ')" class="lupa-list"><i class="bi bi-save2"></i></button>'
-                    monta_consulta += '</li>'
+                        monta_consulta += '<li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden; width: 93%;" class="list-group-item d-flex justify-content-between align-items-center mx-2">' + element['nome']
+                        monta_consulta += '<button type="submit" name="cliente_id" onclick="buttonAlltech_id(' + element['alltech_id'] + ')" class="lupa-list"><i class="bi bi-save2"></i></button>'
+                        monta_consulta += '</li>'
 
-                });
-                monta_consulta += '</ul>'
+                    });
+                    monta_consulta += '</ul>'
+                } else {
+                    var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
+
+                    monta_consulta += '<div class="alert alert-warning" role="alert">'
+                    monta_consulta += 'Nome não encontrado na nossa base de dados'
+                    monta_consulta += '</div>'
+
+                }
+
                 document.getElementById('MontaBuscaClienteFinaliza').innerHTML = monta_consulta;
                 // console.log(document.getElementById('lisClientesModal'));
             });
@@ -211,7 +283,8 @@ function botaoBuscaClienteNomefinalizaAjax(event) {
 
 
     var busca = $("#buscaNomeClienteVendaAjax").val();
-    console.log(busca);
+    document.getElementById('MontaBuscaClienteFinaliza').innerHTML = '';
+    $(".carregando").show();
     $.ajax({
         url: "/busca_cliente",
         type: "GET",
@@ -221,21 +294,33 @@ function botaoBuscaClienteNomefinalizaAjax(event) {
             id: false,
         },
         dataType: 'json',
+        success: function (result) {
+            $(".carregando").hide();
+        },
     }).done(function (response) {
-        console.log(response);
 
-        var clientes = response['nome'];
-        var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
-        monta_consulta += '<ul class="list-group">';
+        if (response.nome && response.nome.length) {
+            var clientes = response['nome'];
+            var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
+            monta_consulta += '<ul class="list-group">';
 
-        clientes.forEach(element => {
+            clientes.forEach(element => {
 
-            monta_consulta += '<li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;" class="list-group-item d-flex justify-content-between align-items-center">' + element['nome']
-            monta_consulta += '<button type="submit" name="cliente_id" onclick="buttonAlltech_id(' + element['alltech_id'] + ')" class="lupa-list"><i class="bi bi-save2"></i></button>'
-            monta_consulta += '</li>'
+                monta_consulta += '<li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden; width: 93%;" class="list-group-item d-flex justify-content-between align-items-center mx-2">' + element['nome']
+                monta_consulta += '<button type="submit" name="cliente_id" onclick="buttonAlltech_id(' + element['alltech_id'] + ')" class="lupa-list"><i class="bi bi-save2"></i></button>'
+                monta_consulta += '</li>'
 
-        });
-        monta_consulta += '</ul>'
+            });
+            monta_consulta += '</ul>'
+        } else {
+            var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
+
+            monta_consulta += '<div class="alert alert-warning" role="alert">'
+            monta_consulta += 'Nome não encontrado na nossa base de dados'
+            monta_consulta += '</div>'
+
+        }
+
         document.getElementById('MontaBuscaClienteFinaliza').innerHTML = monta_consulta;
         // console.log(document.getElementById('lisClientesModal'));
     });
@@ -285,8 +370,10 @@ $(function () {
 $(function () {
     $('form[id="formSalvaItensCliente"]').submit(function (event) {
         event.preventDefault();
-        console.log(botaoBuscaClienteNomeAjax);
+
         var busca = $("#nomeClienteSalvarItens").val();
+        document.getElementById('lisClientesModal').innerHTML = '';
+        $(".carregando").show();
         $.ajax({
             url: "/busca_cliente",
             type: "GET",
@@ -297,42 +384,12 @@ $(function () {
 
             },
             dataType: 'json',
+            success: function (result) {
+                $(".carregando").hide();
+            },
         }).done(function (response) {
-            var clientes = response['nome'];
-            var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
-            monta_consulta += '<ul class="list-group">';
-
-            clientes.forEach(element => {
-
-                monta_consulta += '<li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;" class="list-group-item d-flex justify-content-between align-items-center">' + element['nome']
-                monta_consulta += '<button type="submit" name="cliente_id" value="' + element['id'] + '" class="lupa-list"><i class="bi bi-save2"></i></button>'
-                monta_consulta += '</li>'
-
-            });
-            monta_consulta += '</ul>'
-            document.getElementById('lisClientesModal').innerHTML = monta_consulta;
-
-        });
-    });
-});
-
-$(function () {
-    $("#nomeClienteSalvarItens").keyup(function () {
-        var busca = $("#nomeClienteSalvarItens").val();
-        console.log(busca);
-        if (busca.length >= 3) {
-            $.ajax({
-                url: "/busca_cliente",
-                type: "GET",
-                data: {
-                    nome: busca,
-                    codigo: false,
-                    id: false,
-                },
-                dataType: 'json',
-            }).done(function (response) {
-                console.log(response);
-
+            console.log(response.nome.length)
+            if (response.nome.length) {
                 var clientes = response['nome'];
                 var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
                 monta_consulta += '<ul class="list-group">';
@@ -345,7 +402,61 @@ $(function () {
 
                 });
                 monta_consulta += '</ul>'
+            } else {
+                var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
+
+                monta_consulta += '<div class="alert alert-warning" role="alert">'
+                monta_consulta += 'Nome não encontrado na nossa base de dados'
+                monta_consulta += '</div>'
+            }
+            document.getElementById('lisClientesModal').innerHTML = monta_consulta;
+
+        });
+    });
+});
+
+$(function () {
+    $("#nomeClienteSalvarItens").keyup(function () {
+        var busca = $("#nomeClienteSalvarItens").val();
+
+        if (busca.length >= 10) {
+            document.getElementById('lisClientesModal').innerHTML = '';
+            $(".carregando").show();
+            $.ajax({
+                url: "/busca_cliente",
+                type: "GET",
+                data: {
+                    nome: busca,
+                    codigo: false,
+                    id: false,
+                },
+                dataType: 'json',
+                success: function (result) {
+                    $(".carregando").hide();
+                },
+            }).done(function (response) {
+                if (response.nome.length) {
+                    var clientes = response['nome'];
+                    var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
+                    monta_consulta += '<ul class="list-group">';
+
+                    clientes.forEach(element => {
+
+                        monta_consulta += '<li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;" class="list-group-item d-flex justify-content-between align-items-center">' + element['nome']
+                        monta_consulta += '<button type="submit" name="cliente_id" value="' + element['id'] + '" class="lupa-list"><i class="bi bi-save2"></i></button>'
+                        monta_consulta += '</li>'
+
+                    });
+                    monta_consulta += '</ul>'
+                } else {
+                    var monta_consulta = '  <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>';
+
+                    monta_consulta += '<div class="alert alert-warning" role="alert">'
+                    monta_consulta += 'Nome não encontrado na nossa base de dados'
+                    monta_consulta += '</div>'
+                }
                 document.getElementById('lisClientesModal').innerHTML = monta_consulta;
+
             });
         }
     });
@@ -358,3 +469,4 @@ function abremodalConfDesconto() {
 function abremodalDesconto(params) {
     document.getElementById('modalUnificaclick').click()
 }
+

@@ -138,15 +138,17 @@ body {
     margin: 1%;
 }
 
-
 #buscaCliente {
     position: fixed;
-    top: 9.3%;
-    z-index: 100;
-    opacity: 0.7;
     right: 0;
-    background-color: #000000;
+    top: 30%;
+    width: 3em;
+    margin-top: -2.5em;
+
+    background-color: black;
+    z-index: 150;
 }
+
 
 .inputDivBuscaCliente {
     transition: 0.5s;
@@ -159,9 +161,12 @@ body {
     top: 9%;
     z-index: 100;
     opacity: 1.0;
-    right: 0;
     background-color: #ffffff;
     transform: translateX(100%);
+    position: fixed;
+    right: 0;
+    top: 30%;
+    margin-top: -2.5em;
 }
 
 .inputBuscaCliente {
@@ -170,6 +175,13 @@ body {
     margin-top: 2px;
 }
 
+// #buscaCliente {
+//     position: fixed;
+//     right: 0;
+//     top: 25%;
+//     width: 8em;
+//     margin-top: -2.5em;
+// }
 .contentItnsCarrinho {
     margin-top: 7%;
 }
@@ -186,8 +198,17 @@ body {
 
     }
 
+    // #buscaCliente {
+    //     position: fixed;
+    //     right: 0;
+    //     top: 24%;
+    //     width: 8em;
+    //     margin-top: -2.5em;
+    // }
 
 }
+
+
 
 //media navbar
 @media screen and (min-width: 500px) and (max-width: 930px) {
@@ -301,9 +322,7 @@ body {
 
 //media navbar
 @media screen and (min-width: 0px) and (max-width: 499px) {
-    
 
-   
     .bar {
         margin-top: 20%;
         height: 20%;
@@ -356,6 +375,7 @@ body {
         display: flex;
         margin-top: 2%;
     }
+
     .bar-user-sair {
         margin-top: 15px;
         display: flex;
@@ -416,11 +436,13 @@ body {
 
     #buscaCliente {
         position: fixed;
-        top: 13%;
-        z-index: 100;
-        opacity: 0.7;
         right: 0;
-        background-color: #000000;
+        top: 25%;
+        width: 3em;
+        margin-top: -2.5em;
+    
+        background-color: black;
+        z-index: 150;
     }
 
     .inputDivBuscaCliente {
@@ -430,19 +452,18 @@ body {
         border-color: white;
         width: 80%;
         height: 30px;
-        position: fixed;
-        top: 13%;
         z-index: 100;
         opacity: 1.0;
-        right: 0;
         background-color: #ffffff;
         transform: translateX(100%);
+        position: fixed;
+        right: 0;
+        top: 25%;
     }
 
     .inputBuscaCliente {
         position: fixed;
         width: 100%;
-        margin-left: 20px;
 
     }
 
@@ -453,12 +474,14 @@ body {
 
     #buscaCliente {
         position: fixed;
-        top: 13%;
-        z-index: 100;
-        opacity: 0.7;
         right: 0;
-        background-color: #000000;
+        top: 24%;
+        width: 3em;
+        margin-top: -2.5em;  
+        background-color: black;
+        z-index: 150;
     }
+
 
     .inputDivBuscaCliente {
         transition: 1.0s;
@@ -467,13 +490,13 @@ body {
         border-color: white;
         width: 80%;
         height: 30px;
-        position: fixed;
-        top: 13%;
         z-index: 100;
         opacity: 1.0;
-        right: 0;
         background-color: #ffffff;
         transform: translateX(100%);
+        position: fixed;
+        right: 0;
+        top: 24%;
     }
 
     .inputBuscaCliente {
@@ -750,3 +773,13 @@ body {
 .dropdown-menu {
     z-index: 1000000 !important;
 }
+
+.iconeSearchCliente {
+    font-size: 1rem;
+    color: #333;
+    top: 10%;
+    right: 0;
+
+}
+
+

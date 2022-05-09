@@ -476,7 +476,7 @@
 
     <div class="main__navigations__div">
         <li class="main__navigations__div__li save__from__left mx-3"><a class="anchor__remains__same"
-                style="font-weight: bold; color:rgb(0, 0, 0); font-size:14px;">
+                style="font-weight: bold; color:rgb(255, 152, 56); font-size:14px;">
                 {{$titulo}}</a></li>
         <ul class="main__navigations__div__ul">
 

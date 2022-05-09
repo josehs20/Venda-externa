@@ -12,33 +12,34 @@
         -moz-appearance: textfield;
     }
 
+    .inputSearchCliente {
+        border-radius: 15px;
+
+    }
+
 </style>
 
 @section('content')
-
-
-
-
-    <form action="{{ route('clientes.index', auth()->user()->id) }}">
-        <div class="inputDivBuscaCliente" id="inputBuscaCliente">
-
-            <button class="btn" type="submit" style="font-size: 10px"> <i style="font-size: 18px"
-                    class="bi bi-search"></i></button>
-            <input name="nome" class="inputBuscaCliente" type="text" placeholder="Buscar Cliente">
-        </div>
-        <a id="buscaCliente" class="btn btn-primary"><i class="bi bi-arrow-left-right"></i></i></a>
-    </form>
 
     @if (Session::has('Add_Obs'))
 
         <body onload="msgSuccess('Observação Adicionada Com Sucesso')">
     @endif
     @include('componentes.navbar', ['titulo' => 'Clientes'])
-    <br><br><br><br><br>
-    @if ($clientes->count())
-        <div class="listCliente">
-            <div class="container">
+    <br><br><br><br><br><br>
+    <div class="listCliente">
+        <div class="container">
 
+            <form action="{{ route('clientes.index', auth()->user()->id) }}" class="position-relative col-md-6">
+
+                <input name="nome" class="form-control" style=" border-radius: 15px;" placeholder="Busca Cliente"
+                    type="search">
+                <button class="btn position-absolute iconeSearchCliente">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+
+            @if ($clientes->count())
                 @foreach ($clientes as $cliente)
                     <ul class="list-group mt-3">
                         <button class="collapsible"
@@ -56,9 +57,9 @@
                                     &nbsp;&nbsp;{{ $cliente->docto ? $cliente->docto : 'Não Informado' }}
 
                                     <span data-bs-toggle="modal" data-bs-target="#contato{{ $cliente->id }}"
-                                        style="float: right; cursor:pointer;" class="badge bg-primary"><i data-bs-toggle="modal"
-                                            data-bs-target="#contato{{ $cliente->id }}" style="color: white"
-                                            class="bi bi-telephone"></i></span>
+                                        style="float: right; cursor:pointer;" class="badge bg-primary"><i
+                                            data-bs-toggle="modal" data-bs-target="#contato{{ $cliente->id }}"
+                                            style="color: white" class="bi bi-telephone"></i></span>
                                 </li>
 
                                 <li class="list-group-item">
@@ -91,12 +92,11 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <a href="{{ route('clientes.edit', $cliente->id) }}"
-                                        style="cursor: pointer; text-decoration:none;"
-                                        class="badge bg-primary">Editar
+                                        style="cursor: pointer; text-decoration:none;" class="badge bg-primary">Editar
                                         Cliente</a>
 
-                                    <span style="cursor: pointer;" class="badge bg-primary"
-                                        data-bs-toggle="modal" data-bs-target="#addObs{{ $cliente->id }}">Adicionar
+                                    <span style="cursor: pointer;" class="badge bg-primary" data-bs-toggle="modal"
+                                        data-bs-target="#addObs{{ $cliente->id }}">Adicionar
                                         Observação</span>
                                 </li>
                                 {{-- </ul> --}}
@@ -211,7 +211,7 @@
                                                 </b>{{ $info->data ? $info->data : 'Não informado ' }}</small>
                                             <button
                                                 style="float: right; border:none!important;
-                                                                                                                                                                                                background-color: rgb(172, 172, 172); "
+                                                                                                                                                                                                                                                background-color: rgb(172, 172, 172); "
                                                 type="submit" class="js-del"
                                                 onclick="botaoInfo(<?php echo $info->id; ?>)">
 
@@ -225,14 +225,13 @@
                             @endforeach
                     </ul>
                 @endforeach
-            </div>
+            @else
+                <div class="alert alert-warning" style="margin-top: 100px;" role="alert">
+                    Nenhum Cliente Encontrado !
+                </div>
+            @endif
         </div>
-    @else
-        <div class="alert alert-warning" style="margin-top: 100px;" role="alert">
-            Nenhum Cliente Cadastrado !
-        </div>
-    @endif
-
+    </div>
     {{-- paginação --}}
     <nav class="navegacao mt-3" aria-label="Navegação">
         <ul class="pagination" style="justify-content: center;">

@@ -20,16 +20,19 @@
     @if (Session::has('success'))
 
         <body onload="msgSuccess('<?php echo Session::get('success'); ?>')">
-        {{-- @elseif (Session::has('carrinho_finalizado'))
-
-            <body onload="msgSuccess('Venda Finalizado Com Sucesso')"> --}}
+        
     @endif
-    {{-- @include('componentes.titulo', ['titlePage' => 'Produtos']) --}}
-
+    
     <div id="elemento_ajax_html" name="addItem" method="POST" class="list">
         @php
             $i = 0;
         @endphp
+
+        @if (!$produtos->count())
+            <div class="alert alert-warning mt-5" role="alert">
+                Nenhuma Produto Encontrado !
+            </div>
+        @endif
         @foreach ($produtos as $produto)
             <a class="listHome" style="cursor: pointer">
                 <ul class="list-group">

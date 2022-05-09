@@ -3,7 +3,7 @@
 $(function () {
     $('form[id="CadastroCliente"]').submit(function (event) {
         event.preventDefault();
-
+        console.log(documento());
         if (documento() && validaInputNome() &&
             validaInputNumeros('inputTel1') &&
             validaInputNumeros('inputTel2') &&
@@ -42,6 +42,7 @@ $(function () {
                 },
                 dataType: 'json',
             }).done(function (response) {
+            
                 if (response['success'] == true) {
                     $('#docto').val("");
                     $('#inputNome').val("");
@@ -63,6 +64,14 @@ $(function () {
                         title: 'Cliente Cadastrado Com Sucesso',
                         showConfirmButton: false,
                         timer: 1500
+                    })
+                }else{
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Documento já cadastrado para' + response.nome,
+                        showConfirmButton: false,
+                        timer: 2000
                     })
                 }
             });
@@ -93,7 +102,7 @@ $(function () {
             var codIbge = $("#cidIbge").val();
             var id = $('#idCliente').val();
             var nome = $('#inputNome').val();
-       
+
             $.ajax({
                 url: "/clientes/" + id,
                 type: "PUT",
@@ -112,7 +121,7 @@ $(function () {
                     numero: numero,
                     complemento: complemento,
                     codIbge: codIbge,
-                    nome : nome,
+                    nome: nome,
                 },
                 dataType: 'json',
             }).done(function (response) {
@@ -162,14 +171,10 @@ function removeCarcterEspecial(letra, id) {
 
 }
 
-
-
-
-
 //valid cep
 function PesquisarCepCidade() {
     var uf = $("#uf").val();
-    var cidade = $('#cidade').val($('#cidade').val().normalize("NFD").replace(/[^\w\s]/gi, "").toUpperCase());
+    var cidade = $('#cidade').val()
     var erro = document.getElementById("error");
     $.ajax({
         type: "GET",
@@ -292,12 +297,14 @@ $('#docto').keyup(function () {
     documento();
 
 });
+
 function validaDocs(docto, tipoDoc) {
 
     var msg = document.getElementById('msgValid');
 
     if (tipoDoc == 'CPF') {
         if (validaCPF(docto)) {
+
             msg.style.color = "black"
             msg.innerHTML = "CPF Válido"
             return docto;
@@ -310,9 +317,12 @@ function validaDocs(docto, tipoDoc) {
     }
     if (tipoDoc == 'CNPJ') {
         if (validaCNPJ(docto)) {
+
             msg.style.color = "black"
             msg.innerHTML = "CNPJ Válido"
             return docto;
+
+
         } else {
             msg.style.color = "red"
             msg.innerHTML = "CNPJ Inválido"
@@ -321,7 +331,6 @@ function validaDocs(docto, tipoDoc) {
         }
     }
 }
-
 
 // Função que valida o CPF
 function validaCPF(strDocument) {

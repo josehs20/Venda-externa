@@ -60,7 +60,7 @@ class VendaController extends Controller
 
     public function itens_carrinho($user_id = null, $msg = null)
     {
-        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->paginate(50);
+        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->get();
        
         $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
  
