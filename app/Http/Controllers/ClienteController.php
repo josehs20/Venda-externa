@@ -31,7 +31,7 @@ class ClienteController extends Controller
         $codigo = $_GET['codigo'];
 
         if ($nome || $nome === "") {
-            $dados['nome'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->take(10)->get();
+            $dados['nome'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->take(30)->get();
         }
         if ($codigo) {
             //$cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
@@ -165,14 +165,13 @@ class ClienteController extends Controller
     //Faz o json, envia para storage para assim ser enviado para o ftp
     public function jsonClienteStorageJob($cliente)
     {
-
         $dados['id'] = $cliente->id;
         $dados['alltech_id'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? "-" . $cliente->alltech_id : $cliente->alltech_id;
         $dados['loja_id'] = $cliente->loja_id;
         $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
         $dados['nome'] = $cliente->nome;
         $dados['docto'] = $cliente->docto;
-        $dados['tipo'] = $cliente->tipo;
+        $dados['tipo'] =  $cliente->tipo;
         $dados['email'] = $cliente->email;
         $dados['fone1'] = $cliente->fone1;
         $dados['fone2'] = $cliente->fone2;
@@ -185,10 +184,10 @@ class ClienteController extends Controller
         $dados['rua'] = $cliente->enderecos->rua;
         $dados['numero'] = $cliente->enderecos->numero;
         $dados['compto'] = $cliente->enderecos->compto;
-        $dados['tipo'] = $cliente->enderecos->tipo;
+        $dados['tipo_endereco'] = $cliente->enderecos->tipo;
 
         $json = json_encode($dados);
-        //dd($json);
+
         $dir = $cliente->loja->empresa->pasta;
         Storage::disk('local')->makeDirectory($dir);
         $files = Storage::disk('local')->files($dir);

@@ -36,6 +36,16 @@ function msgSuccess(msg) {
     })
 }
 
+function msgError(msg) {
+    console.log(msg);
+    Swal.fire({
+        icon: 'error',
+        title: msg,
+        showConfirmButton: false,
+        timer: 2000
+    })
+}
+
 // function msgContato(msg) {
 //     if (msg === 2) {
 //         Swal.fire({

@@ -6,6 +6,7 @@ use App\Jobs\ExportaVendaJob;
 use App\Models\Carrinho;
 use App\Models\CarrinhoItem;
 use App\Models\Cliente;
+use App\Models\Estoque;
 use App\Models\Igrade;
 use App\Models\Produto;
 use Illuminate\Http\Request;
@@ -37,7 +38,6 @@ class VendaController extends Controller
                     $produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id'] = $item->produto_id;
                 } else {
                     $produtos_carrinho_quantidade['itemCarrinho'][$item->produto_id] = $item->quantidade;
-                  
                 }
             }
         }
@@ -60,10 +60,10 @@ class VendaController extends Controller
 
     public function itens_carrinho($user_id = null, $msg = null)
     {
-        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->get();
-       
+        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->take(30)->get();
+
         $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
- 
+
         return view('vendedor.itemCarrinho', compact('carrinho', 'clientes_user', 'msg'));
     }
 
@@ -321,19 +321,23 @@ class VendaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    //update para desconto parcial 
     public function update(Request $request, $venda)
     {
         //id do item da venda
 
         $item = CarrinhoItem::find($venda);
-
-        if ($request->quantidade && !$request->tipo_desconto) {
+        
+        if ($request->quantidade && !$request->qtd_desconto) {
             $carrinho = Carrinho::find($item->carrinho_id);
 
-            // dd($item);
             $item->update([
                 'quantidade' => $request->quantidade,
                 'valor' => $item->preco * $request->quantidade,
+                'qtd_desconto' => null,
+                'tipo_desconto' => null,
+                'valor_desconto' => null,
             ]);
 
             $this->atualiza_carrinho_desconto_unico($carrinho);
@@ -441,7 +445,7 @@ class VendaController extends Controller
             ]);
         }
         Session::flash('success', 'Itens Salvos Com Sucesso');
-      
+
         return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
     }
 
@@ -510,15 +514,16 @@ class VendaController extends Controller
         ]);
 
         $carrinho = Carrinho::find($carrinho);
-        //monta json para exportação
+        // //monta json para exportação
         $this->jsonVendaStorageJob($carrinho);
-        //vai entrar função json para exportação da venda e jobs
+
         Session::flash('success', 'Venda Finalizada Com Sucesso');
         return redirect(route('venda.index'));
     }
 
     public function jsonVendaStorageJob($carrinho)
     {
+
         $dados['id'] = $carrinho->id;
         $dados['status'] = $carrinho->status;
         $dados['loja_alltech_id'] = $carrinho->usuario->loja->alltech_id;
@@ -537,12 +542,17 @@ class VendaController extends Controller
         $dados['qtd_desc_sb_venda'] = $carrinho->desconto_qtd_sb_venda ? $carrinho->desconto_qtd_sb_venda : null;
         $dados['v_desc_sb_venda'] = $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : null;
 
+        $estoque = Estoque::where('loja_id', auth()->user()->loja_id)->get();
         $i = 1;
         foreach ($carrinho->carItem as $key => $item) {
 
-            $dados['itens'][$i]['produto_alltech_id'] = $item->produto->alltech_id;
-            $dados['itens'][$i]['alltech_id_grade'] = $item->i_grade_id ? $item->iGrade->id_grade_alltech_id : null;
-            $dados['itens'][$i]['alltech_id_i_grade'] = $item->i_grade_id ? $item->iGrade->alltech_id : null;
+            if ($item->i_grade_id) {
+                $produto_codbar = $estoque->where('produto_id', $item->produto_id)->where('tam', $item->iGrade->tam)->first();
+            } else {
+                $produto_codbar = $estoque->where('produto_id', $item->produto_id)->first();
+            }
+
+            $dados['itens'][$i]['codbar'] = $produto_codbar->codbar;
             $dados['itens'][$i]['preco'] = $item->preco;
             $dados['itens'][$i]['quantidade'] = $item->quantidade;
             $dados['itens'][$i]['tipo_desconto'] = ($item->tipo_desconto && $item->tipo_desconto == 'porcento') ? '%' : (($item->tipo_desconto && $item->tipo_desconto == 'dinheiro') ? '$' : null);
@@ -552,6 +562,7 @@ class VendaController extends Controller
 
             $i++;
         }
+
         //monnta arquivo para exportação em job
         $json = json_encode($dados);
         $dir = $carrinho->usuario->loja->empresa->pasta;

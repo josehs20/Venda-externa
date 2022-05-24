@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use App\Models\Funario;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -73,7 +74,9 @@ trait AuthenticatesUsers
     protected function validateLogin(Request $request)
     {
         $verifica = User::where('email', $request->email)->first();
-
+     //   $funario =  Funario::where('user_id', $verifica->id)->first();
+        
+        //dd($verifica);
         if (!$verifica or $verifica->perfil != 'vendedor') {
 
             return $this->sendFailedLoginResponse($request);

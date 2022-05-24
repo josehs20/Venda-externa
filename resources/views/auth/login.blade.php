@@ -17,7 +17,10 @@
     <link rel="stylesheet" type="text/css" href="entrar/css/util.css">
     <link rel="stylesheet" type="text/css" href="entrar/css/main.css">
     <!--===============================================================================================-->
-  
+    @if (Session::has('message'))
+
+    <body onload="msgError('<?php echo Session::get('message'); ?>')">
+@endif
     <div class="limiter">
         <div class="container-login100">
             <div class="wrap-login100" style="margin-right: 20px;">
@@ -77,7 +80,7 @@
 
 
 
-
+    <script type="text/javascript" src="{{ asset('js/layoutfisic.js') }}" defer></script>
     <!--===============================================================================================-->
     <script src="entrar/vendor/jquery/jquery-3.2.1.min.js"></script>
     <!--===============================================================================================-->

@@ -380,7 +380,7 @@
                         @method('PUT')
                         @csrf
                         <div class="carregando">
-                            <img style="width: 50%; heigth: 50%;"  src="{{asset('carregando.gif')}}" alt="">
+                            <img style="width: 50%; heigth: 50%;" src="{{ asset('carregando.gif') }}" alt="">
                             <h6>Buscando Clientes....</h6>
                         </div>
                         <a id="lisClientesModal">
@@ -481,14 +481,14 @@
                                                         {{-- Verifica tipo de qauntidade --}}
                                                         @if ('u' == 'un')
                                                             <input name="quantidade" type="number" class="form-control"
-                                                                min="0" step="1" value="{{ $item->quantidade }}"
+                                                                min="0" value="{{ $item->quantidade }}"
                                                                 id="floatingInputGrid" placeholder="quantidade">
                                                             <label for="floatingInputGrid">Quantidadeasd</label>
                                                         @else
                                                             <input name="quantidade" type="number" class="form-control"
-                                                                min="0" step="0.001" value="{{ $item->quantidade }}"
+                                                                min="0" value="{{ $item->quantidade }}"
                                                                 id="floatingInputGrid" placeholder="quantidade">
-                                                            <label for="floatingInputGrid">Quantidade12</label>
+                                                            <label for="floatingInputGrid">Quantidade</label>
                                                         @endif
 
                                                     </div>
@@ -602,7 +602,7 @@
             <div class="modal fade" id="modalFinalizaVendaSemCliente" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-lg"">
-                                                <div class="       modal-content">
+                                                        <div class="         modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Finalizar Venda
                         </h5><br>
@@ -654,7 +654,8 @@
                                         <label for="floatingInputGrid">Cliente</label>
                                         <datalist id="listaClientes">
                                             @foreach ($clientes_user as $cliente)
-                                                <option value="{{ $cliente->nome }}">{{ $cliente->alltech_id }}</option>
+                                                <option value="{{ $cliente->nome }}">{{ $cliente->alltech_id }}
+                                                </option>
                                             @endforeach
 
                                         </datalist>
@@ -680,8 +681,8 @@
                                     <div class="form-floating">
                                         <input disabled required
                                             onkeyup="calculoDescontoSobreVenda(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
-                                            name="qtd_desconto_sobre_venda" type="number" class="form-control" min="0.01"
-                                            step="1" id="inputDesconto">
+                                            name="qtd_desconto_sobre_venda" type="number" class="form-control" min="0"
+                                            id="inputDesconto">
                                         <label for="floatingInputGrid">Desconto</label>
                                     </div>
                                 </div>

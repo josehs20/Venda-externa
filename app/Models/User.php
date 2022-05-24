@@ -49,10 +49,10 @@ class User extends Authenticatable
     public function vendedor() {
         return $this->perfil == 'vendedor';
     }
+   
+    public function funcionario()
+    {
+        return $this->belongsTo('App\Models\Funario');
+    }
 
-
-    // public function carrinho()
-    // {
-    //     return $this->belongsTo('App\Models\Carrinho');
-    // }
 }

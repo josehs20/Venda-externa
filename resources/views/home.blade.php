@@ -17,6 +17,7 @@
 
     @include('componentes.navbar', ['titulo' => 'Produtos'])
     <br><br><br>
+  
     @if (Session::has('success'))
 
         <body onload="msgSuccess('<?php echo Session::get('success'); ?>')">
