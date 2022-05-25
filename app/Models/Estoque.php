@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Estoque extends Model
 {
     use HasFactory;
+    protected $table = 'estoques';
     protected $fillable = [
         'loja_id',
         'codbar',

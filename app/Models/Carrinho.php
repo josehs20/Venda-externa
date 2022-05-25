@@ -16,12 +16,14 @@ class Carrinho extends Model
         'valor_bruto',
         'total',
         'tipo_pagamento',
+        'forma_pagamento',
         'cliente_id',
         'status',
         'parcelas',
         'tp_desconto_sb_venda',
         'valor_desconto_sb_venda',
         'desconto_qtd_sb_venda',
+        'valor_entrada',
 
     ];
 

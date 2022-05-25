@@ -22,12 +22,15 @@ function habilitaDescontoEditarItem(value, inputId) {
 //habilita avista ou a prazo
 function verificaAvistaAprazo(value) {
     var input = document.getElementById("inputParcelas");
+    var campoInserirEntrada = document.getElementById('campoInserirEntrada');
     console.log(input);
     if (value == 'AP') {
         input.disabled = false;
+        campoInserirEntrada.style.display = 'block';
     } else if (value == 'AV') {
         input.disabled = true;
         input.value = 1;
+        campoInserirEntrada.style.display = 'none'
     }
 }
 function verificaDesconto(value, valorTotal, qtd_desconto_antigo) {
@@ -82,14 +85,13 @@ function atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoVa
 
 }
 
-
-
 $(function () {
     $('form[name="formFinalizaVenda"]').submit(function (event) {
         event.preventDefault();
         var parcelas = document.getElementById("inputParcelas").value;
         var cod = $("#clienteCodigo").val();
         var nome = $("#clienteNomeVenda").val();
+       
         $.ajax({
             url: "/busca_cliente",
             type: "GET",
@@ -101,10 +103,21 @@ $(function () {
             dataType: 'json',
         }).done(function (response) {
 
-            if (response.codigo && response.codigo.nome == nome) {
+            console.log(response);
+            if (response.codigo.docto == null || response.codigo.enderecos.cep == null || response.codigo.enderecos.rua == null) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Cadastro de cliente inválido',
+                    text: !response.codigo.docto ? 'Cliente não possui docunento' : 'Endereço do cliente inválido',
+                    footer: '<a class="btn btn-secondary style="color:black;" href="clientes/'+response.codigo.id+'/edit">Atualizar cadastro do cliente</a>'
+                  })
+                return;             
+            }
+
+            if (response.codigo) {
 
                 if (parcelas < 1 || parcelas % 1 != 0) {
-                    console.log(parcelas);
+                  
                     Swal.fire({
                         icon: 'error',
                         title: 'Quantidade de parcelas Inválida',
@@ -112,19 +125,14 @@ $(function () {
                         timer: 1500
                     });
                 } else {
-
+  
                     console.log(document.getElementById('formFinalizaVendaSubmit').submit());
 
                 }
             } else {
                 document.getElementById('nomeValid').innerHTML = "Codigo ou nome não exitem";
             }
-
-
         });
-
-
-
     });
 });
 
@@ -337,7 +345,7 @@ $(function () {
     $('form[id="buscaAlltech_idClienteVendaAjax"]').submit(function (event) {
         event.preventDefault();
         var cliente = cliente_consulta_finaliza;
-        console.log(cliente);
+      
         $.ajax({
             url: "/busca_cliente",
             type: "GET",

@@ -28,11 +28,12 @@ class HomeController extends Controller
 
         $funario = Funario::where('user_id', auth()->user()->id)->first();
 
-        if (auth()->user()->perfil === 'vendedor' && $funario->status == 'Ativo') {
-            Session::flash('success');
+        if (auth()->user()->perfil === 'vendedor' && $funario->status === 'Ativo') {
+            Session::flash('success', 'Bem vindo');
             return redirect(route('venda.index'));
         }
-        Session::flash('error', 'adaSem permissão de acessos');
+      
+        Session::flash('error', 'Sem permissão de acesso');
         return redirect('/');
     }
 }

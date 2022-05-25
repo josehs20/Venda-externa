@@ -25,7 +25,11 @@ class VendaController extends Controller
         $produtos_carrinho_quantidade['itemCarrinho'][0] = false;
         $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = false;
 
-        $produtos = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
+        $produtos = Produto::with('grades', 'estoque')->where('produtos.loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')
+        ->paginate(30);
+        // $produtos = Produto::with('grades')->where('produtos.loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$request->nome}%'")   
+        // ->orderBy('nome')->where('situacao', 'A')->join('estoques', 'produtos.id', '=', 'estoques.produto_id')->get();
+        //dd($produtos[0]);
         $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
 
         // dd($carrinho );
@@ -60,7 +64,7 @@ class VendaController extends Controller
 
     public function itens_carrinho($user_id = null, $msg = null)
     {
-        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->take(30)->get();
+        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->take(100)->get();
 
         $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
@@ -328,7 +332,7 @@ class VendaController extends Controller
         //id do item da venda
 
         $item = CarrinhoItem::find($venda);
-        
+
         if ($request->quantidade && !$request->qtd_desconto) {
             $carrinho = Carrinho::find($item->carrinho_id);
 
@@ -501,46 +505,64 @@ class VendaController extends Controller
     public function finaliza_venda(Request $request, $carrinho)
     {
         $cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $request->cliente_alltech_id)->orWhere('docto', $request->cliente_alltech_id)->first();
+        $upCarr =  Carrinho::find($carrinho);
 
-        Carrinho::find($carrinho)->update([
-            'status' => 'fechado',
-            'cliente_id' => $cliente ? $cliente->id : '0000',
-            'total' => $request->hiddenInputValorTotalModal,
-            'tipo_pagamento' => $request->tipo_pagamento,
-            'parcelas' => $request->parcelas ? $request->parcelas : 1,
-            'tp_desconto_sb_venda' => $request->tp_desconto_sb_venda == "0" ? null : $request->tp_desconto_sb_venda,
-            'valor_desconto_sb_venda' => $request->hiddenInputValorDescontoSobreVendaModal,
-            'desconto_qtd_sb_venda' => $request->qtd_desconto_sobre_venda,
-        ]);
+        // dd($request->all());
 
-        $carrinho = Carrinho::find($carrinho);
-        // //monta json para exportação
-        $this->jsonVendaStorageJob($carrinho);
+        if ($cliente) {
 
-        Session::flash('success', 'Venda Finalizada Com Sucesso');
-        return redirect(route('venda.index'));
+            $upCarr->update([
+                'status' => 'fechado',
+                'valor_desconto' => $upCarr->valor_desconto == '0' ? null : $upCarr->valor_desconto,
+                'cliente_id' => $cliente ? $cliente->id : '0000',
+                'total' => $request->hiddenInputValorTotalModal ? $request->hiddenInputValorTotalModal : null,
+                'tipo_pagamento' => $request->tipo_pagamento,
+                'parcelas' => $request->parcelas ? $request->parcelas : 1,
+                'tp_desconto_sb_venda' => $request->tp_desconto_sb_venda == "0" ? null : $request->tp_desconto_sb_venda,
+                'valor_desconto_sb_venda' => $request->hiddenInputValorDescontoSobreVendaModal ? $request->hiddenInputValorDescontoSobreVendaModal : null,
+                'desconto_qtd_sb_venda' => $request->qtd_desconto_sobre_venda ? $request->qtd_desconto_sobre_venda : null,
+                'forma_pagamento' => $request->forma_pagamento ? $request->forma_pagamento : null,
+                'valor_entrada' => $request->valor_entrada ? $request->valor_entrada : null,
+
+            ]);
+
+            $carrinho = Carrinho::find($carrinho);
+            //dd($carrinho->forma_pagamento);
+            // //monta json para exportação
+            $this->jsonVendaStorageJob($carrinho);
+
+            Session::flash('success', 'Venda Finalizada Com Sucesso');
+            return redirect(route('venda.index'));
+        } else {
+            Session::flash('error', 'Verifique os dados do cliente');
+
+            return redirect(route('itens_carrinho', ['user_id' => auth()->user()->id]));
+        }
     }
 
     public function jsonVendaStorageJob($carrinho)
     {
 
+        // dd($carrinho);
         $dados['id'] = $carrinho->id;
         $dados['status'] = $carrinho->status;
         $dados['loja_alltech_id'] = $carrinho->usuario->loja->alltech_id;
-        $dados['id_vendedor'] = $carrinho->usuario->id;
-        $dados['nome_vendedor'] = $carrinho->usuario->name;
-        $dados['cliente_alltech_id'] = $carrinho->cliente->alltech_id;
+        $dados['vendedor_alltech_id'] = $carrinho->usuario->funcionario->alltech_id;
+        // $dados['nome_vendedor'] = $carrinho->usuario->name;
+        $dados['cliente'] = $carrinho->cliente->docto;
         $dados['emissao'] = $carrinho->updated_at->format('Ymd');
         $dados['qtd_desc'] = $carrinho->desconto_qtd;
-        $dados['tipo_desc'] = ($carrinho->tp_desconto == 'parcial') ? 'parcial' : (($carrinho->tp_desconto == 'porcento_unico') ? '%' : '$');
+        $dados['tipo_desc'] = ($carrinho->tp_desconto == 'parcial') ? 'parcial' : (($carrinho->tp_desconto == 'porcento_unico') ? '%' : (($carrinho->tp_desconto == 'dinheiro_unico') ? '$' : null));
         $dados['v_desc'] = $carrinho->valor_desconto;
         $dados['v_bruto'] = $carrinho->valor_bruto;
-        $dados['v_total'] = $carrinho->total;
         $dados['tipo_pg'] = $carrinho->tipo_pagamento;
         $dados['parcelas'] = $carrinho->parcelas;
         $dados['tp_desc_sb_venda'] = ($carrinho->tp_desconto_sb_venda && $carrinho->tp_desconto_sb_venda == 'porcento') ? '%' : (($carrinho->tp_desconto_sb_venda && $carrinho->tp_desconto_sb_venda == 'dinheiro') ? '$' : null);
         $dados['qtd_desc_sb_venda'] = $carrinho->desconto_qtd_sb_venda ? $carrinho->desconto_qtd_sb_venda : null;
         $dados['v_desc_sb_venda'] = $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : null;
+        $dados['forma_pagamento'] = $carrinho->forma_pagamento;
+        $dados['valor_entrada'] = $carrinho->valor_entrada;
+        $dados['v_total'] = $carrinho->total;
 
         $estoque = Estoque::where('loja_id', auth()->user()->loja_id)->get();
         $i = 1;
@@ -551,8 +573,8 @@ class VendaController extends Controller
             } else {
                 $produto_codbar = $estoque->where('produto_id', $item->produto_id)->first();
             }
-
-            $dados['itens'][$i]['codbar'] = $produto_codbar->codbar;
+            ($carrinho->tp_desconto == 'parcial') ? 'parcial' : (($carrinho->tp_desconto == 'porcento_unico') ? '%' : (($carrinho->tp_desconto == 'dinheiro_unico') ? '$' : null));
+            $dados['itens'][$i]['codbar'] = ($produto_codbar && $produto_codbar->codbar) ? $produto_codbar->codbar : (($produto_codbar->alltech_id) ? $produto_codbar->alltech_id : null);
             $dados['itens'][$i]['preco'] = $item->preco;
             $dados['itens'][$i]['quantidade'] = $item->quantidade;
             $dados['itens'][$i]['tipo_desconto'] = ($item->tipo_desconto && $item->tipo_desconto == 'porcento') ? '%' : (($item->tipo_desconto && $item->tipo_desconto == 'dinheiro') ? '$' : null);
@@ -562,7 +584,7 @@ class VendaController extends Controller
 
             $i++;
         }
-
+       // dd($dados);
         //monnta arquivo para exportação em job
         $json = json_encode($dados);
         $dir = $carrinho->usuario->loja->empresa->pasta;

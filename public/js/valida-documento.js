@@ -1,4 +1,5 @@
 
+
 //Cria Usuário
 $(function () {
     $('form[id="CadastroCliente"]').submit(function (event) {
@@ -42,7 +43,7 @@ $(function () {
                 },
                 dataType: 'json',
             }).done(function (response) {
-            
+
                 if (response['success'] == true) {
                     $('#docto').val("");
                     $('#inputNome').val("");
@@ -65,18 +66,23 @@ $(function () {
                         showConfirmButton: false,
                         timer: 1500
                     })
-                }else{
+                } else if(response['succes'] == false){
 
                     Swal.fire({
                         icon: 'warning',
-                        title: 'Documento já cadastrado para' + response.nome,
+                        title: 'Documento já cadastrado para' + response.cliente.nome,
                         showConfirmButton: false,
                         timer: 2000
                     })
                 }
             });
         } else {
-            event.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Não foi possível, entre em contato com o suporte',
+                showConfirmButton: false,
+                timer: 2000
+            })
         }
     });
 });
@@ -102,6 +108,7 @@ $(function () {
             var codIbge = $("#cidIbge").val();
             var id = $('#idCliente').val();
             var nome = $('#inputNome').val();
+            var docto = $('#docto').val();
 
             $.ajax({
                 url: "/clientes/" + id,
@@ -122,15 +129,12 @@ $(function () {
                     complemento: complemento,
                     codIbge: codIbge,
                     nome: nome,
+                    docto: docto,
                 },
                 dataType: 'json',
             }).done(function (response) {
                 if (response['success'] == true) {
-                    // mensagem = 'Cliente Atualizado Com Sucesso';
-                    // tipo = 'success';
-                    // tempo = false;
-                    // mostraDialogo(mensagem, tipo, tempo);
-                    // console.log(response);
+      
                     Swal.fire({
                         icon: 'success',
                         title: 'Cliente Atualizado Com Sucesso',
@@ -138,13 +142,27 @@ $(function () {
                         timer: 1500
                     })
 
+                }else if(response['success'] == false){
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Documento já existe para  '+ response.cliente.nome,
+                        showConfirmButton: false,
+                        timer: 2000
+                    })
                 }
             });
         } else {
-            event.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Não foi possível entre em contato com o suporte',
+                showConfirmButton: false,
+                timer: 1500
+            })
         }
     });
 });
+
+
 //arruma inputes quando entra da página para update
 window.onload = function () {
     var dados = {
@@ -263,8 +281,10 @@ function validaInputNumeros(inputId) {
 function documento() {
     var input = document.getElementById("docto").value; //pega o valor digitado.
     var msg = document.getElementById('msgValid');
+    if (input.length == 11 || input.length == 14) {
 
-    if (input.length == 11 || input.length == 14) { //verifica se é o valor de sua preferencia. se for seleciona.
+        // console.log(verifica_docto_repetido(input)); //verifica se é o valor de sua preferencia. se for seleciona.
+
         if (input.length == 11) {
             $("#TipoDocumento").val('CPF');
             var docto = input;

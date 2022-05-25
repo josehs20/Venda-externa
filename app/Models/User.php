@@ -52,7 +52,7 @@ class User extends Authenticatable
    
     public function funcionario()
     {
-        return $this->belongsTo('App\Models\Funario');
+        return $this->hasOne('App\Models\Funario');
     }
 
 }

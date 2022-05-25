@@ -27,6 +27,7 @@
     <div id="elemento_ajax_html" name="addItem" method="POST" class="list">
         @php
             $i = 0;
+            $p = 0
         @endphp
 
         @if (!$produtos->count())
@@ -34,7 +35,12 @@
                 Nenhuma Produto Encontrado !
             </div>
         @endif
+
         @foreach ($produtos as $produto)
+        @if ($produto->estoque)
+       @php
+           $p++
+       @endphp
             <a class="listHome" style="cursor: pointer">
                 <ul class="list-group">
                     <li class="list-group-item" style="background-color: rgb(58, 36, 252)">
@@ -176,11 +182,12 @@
                 </div>
                 {{-- Fim Modal Item Com Grade --}}
             @endif
+            @endif
         @endforeach
     </div>
 
-
-    {{-- paginação --}}
+  @if ($p != 0)
+      {{-- paginação --}}
     <nav class="navegacao" aria-label="Navegação">
         <ul class="pagination" style="justify-content: center;">
             <li class="page-item">
@@ -204,5 +211,11 @@
             </li>
         </ul>
     </nav>
+    @else
+    <div class="alert alert-warning mt-5" role="alert">
+        Nenhuma Produto Encontrado !
+    </div>
+  @endif
+    
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewhome.js') }}" defer></script>

@@ -29,6 +29,10 @@ class Produto extends Model
     {
        return $this->belongsTo('App\Models\Carrinho', 'carrinho_id', 'id');
     }
+    public function estoque()
+    {
+       return $this->hasOne('App\Models\Estoque');
+    }
 
     public function descricaoProduto() {
         switch($this->situacao) {

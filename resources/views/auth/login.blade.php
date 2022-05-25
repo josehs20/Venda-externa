@@ -17,9 +17,9 @@
     <link rel="stylesheet" type="text/css" href="entrar/css/util.css">
     <link rel="stylesheet" type="text/css" href="entrar/css/main.css">
     <!--===============================================================================================-->
-    @if (Session::has('message'))
+    @if (Session::has('error'))
 
-    <body onload="msgError('<?php echo Session::get('message'); ?>')">
+    <body onload="msgError('<?php echo Session::get('error'); ?>')">
 @endif
     <div class="limiter">
         <div class="container-login100">

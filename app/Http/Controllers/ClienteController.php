@@ -35,8 +35,9 @@ class ClienteController extends Controller
         }
         if ($codigo) {
             //$cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
-            $dados['codigo'] = Cliente::where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
+            $dados['codigo'] = Cliente::with('enderecos')->where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
         }
+
         echo json_encode($dados);
         return;
     }
@@ -62,11 +63,11 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         $codIbge = CidadeIbge::where('codigo', trim($_POST['codIbge']))->first();
-        $verifyExists = Cliente::where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_POST['documento'])->orWhere('docto', $_POST['documento'])->first();
+        $dado = Cliente::where('loja_id', auth()->user()->loja_id)->orWhere('docto', $_POST['documento'])->first();
 
-        if ($verifyExists) {
+        if ($dado) {
             $dados['success'] = false;
-            echo json_encode($verifyExists);
+            echo json_encode($dado);
             return;
         }
 
@@ -76,7 +77,7 @@ class ClienteController extends Controller
             'nome' => $_POST['nome'],
             'docto' => $_POST['documento'],
             'tipo' =>  strlen($_POST['documento']) == 11 ? 'F' : 'J',
-            'email' => $_POST['email'],
+            'email' => trim($_POST['email']) ? trim($_POST['email']) : null,
             'fone1' => strlen($_POST['telefones'][0]) > 7 ? $_POST['telefones'][0] : null,
             'fone2' => strlen($_POST['telefones'][1]) > 7 ? $_POST['telefones'][1] : null,
             'celular' => strlen($_POST['telefones'][2]) > 7 ? $_POST['telefones'][2] : null,
@@ -138,7 +139,19 @@ class ClienteController extends Controller
 
             $cliente = Cliente::find($_PUT['id']);
 
+            if (!$cliente->docto) {
+
+                $dado['cliente'] = Cliente::where('loja_id', auth()->user()->loja_id)->where('docto', $_PUT['docto'])->first();
+
+                //return caso já exista client com o mesmo docto
+                if ($dado['cliente']) {
+                    $dado['success'] = false;
+                    echo json_encode($dado);
+                    return;
+                }
+            }
             $cliente->update([
+                'docto' => $_PUT['docto'],
                 'nome' => $_PUT['nome'],
                 'email' => $_PUT['email'],
                 'fone1' => strlen($_PUT['telefones'][0]) > 7 ? $_PUT['telefones'][0] : null,
@@ -155,7 +168,7 @@ class ClienteController extends Controller
             ]);
             $dados['success'] = true;
             echo json_encode($dados);
-
+            $cliente = Cliente::find($_PUT['id']);
 
             $this->jsonClienteStorageJob($cliente);
         }
@@ -166,13 +179,13 @@ class ClienteController extends Controller
     public function jsonClienteStorageJob($cliente)
     {
         $dados['id'] = $cliente->id;
-        $dados['alltech_id'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? "-" . $cliente->alltech_id : $cliente->alltech_id;
+       // $dados['alltech_id'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? "-" . $cliente->alltech_id : $cliente->alltech_id;
         $dados['loja_id'] = $cliente->loja_id;
         $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
         $dados['nome'] = $cliente->nome;
-        $dados['docto'] = $cliente->docto;
+        $dados['docto'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? '-'. $cliente->docto : $cliente->docto;
         $dados['tipo'] =  $cliente->tipo;
-        $dados['email'] = $cliente->email;
+        $dados['email'] = trim($cliente->email) ? trim($cliente->email) : null;
         $dados['fone1'] = $cliente->fone1;
         $dados['fone2'] = $cliente->fone2;
         $dados['celular'] = $cliente->celular;

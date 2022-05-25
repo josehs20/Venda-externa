@@ -30,15 +30,15 @@
 </div>
 <div class="col-md-3">
     <label for="inputEmail4" id="tituloIputuDocumento" class="form-label">Documento</label>
-    @if ($cliente)
+   
+    @if ($cliente && $cliente->docto)
+   
         <input disabled="" type="number" class="form-control" value="{{ $cliente ? $cliente->docto : '' }}"
             id="docto">
     @else
         <input required type="number" class="form-control" placeholder="Somente Números" id="docto">
         <a style="color: red" id="msgValid"></a>
     @endif
-
-
 </div>
 <div class="col-md-3">
     <label for="inputEmail4" class="form-label">Nome</label>
@@ -80,7 +80,7 @@
 <div class="col-md-2">
     <label for="inputAddress" class="form-label">CEP</label>
     <input onblur="PesquisarCEP()" onkeyup="PesquisarCEP()" id="cep" type="number" required
-        value="{{ $cliente ? $cliente->enderecos->cep : '' }}" class="form-control">
+        value="{{ $cliente && $cliente->enderecos ? $cliente->enderecos->cep : '' }}" class="form-control">
     <a style=" color: red" id="error"></a>
     <input type="hidden" id="cidIbge"
         value="{{ $cliente && $cliente->enderecos && $cliente->enderecos->cidadeIbge ? $cliente->enderecos->cidadeIbge->codigo : '' }}">
@@ -96,7 +96,6 @@
     <input type="text" onkeyup="removeCarcterEspecial(this.value, 'cidade')" onblur="PesquisarCepCidade()" required id="cidade"
         class="form-control"
         value="{{ $cliente && $cliente->enderecos && $cliente->enderecos->cidadeIbge ? $cliente->enderecos->cidadeIbge->nome : '' }}">
-
 </div>
 <div class="col-md-4">
     <label for="inputCity" class="form-label">Bairro</label>
