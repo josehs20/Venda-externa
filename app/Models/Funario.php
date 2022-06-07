@@ -12,6 +12,7 @@ class Funario extends Model
         'alltech_id',
         'tipo',
         'status',
+        'lucroMimVenda',
         'user_id',
     ];
 

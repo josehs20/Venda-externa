@@ -223,16 +223,24 @@ function valida_form(id) {
 }
 
 function inputGradeqtdInteiro(value) {
-    
+
     var checkbox = document.getElementById("checkboxInputGrade" + value)
-   // console.log(value);
+    // console.log(value);
     var input = document.getElementById("inputGradeqtdInteiro" + value);
- 
+
     if (checkbox.checked) {
         input.disabled = false;
 
     } else {
         input.disabled = true;
     }
+}
+
+function solicitacaoDesconto() {
+    Swal.fire({
+        icon: 'success',
+        title: 'Solicitação enviada',
+        text: 'Aguarde a aprovação do seu gerente',
+    })
 }
 

@@ -417,7 +417,7 @@
 
     .mobile__nav__fade__and__show__circle {
         width: 85%;
-        height: 435px;
+        height: 455px;
         background-image: linear-gradient(120deg, #c8f17da6 -30%, #000c92 100%);
         box-shadow: 0px 10px 10px rgb(0, 0, 0);
         position: fixed;
@@ -491,6 +491,7 @@
                     <p><a href="{{ route('clientes.create') }}">Cadastro De Cliente</a></p>
                     <p><a href="{{ route('vendas_finalizadas') }}">Vendas Finalizadas</a></p>
                     <p><a href="{{ route('venda_salva') }}">Vendas Salvas</a></p>
+                    <p><a href="{{ route('vendas_invalidas') }}">Vendas Em Espera</a></p>
                 </div>
             </li>
 
@@ -530,6 +531,7 @@
                 <p><a href="{{ route('clientes.create') }}">Cadastro De Cliente</a></p>
                 <p><a href="{{ route('vendas_finalizadas') }}">Vendas Finalizadas</a></p>
                 <p><a href="{{ route('venda_salva') }}">Vendas Salvas</a></p>
+                <p><a href="{{ route('vendas_invalidas') }}">Vendas Em Espera</a></p>
             </div>
         </li>
         <li class="main__navigations__div__li">

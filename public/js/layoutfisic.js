@@ -21,13 +21,13 @@ var btn = document.getElementById("btnMenu");
 //     inputBuscaCliente.classList.remove('go-esconde')
 //     inputBuscaCliente.classList.toggle('go-back')
 // console.log(buscaCliente);
-    /* forEach to make the menu an X */
-    // menuIcon.forEach((line) => {
-    //     line.classList.toggle(line.id)
-    // })
+/* forEach to make the menu an X */
+// menuIcon.forEach((line) => {
+//     line.classList.toggle(line.id)
+// })
 //});
 function msgSuccess(msg) {
-    console.log(msg);
+
     Swal.fire({
         icon: 'success',
         title: msg,
@@ -37,7 +37,7 @@ function msgSuccess(msg) {
 }
 
 function msgError(msg) {
-    console.log(msg);
+
     Swal.fire({
         icon: 'error',
         title: msg,

@@ -17,22 +17,44 @@ function habilitaDescontoEditarItem(value, inputId) {
         input.disabled = true;
         input.value = "";
     }
+    console.log(input);
 }
 
 //habilita avista ou a prazo
 function verificaAvistaAprazo(value) {
     var input = document.getElementById("inputParcelas");
     var campoInserirEntrada = document.getElementById('campoInserirEntrada');
-    console.log(input);
+
     if (value == 'AP') {
         input.disabled = false;
         campoInserirEntrada.style.display = 'block';
+
     } else if (value == 'AV') {
         input.disabled = true;
         input.value = 1;
-        campoInserirEntrada.style.display = 'none'
+        valor_entrada.value = null;
+        campoInserirEntrada.style.display = 'none';
     }
 }
+
+$(function () {
+    var selectedFinaliza = document.getElementById('tp_desconto_sobre_venda_modal');
+    console.log(selectedFinaliza);
+    var textSelect = selectedFinaliza.dataset.valueSelected;
+    text = (textSelect == 'porcento') ? '%' : (textSelect == 'dinheiro') ? '$' : '0';
+
+    for (var i = 0; i < selectedFinaliza.options.length; i++) {
+        if (selectedFinaliza.options[i].text === text) {
+            selectedFinaliza.selectedIndex = i;
+            if (text != '0') {
+                document.getElementById('inputDesconto').disabled = false
+
+            }
+            break;
+        }
+    }
+})
+
 function verificaDesconto(value, valorTotal, qtd_desconto_antigo) {
     var input = document.getElementById("inputDesconto");
     if (value == 'porcento') {
@@ -48,25 +70,29 @@ function verificaDesconto(value, valorTotal, qtd_desconto_antigo) {
 
     calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, value)
 }
+
 function calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, tp_desconto) {
     var qtd_desconto = document.getElementById("inputDesconto").value;
-    //  console.log(qtd_desconto);
-    if (qtd_desconto) {
-        var tp_desconto = $('#tp_desconto_sobre_venda_modal').val();
-        var valorDesconto = tp_desconto == 'porcento' ? (valorTotal / 100) * qtd_desconto : qtd_desconto;
+    // console.log(valorTotal);
 
+    if (qtd_desconto) {
         //caso valor seja undefined
         !qtd_desconto_antigo ? qtd_desconto_antigo = 0 : false;
+        !valorDesconto ? valorDesconto = 0 : false;
 
-        var novoValorTotalModal = valorTotal - valorDesconto;
-        var novoValorDescontoModal = qtd_desconto_antigo + parseFloat(valorDesconto);
+        var tp_desconto = $('#tp_desconto_sobre_venda_modal').val();
+        var valorDesconto = tp_desconto == 'porcento' ? ((parseFloat(valorTotal)) / 100) * qtd_desconto : qtd_desconto;
 
+        var novoValorTotalModal = parseFloat(valorTotal) - parseFloat(valorDesconto);
+
+        var novoValorDescontoModal = parseFloat(qtd_desconto_antigo) + parseFloat(valorDesconto);
+        console.log(valorTotal, valorDesconto, qtd_desconto_antigo);
         atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto)
 
     } else {
 
-        var novoValorTotalModal = valorTotal;
-        var novoValorDescontoModal = !qtd_desconto_antigo ? qtd_desconto_antigo = 0 : qtd_desconto_antigo;
+        var novoValorTotalModal = parseFloat(valorTotal);
+        var novoValorDescontoModal = !qtd_desconto_antigo ? qtd_desconto_antigo = 0 : parseFloat(qtd_desconto_antigo);
 
         atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto = null)
     }
@@ -74,7 +100,7 @@ function calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, tp_desconto)
 }
 
 function atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto) {
-    console.log(novoValorDescontoModal);
+
     // console.log(parseFloat(novoValorDescontoModal));
     document.getElementById('valorTotalModal').textContent = novoValorTotalModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
     document.getElementById('valorDescontoModal').textContent = novoValorDescontoModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
@@ -91,7 +117,7 @@ $(function () {
         var parcelas = document.getElementById("inputParcelas").value;
         var cod = $("#clienteCodigo").val();
         var nome = $("#clienteNomeVenda").val();
-       
+
         $.ajax({
             url: "/busca_cliente",
             type: "GET",
@@ -109,15 +135,15 @@ $(function () {
                     icon: 'error',
                     title: 'Cadastro de cliente inválido',
                     text: !response.codigo.docto ? 'Cliente não possui docunento' : 'Endereço do cliente inválido',
-                    footer: '<a class="btn btn-secondary style="color:black;" href="clientes/'+response.codigo.id+'/edit">Atualizar cadastro do cliente</a>'
-                  })
-                return;             
+                    footer: '<a class="btn btn-secondary style="color:black;" href="clientes/' + response.codigo.id + '/edit">Atualizar cadastro do cliente</a>'
+                })
+                return;
             }
 
             if (response.codigo) {
 
                 if (parcelas < 1 || parcelas % 1 != 0) {
-                  
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Quantidade de parcelas Inválida',
@@ -125,8 +151,48 @@ $(function () {
                         timer: 1500
                     });
                 } else {
-  
-                    console.log(document.getElementById('formFinalizaVendaSubmit').submit());
+                    //entra para submit do formulário apra finalizar venda
+                    var numero = response.codigo.enderecos.numero ? response.codigo.enderecos.numero : 'S/N'
+                    Swal.fire({
+                        title: 'Confirmação de cliente',
+                        text: "You won't be able to revert this!",
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        cancelButtonText: 'Voltar',
+                        confirmButtonText: 'Finalizar',
+
+                        html:
+                            '<ul class="list-group">' +
+                            '  <li class="list-group-item active">' + response.codigo.nome + '</li>' +
+                            '</ul>' +
+                            '<br>' +
+                            '<div class="list-group">' +
+                            '  <a lass="list-group-item list-group-item-action" aria-current="true">' +
+                            ' <div class="d-flex w-100 justify-content-between">' +
+                            '<h6 class="mb-1">Cidade: ' + response.cidade.nome + '</h6>' +
+                            '  </div>' +
+                            '<br>' +
+                            ' <div class="d-flex w-100 justify-content-between">' +
+                            '<h6 class="mb-1">Bairro: ' + response.codigo.enderecos.bairro + '</h6>' +
+                            '  </div>' +
+                            '<br>' +
+                            ' <div class="d-flex w-100 justify-content-between">' +
+                            '<h6 class="mb-1">Rua: ' + response.codigo.enderecos.rua + '</h6>' +
+                            '  </div>' +
+                            '<br>' +
+
+                            ' <div class="d-flex w-100 justify-content-between">' +
+                            '<h6 class="mb-1">Nº: ' + numero + '</h6>' +
+                            '  </div>' +
+                            ' </a>' +
+                            '</div>',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            console.log(document.getElementById('formFinalizaVendaSubmit').submit());
+                        }
+                    })
+
 
                 }
             } else {
@@ -164,8 +230,6 @@ function selectClienteFinalizaVenda() {
 // function apagaCodigoConflitoDeBusca(params) {
 //     $("#clienteCodigo").val("");
 // }
-
-
 
 //consulta cliente pelo codigo para finalizar a venda
 $(function () {
@@ -333,7 +397,7 @@ function botaoBuscaClienteNomefinalizaAjax(event) {
         // console.log(document.getElementById('lisClientesModal'));
     });
 }
-botaoBuscaClienteNomefinaliza.addEventListener('click', botaoBuscaClienteNomefinalizaAjax, false);
+botaoBuscaClienteNomefinaliza ? botaoBuscaClienteNomefinaliza.addEventListener('click', botaoBuscaClienteNomefinalizaAjax, false) : false;
 
 //busca alltech_id
 function buttonAlltech_id(id) {
@@ -345,7 +409,7 @@ $(function () {
     $('form[id="buscaAlltech_idClienteVendaAjax"]').submit(function (event) {
         event.preventDefault();
         var cliente = cliente_consulta_finaliza;
-      
+
         $.ajax({
             url: "/busca_cliente",
             type: "GET",
@@ -476,5 +540,33 @@ function abremodalConfDesconto() {
 }
 function abremodalDesconto(params) {
     document.getElementById('modalUnificaclick').click()
+}
+
+function descInvalido() {
+
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger',
+            cancelButtonColor: '#d33',
+        },
+        buttonsStyling: false
+    })
+
+    swalWithBootstrapButtons.fire({
+        title: 'Venda Inválida',
+        text: "O desconto aplicado excede o limite permitido pelo sistema EGI",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Solicitar liberacao?',
+        cancelButtonText: 'Alterar venda',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+
+            document.getElementById('formDescInvalido').submit();
+        }
+    })
+
 }
 

@@ -31,11 +31,17 @@ class ClienteController extends Controller
         $codigo = $_GET['codigo'];
 
         if ($nome || $nome === "") {
-            $dados['nome'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->take(30)->get();
+            $dados['nome'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->get();
         }
+        
         if ($codigo) {
             //$cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
-            $dados['codigo'] = Cliente::with('enderecos')->where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
+            $cliente = Cliente::with('enderecos')->where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
+           $dados['codigo'] = $cliente;
+           if ($cliente) {
+            $dados['cidade'] = $cliente->enderecos->cidadeIbge;
+           }
+          
         }
 
         echo json_encode($dados);

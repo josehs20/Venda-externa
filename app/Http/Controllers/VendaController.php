@@ -12,6 +12,9 @@ use App\Models\Produto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use App\Venda\Desconto;
+use DateTime;
+use DateTimeZone;
 
 class VendaController extends Controller
 {
@@ -26,7 +29,7 @@ class VendaController extends Controller
         $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = false;
 
         $produtos = Produto::with('grades', 'estoque')->where('produtos.loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')
-        ->paginate(30);
+            ->paginate(30);
         // $produtos = Produto::with('grades')->where('produtos.loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$request->nome}%'")   
         // ->orderBy('nome')->where('situacao', 'A')->join('estoques', 'produtos.id', '=', 'estoques.produto_id')->get();
         //dd($produtos[0]);
@@ -212,7 +215,7 @@ class VendaController extends Controller
             'produto_id' => $produto->id,
             'preco'      => $produto->preco,
             'quantidade' => $qtd,
-            'valor'      => $produto->preco,
+            'valor'      => $produto->preco * $qtd,
         ]);
     }
     public function add_item_grade($i_grade_qtd, $produto, $carrinho)
@@ -481,6 +484,7 @@ class VendaController extends Controller
             $valor_itens_bruto[] = $item->preco * $item->quantidade;
             $valor_itens[] = $item->valor;
         }
+        // dd($valor_itens_bruto);
         //caso tenha algum tipo de desconto
         if ($carrinho->tp_desconto == 'porcento_unico' or $carrinho->tp_desconto == 'dinheiro_unico') {
             $desconto_final = $carrinho->tp_desconto == 'porcento_unico' ? ($carrinho->desconto_qtd / 100) * (array_sum($valor_itens)) : $carrinho->desconto_qtd;
@@ -507,28 +511,38 @@ class VendaController extends Controller
         $cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $request->cliente_alltech_id)->orWhere('docto', $request->cliente_alltech_id)->first();
         $upCarr =  Carrinho::find($carrinho);
 
-        // dd($request->all());
+        $fuso = new DateTimeZone('America/New_York');
+        $data = new DateTime('22-01-1990');
+        $data->setTimezone($fuso);
+
+        $dadosCarrinho = [
+            'valor_desconto' => $upCarr->valor_desconto == '0' ? null : $upCarr->valor_desconto,
+            'cliente_id' => $cliente ? $cliente->id : '0000',
+            'total' => $request->hiddenInputValorTotalModal ? $request->hiddenInputValorTotalModal : null,
+            'tipo_pagamento' => $request->tipo_pagamento,
+            'parcelas' => $request->parcelas ? $request->parcelas : 1,
+            'tp_desconto_sb_venda' => $request->tp_desconto_sb_venda == "0" ? null : $request->tp_desconto_sb_venda,
+            'valor_desconto_sb_venda' => $request->hiddenInputValorDescontoSobreVendaModal ? $request->hiddenInputValorDescontoSobreVendaModal : null,
+            'desconto_qtd_sb_venda' => $request->qtd_desconto_sobre_venda ? $request->qtd_desconto_sobre_venda : null,
+            'forma_pagamento' => $request->forma_pagamento ? $request->forma_pagamento : null,
+            'valor_entrada' => $request->valor_entrada ? $request->valor_entrada : null,
+        ];
 
         if ($cliente) {
+            $upCarr->update($dadosCarrinho);
 
-            $upCarr->update([
-                'status' => 'fechado',
-                'valor_desconto' => $upCarr->valor_desconto == '0' ? null : $upCarr->valor_desconto,
-                'cliente_id' => $cliente ? $cliente->id : '0000',
-                'total' => $request->hiddenInputValorTotalModal ? $request->hiddenInputValorTotalModal : null,
-                'tipo_pagamento' => $request->tipo_pagamento,
-                'parcelas' => $request->parcelas ? $request->parcelas : 1,
-                'tp_desconto_sb_venda' => $request->tp_desconto_sb_venda == "0" ? null : $request->tp_desconto_sb_venda,
-                'valor_desconto_sb_venda' => $request->hiddenInputValorDescontoSobreVendaModal ? $request->hiddenInputValorDescontoSobreVendaModal : null,
-                'desconto_qtd_sb_venda' => $request->qtd_desconto_sobre_venda ? $request->qtd_desconto_sobre_venda : null,
-                'forma_pagamento' => $request->forma_pagamento ? $request->forma_pagamento : null,
-                'valor_entrada' => $request->valor_entrada ? $request->valor_entrada : null,
+            $carrinho = Carrinho::with('carItem')->find($carrinho);
+            //valida desconto para finalizacao da venda
+            if (!$this->valida_desconto_venda($carrinho)) {
 
-            ]);
+                Session::flash('descInvalido', 'Venda não permitida, quantidade de desconto inválida');
+                return redirect()->back();
+            }
 
-            $carrinho = Carrinho::find($carrinho);
-            //dd($carrinho->forma_pagamento);
-            // //monta json para exportação
+          //  dd('b');
+            $upCarr->update(['status' => 'fechado']);
+
+            //monta json para exportação
             $this->jsonVendaStorageJob($carrinho);
 
             Session::flash('success', 'Venda Finalizada Com Sucesso');
@@ -540,15 +554,74 @@ class VendaController extends Controller
         }
     }
 
-    public function jsonVendaStorageJob($carrinho)
+    public function finaliza_venda_aprovada($carrinho)
+    {
+       Carrinho::find($carrinho)->update(['status' => 'fechado']);
+       $carrinho = Carrinho::find($carrinho);
+      
+       $this->jsonVendaStorageJob($carrinho);
+     //  dd($carrinho);
+       Session::flash('success', 'Venda Finalizada Com Sucesso');
+       return redirect(route('venda.index'));
+    }
+
+    public function desc_invalido($carrinho)
+    {
+        Carrinho::find($carrinho)->update(['status' => 'descInvalido']);
+
+        Session::flash('solicitacaoDesconto');
+        return redirect(route('venda.index'));
+    }
+
+    public function vendas_invalidas()
     {
 
+        $carrinhos = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', '!=', 'fechado')->orWhere('status', 'descInvalido')
+            ->orWhere('status', 'aprovado')->orWhere('status', 'recusado')->get();
+//dd($carrinhos);
+        return view('vendedor.vendas-invalidas', compact('carrinhos'));
+    }
+
+    public function venda_aprovada($carrinho)
+    {
+        $carrinho = Carrinho::find($carrinho);
+
+        return view('vendedor.venda-aprovada', compact('carrinho'));
+    }
+
+  
+
+    //------------------------------validação e montagem de exportacao-------------------------------//
+
+    public function valida_desconto_venda($carrinho)
+    {
+        //50%  
+        $descontoTotal = $carrinho->valor_desconto + $carrinho->valor_desconto_sb_venda;
+        foreach ($carrinho->carItem as $value) {
+            $custoTotal[] = $value->produto->custo * $value->quantidade;
+            $precoTotal[] = $value->produto->preco * $value->quantidade;
+        }
+
+        $lucroMin = array_sum($precoTotal) - ((array_sum($precoTotal) * 30) / 100);
+        $lucroMin = array_sum($precoTotal) - $lucroMin;
+       
+        $lucro = (array_sum($precoTotal) - array_sum($custoTotal)) - $descontoTotal;
+       
+        if ($lucro > $lucroMin) {
+            return true;
+           
+        }
+
+        return false;
+    }
+
+    public function jsonVendaStorageJob($carrinho)
+    {
         // dd($carrinho);
         $dados['id'] = $carrinho->id;
         $dados['status'] = $carrinho->status;
         $dados['loja_alltech_id'] = $carrinho->usuario->loja->alltech_id;
         $dados['vendedor_alltech_id'] = $carrinho->usuario->funcionario->alltech_id;
-        // $dados['nome_vendedor'] = $carrinho->usuario->name;
         $dados['cliente'] = $carrinho->cliente->docto;
         $dados['emissao'] = $carrinho->updated_at->format('Ymd');
         $dados['qtd_desc'] = $carrinho->desconto_qtd;
@@ -573,7 +646,8 @@ class VendaController extends Controller
             } else {
                 $produto_codbar = $estoque->where('produto_id', $item->produto_id)->first();
             }
-            ($carrinho->tp_desconto == 'parcial') ? 'parcial' : (($carrinho->tp_desconto == 'porcento_unico') ? '%' : (($carrinho->tp_desconto == 'dinheiro_unico') ? '$' : null));
+            // ($carrinho->tp_desconto == 'parcial') ? 'parcial' : (($carrinho->tp_desconto == 'porcento_unico') ? '%' : (($carrinho->tp_desconto == 'dinheiro_unico') ? '$' : null));
+
             $dados['itens'][$i]['codbar'] = ($produto_codbar && $produto_codbar->codbar) ? $produto_codbar->codbar : (($produto_codbar->alltech_id) ? $produto_codbar->alltech_id : null);
             $dados['itens'][$i]['preco'] = $item->preco;
             $dados['itens'][$i]['quantidade'] = $item->quantidade;
@@ -584,7 +658,7 @@ class VendaController extends Controller
 
             $i++;
         }
-       // dd($dados);
+        // dd($dados);
         //monnta arquivo para exportação em job
         $json = json_encode($dados);
         $dir = $carrinho->usuario->loja->empresa->pasta;
