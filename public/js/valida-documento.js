@@ -210,7 +210,7 @@ function PesquisarCepCidade() {
     });
 }
 function PesquisarCEP() {
-    var cep = $("#cep").val();
+    var cep = document.getElementById('cep').value
     var erro = document.getElementById("error");
     if (cep.length > 7) {
         $.ajax({
@@ -223,7 +223,7 @@ function PesquisarCEP() {
         }).done(function (dados) {
             $("#uf").val(dados.uf);
             $("#cidade").val(dados.localidade.normalize("NFD").replace(/[^\w\s]/gi, "").toUpperCase());
-            $("#cidIbge").val(dados.ibge);
+            $("#cidIbge").val(dados.ibge.replace('-', ''));
             erro.innerHTML = ""
         });
     }

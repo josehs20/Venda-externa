@@ -16,7 +16,6 @@
         border-radius: 15px;
 
     }
-
 </style>
 
 @section('content')
@@ -39,7 +38,7 @@
                 </button>
             </form>
 
-            @if ($clientes->count())
+            @if (count($clientes))
                 @foreach ($clientes as $cliente)
                     <ul class="list-group mt-3">
                         <button class="collapsible"
@@ -212,8 +211,7 @@
                                             <button
                                                 style="float: right; border:none!important;
                                                                                                                                                                                                                                                 background-color: rgb(172, 172, 172); "
-                                                type="submit" class="js-del"
-                                                onclick="botaoInfo(<?php echo $info->id; ?>)">
+                                                type="submit" class="js-del" onclick="botaoInfo(<?php echo $info->id; ?>)">
 
                                                 <i class="bi bi-x-square"></i>
                                             </button>
@@ -225,6 +223,31 @@
                             @endforeach
                     </ul>
                 @endforeach
+                {{-- paginação --}}
+                <nav class="navegacao mt-3" aria-label="Navegação">
+                    <ul class="pagination" style="justify-content: center;">
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $clientes->previousPageUrl() }}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">voltar</span>
+                            </a>
+                        </li>
+
+                        @for ($i = 1; $i <= ($clientes->lastPage() >= 6 ? 6 : $clientes->lastPage()); $i++)
+                            <!-- a Tag for another page -->
+                            <li class="page-item"><a class="page-link"
+                                    href="{{ $clientes->url($i) }}">{{ $i }}</a></li>
+                        @endfor
+
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $clientes->url($clientes->lastPage()) }}"
+                                aria-label="Próximo">
+                                <span aria-hidden="true">... {{ $clientes->lastPage() }}</span>
+
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             @else
                 <div class="alert alert-warning" style="margin-top: 100px;" role="alert">
                     Nenhum Cliente Encontrado !
@@ -232,30 +255,7 @@
             @endif
         </div>
     </div>
-    {{-- paginação --}}
-    <nav class="navegacao mt-3" aria-label="Navegação">
-        <ul class="pagination" style="justify-content: center;">
-            <li class="page-item">
-                <a class="page-link" href="{{ $clientes->previousPageUrl() }}" aria-label="Anterior">
-                    <span aria-hidden="true">&laquo;</span>
-                    <span class="sr-only">voltar</span>
-                </a>
-            </li>
 
-            @for ($i = 1; $i <= ($clientes->lastPage() >= 6 ? 6 : $clientes->lastPage()); $i++)
-                <!-- a Tag for another page -->
-                <li class="page-item"><a class="page-link"
-                        href="{{ $clientes->url($i) }}">{{ $i }}</a></li>
-            @endfor
-
-            <li class="page-item">
-                <a class="page-link" href="{{ $clientes->url($clientes->lastPage()) }}" aria-label="Próximo">
-                    <span aria-hidden="true">... {{ $clientes->lastPage() }}</span>
-
-                </a>
-            </li>
-        </ul>
-    </nav>
     {{-- evento conspllan --}}
     <script>
         var coll = document.getElementsByClassName("collapsible");

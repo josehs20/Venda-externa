@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Venda\Desconto;
 use DateTime;
 use DateTimeZone;
+use Illuminate\Database\Eloquent\Builder;
 
 class VendaController extends Controller
 {
@@ -28,18 +29,16 @@ class VendaController extends Controller
         $produtos_carrinho_quantidade['itemCarrinho'][0] = false;
         $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = false;
 
-        $produtos = Produto::with('grades', 'estoque')->where('produtos.loja_id', auth()->user()->loja_id)->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')
-            ->paginate(30);
-        // $produtos = Produto::with('grades')->where('produtos.loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$request->nome}%'")   
-        // ->orderBy('nome')->where('situacao', 'A')->join('estoques', 'produtos.id', '=', 'estoques.produto_id')->get();
-        //dd($produtos[0]);
-        $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
+        $produtos = Produto::with('grades', 'estoque')->where('loja_id', auth()->user()->loja_id)
+            ->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->whereNotNull('preco')
+            ->whereNotNull('refcia')->whereHas('estoque', function (Builder $query) {
+                $query->whereNotNull('codbar');
+            })->orderBy('nome')->paginate(30);
 
-        // dd($carrinho );
+        $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
 
         if ($carrinho) {
             foreach ($carrinho->carItem as $key => $item) {
-
                 if ($item->i_grade_id) {
                     $produtos_carrinho_quantidade['itemCarrinhoGrade'][$item->i_grade_id] = $item->quantidade;
                     $produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id'] = $item->produto_id;
@@ -430,7 +429,6 @@ class VendaController extends Controller
 
     public function salvar_venda(Request $request)
     {
-
         $carrinho_aberto =     Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
         if ($request->cliente_id) {
@@ -511,9 +509,9 @@ class VendaController extends Controller
         $cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $request->cliente_alltech_id)->orWhere('docto', $request->cliente_alltech_id)->first();
         $upCarr =  Carrinho::find($carrinho);
 
-        $fuso = new DateTimeZone('America/New_York');
-        $data = new DateTime('22-01-1990');
-        $data->setTimezone($fuso);
+        // $fuso = new DateTimeZone('America/New_York');
+        // $data = new DateTime('22-01-1990');
+        // $data->setTimezone($fuso);
 
         $dadosCarrinho = [
             'valor_desconto' => $upCarr->valor_desconto == '0' ? null : $upCarr->valor_desconto,
@@ -539,7 +537,7 @@ class VendaController extends Controller
                 return redirect()->back();
             }
 
-          //  dd('b');
+            //dd('b');
             $upCarr->update(['status' => 'fechado']);
 
             //monta json para exportação
@@ -556,13 +554,13 @@ class VendaController extends Controller
 
     public function finaliza_venda_aprovada($carrinho)
     {
-       Carrinho::find($carrinho)->update(['status' => 'fechado']);
-       $carrinho = Carrinho::find($carrinho);
-      
-       $this->jsonVendaStorageJob($carrinho);
-     //  dd($carrinho);
-       Session::flash('success', 'Venda Finalizada Com Sucesso');
-       return redirect(route('venda.index'));
+        Carrinho::find($carrinho)->update(['status' => 'fechado']);
+        $carrinho = Carrinho::find($carrinho);
+
+        $this->jsonVendaStorageJob($carrinho);
+        //  dd($carrinho);
+        Session::flash('success', 'Venda Finalizada Com Sucesso');
+        return redirect(route('venda.index'));
     }
 
     public function desc_invalido($carrinho)
@@ -576,9 +574,12 @@ class VendaController extends Controller
     public function vendas_invalidas()
     {
 
-        $carrinhos = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', '!=', 'fechado')->orWhere('status', 'descInvalido')
+        $carrinhos = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->orWhere('status', 'descInvalido')
             ->orWhere('status', 'aprovado')->orWhere('status', 'recusado')->get();
-//dd($carrinhos);
+        $carrinhos = $carrinhos->reject(function ($carrinho) {
+            return $carrinho->status == 'Salvo' || $carrinho->status == 'fechado';
+        });
+        //dd($carrinhos);
         return view('vendedor.vendas-invalidas', compact('carrinhos'));
     }
 
@@ -589,7 +590,7 @@ class VendaController extends Controller
         return view('vendedor.venda-aprovada', compact('carrinho'));
     }
 
-  
+
 
     //------------------------------validação e montagem de exportacao-------------------------------//
 
@@ -604,12 +605,11 @@ class VendaController extends Controller
 
         $lucroMin = array_sum($precoTotal) - ((array_sum($precoTotal) * 30) / 100);
         $lucroMin = array_sum($precoTotal) - $lucroMin;
-       
+
         $lucro = (array_sum($precoTotal) - array_sum($custoTotal)) - $descontoTotal;
-       
+
         if ($lucro > $lucroMin) {
             return true;
-           
         }
 
         return false;
@@ -617,7 +617,7 @@ class VendaController extends Controller
 
     public function jsonVendaStorageJob($carrinho)
     {
-        // dd($carrinho);
+
         $dados['id'] = $carrinho->id;
         $dados['status'] = $carrinho->status;
         $dados['loja_alltech_id'] = $carrinho->usuario->loja->alltech_id;
@@ -659,31 +659,13 @@ class VendaController extends Controller
             $i++;
         }
         // dd($dados);
-        //monnta arquivo para exportação em job
+        //monta arquivo para exportação em job
         $json = json_encode($dados);
+
         $dir = $carrinho->usuario->loja->empresa->pasta;
 
-        Storage::disk('local')->makeDirectory($dir);
-        $files = Storage::disk('local')->files($dir);
-        $count = 1;
-
-        if (count($files) == 0) {
-
-            Storage::put($dir . '/VONLINE-' . $count . '.json', $json);
-            $file = $dir . '/VONLINE-' . $count . '.json';
-        } else {
-
-            foreach ($files as $key => $file) {
-                if (str_contains($file, 'VONLINE')) {
-                    $count++;
-                }
-            }
-
-            Storage::put($dir . '/VONLINE-' . $count . '.json', $json);
-            $file = $dir . '/VONLINE-' . $count . '.json';
-        }
-        //Class de Jobs para exportação 
-        // ExportaVendaJob::dispatch($file, $dir);
+        //Class Job para exportação 
+        //ExportaVendaJob::dispatch($json, $dir, $carrinho);
         return;
     }
 }

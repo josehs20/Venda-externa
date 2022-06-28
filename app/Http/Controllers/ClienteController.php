@@ -21,7 +21,14 @@ class ClienteController extends Controller
     public function index(Request $request, $msg = null)
     {
         $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
-            ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->paginate(30);
+            ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->get();
+
+        $clientes = $clientes->reject(function ($cliente) {
+            return $cliente->alltech_id == '999999';
+        });
+
+        //  dd(auth()->user()->loja_id);
+        $clientes = count($clientes) ? $clientes->toQuery()->paginate(30) : [];
 
         return view('cliente.index', compact('clientes', 'msg'));
     }
@@ -31,17 +38,26 @@ class ClienteController extends Controller
         $codigo = $_GET['codigo'];
 
         if ($nome || $nome === "") {
-            $dados['nome'] = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->get();
+
+            if ($nome === "") {
+                $clientes = Cliente::where('loja_id', auth()->user()->loja_id)->get();
+                //dd($clientes);
+            } else {
+                $clientes = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->get();
+            }
+
+            $dados['nome'] = $clientes->reject(function ($cliente) {
+                return $cliente->alltech_id == '999999';
+            });
         }
-        
+
         if ($codigo) {
             //$cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
             $cliente = Cliente::with('enderecos')->where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
-           $dados['codigo'] = $cliente;
-           if ($cliente) {
-            $dados['cidade'] = $cliente->enderecos->cidadeIbge;
-           }
-          
+            $dados['codigo'] = $cliente;
+            if ($cliente) {
+                $dados['cidade'] = $cliente->enderecos->cidadeIbge;
+            }
         }
 
         echo json_encode($dados);
@@ -156,22 +172,32 @@ class ClienteController extends Controller
                     return;
                 }
             }
-            $cliente->update([
-                'docto' => $_PUT['docto'],
-                'nome' => $_PUT['nome'],
-                'email' => $_PUT['email'],
-                'fone1' => strlen($_PUT['telefones'][0]) > 7 ? $_PUT['telefones'][0] : null,
-                'fone2' => strlen($_PUT['telefones'][1]) > 7 ? $_PUT['telefones'][1] : null,
-                'celular' => strlen($_PUT['telefones'][2]) > 7 ? $_PUT['telefones'][2] : null,
-            ]);
-            $cliente->enderecos()->update([
-                'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
-                'cep' => preg_replace("/[^0-9]/", "", $_PUT['cep']),
-                'bairro' => $_PUT['bairro'],
-                'rua' => $_PUT['rua']  ? $_PUT['rua']  : null,
-                'numero' => $_PUT['numero'] ? intval($_PUT['numero']) : null,
-                'compto' => $_PUT['complemento'] ? $_PUT['complemento'] : null,
-            ]);
+
+            $lojas = $cliente->loja->empresa->lojas;
+            
+            //Atualiza cliente parar todas lojas
+            foreach ($lojas as $key => $loja) {
+
+                $cliente =  $loja->clientes()->where('alltech_id', $cliente->alltech_id)->first();
+
+                $cliente->update([
+                    'docto' => $_PUT['docto'],
+                    'nome' => $_PUT['nome'],
+                    'email' => $_PUT['email'],
+                    'fone1' => strlen($_PUT['telefones'][0]) > 7 ? $_PUT['telefones'][0] : null,
+                    'fone2' => strlen($_PUT['telefones'][1]) > 7 ? $_PUT['telefones'][1] : null,
+                    'celular' => strlen($_PUT['telefones'][2]) > 7 ? $_PUT['telefones'][2] : null,
+                ]);
+                $cliente->enderecos()->update([
+                    'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
+                    'cep' => preg_replace("/[^0-9]/", "", $_PUT['cep']),
+                    'bairro' => $_PUT['bairro'],
+                    'rua' => $_PUT['rua']  ? $_PUT['rua']  : null,
+                    'numero' => $_PUT['numero'] ? intval($_PUT['numero']) : null,
+                    'compto' => $_PUT['complemento'] ? $_PUT['complemento'] : null,
+                ]);
+            }
+
             $dados['success'] = true;
             echo json_encode($dados);
             $cliente = Cliente::find($_PUT['id']);
@@ -185,11 +211,11 @@ class ClienteController extends Controller
     public function jsonClienteStorageJob($cliente)
     {
         $dados['id'] = $cliente->id;
-       // $dados['alltech_id'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? "-" . $cliente->alltech_id : $cliente->alltech_id;
+        // $dados['alltech_id'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? "-" . $cliente->alltech_id : $cliente->alltech_id;
         $dados['loja_id'] = $cliente->loja_id;
         $dados['loja_alltech_id'] = $cliente->loja->alltech_id;
         $dados['nome'] = $cliente->nome;
-        $dados['docto'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? '-'. $cliente->docto : $cliente->docto;
+        $dados['docto'] = $_SERVER['REQUEST_METHOD'] == 'PUT' ? '-' . $cliente->docto : $cliente->docto;
         $dados['tipo'] =  $cliente->tipo;
         $dados['email'] = trim($cliente->email) ? trim($cliente->email) : null;
         $dados['fone1'] = $cliente->fone1;
@@ -208,28 +234,9 @@ class ClienteController extends Controller
         $json = json_encode($dados);
 
         $dir = $cliente->loja->empresa->pasta;
-        Storage::disk('local')->makeDirectory($dir);
-        $files = Storage::disk('local')->files($dir);
-        $count = 1;
-
-        if (count($files) == 0) {
-
-            Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
-            $file = $dir . '/CLIENTE-' . $count . '.json';
-        } else {
-
-            foreach ($files as $key => $file) {
-                if (str_contains($file, 'CLIENTE')) {
-                    $count++;
-                }
-            }
-
-            Storage::put($dir . '/CLIENTE-' . $count . '.json', $json);
-            $file = $dir . '/CLIENTE-' . $count . '.json';
-        }
 
         //Class de Jobs para exportação 
-        //ExportaClienteJob::dispatch($file, $dir);
+        //ExportaClienteJob::dispatch($json, $dir);
         return;
     }
 

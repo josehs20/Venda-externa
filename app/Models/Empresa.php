@@ -16,4 +16,12 @@ class Empresa extends Model
         return $this->hasMany('App\Models\Loja');
     }
 
+    public function logs() {
+        return $this->hasMany('App\Models\Log');
+    }
+
+    public function arquivosExp() {
+        return $this->hasMany('App\Models\ArquivoExportado');
+    }
+
 }

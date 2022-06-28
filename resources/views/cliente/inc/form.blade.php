@@ -79,7 +79,7 @@
 
 <div class="col-md-2">
     <label for="inputAddress" class="form-label">CEP</label>
-    <input onblur="PesquisarCEP()" onkeyup="PesquisarCEP()" id="cep" type="number" required
+    <input onblur="PesquisarCEP()" onkeyup="PesquisarCEP()" id="cep" type="text" required
         value="{{ $cliente && $cliente->enderecos ? $cliente->enderecos->cep : '' }}" class="form-control">
     <a style=" color: red" id="error"></a>
     <input type="hidden" id="cidIbge"

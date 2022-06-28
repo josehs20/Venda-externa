@@ -6,10 +6,6 @@
         .carregando {
             display: none;
         }
-
-        #campoInserirEntrada {
-            display: none;
-        }
     </style>
     @include('componentes.navbar', ['titulo' => 'Itens'])
     <br><br><br><br>
@@ -151,7 +147,7 @@
                                     <div class="col-6">
                                         <div class="form-floating">
                                             <input name="parcelas" readonly min="1" type="text" class="form-control"
-                                                placeholder="1" value="1" id="inputParcelas">
+                                                placeholder="1" value="{{$carrinho->parcelas}}" id="inputParcelas">
                                             <label for="floatingInputGrid">Parcelas</label>
                                         </div>
                                     </div>
@@ -179,8 +175,8 @@
                                     @if ($carrinho->valor_entrada)
                                         <div id="campoInserirEntrada" class="col-12">
                                             <div class="form-floating">
-                                                <input id="valor_entrada" name="valor_entrada" type="number"
-                                                    class="form-control" min="0">
+                                                <input readonly id="valor_entrada" name="valor_entrada" type="text"
+                                                    class="form-control" min="0" value="{{reais($carrinho->valor_entrada)}}">
 
                                                 <label for="floatingInputGrid">Aplicar algum valor de entrada ?</label>
                                             </div>

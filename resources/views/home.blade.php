@@ -43,36 +43,58 @@
                 @php
                     $p++;
                 @endphp
+                @if ($produto->grades)
+                    <a class="listHome" data-bs-toggle="modal"
+                        data-bs-target="#Grade{{ $produto->id }}
+                        style="cursor: pointer">
+                        <ul class="list-group">
+                            <li class="list-group-item" style="background-color: rgb(58, 36, 252)">
+                                <div class="listCar">
+                                    <h6 style="color: white">{{ $produto->nome }}</h6>
 
-                <a class="listHome" style="cursor: pointer">
-                    <ul class="list-group">
-                        <li class="list-group-item" style="background-color: rgb(58, 36, 252)">
-                            <div class="listCar">
-                                <h6 style="color: white">{{ $produto->nome }}</h6>
-                                @if ($produto->grades)
                                     <button type="button" class="buttonAdd" data-bs-toggle="modal"
                                         data-bs-target="#Grade{{ $produto->id }}"><img id="imgg" class="imgCarr"
                                             src="{{ asset('addCar.ico') }}" alt=""></button>
-                                @else
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="listCar">
+                                    <span> Preço :</span>
+
+                                    <h5>R$ {{ reais($produto->preco) }}</h5>
+
+                                </div>
+                            </li>
+
+                        </ul>
+                    </a>
+                @else
+                    <a class="listHome" data-bs-toggle="modal" data-bs-target="#SemGrade{{ $produto->id }}"
+                        style="cursor: pointer">
+                        <ul class="list-group">
+                            <li class="list-group-item" style="background-color: rgb(58, 36, 252)">
+                                <div class="listCar">
+                                    <h6 style="color: white">{{ $produto->nome }}</h6>
+
                                     <button type="button" class="buttonAdd" data-bs-toggle="modal"
                                         data-bs-target="#SemGrade{{ $produto->id }}"><img id="imgg" class="imgCarr"
                                             src="{{ asset('addCar.ico') }}" alt="">
-                                @endif
 
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="listCar">
-                                <span> Preço :</span>
 
-                                <h5>R$ {{ reais($produto->preco) }}</h5>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="listCar">
+                                    <span> Preço :</span>
 
-                            </div>
-                        </li>
+                                    <h5>R$ {{ reais($produto->preco) }}</h5>
 
-                    </ul>
-                </a>
+                                </div>
+                            </li>
 
+                        </ul>
+                    </a>
+                @endif
                 {{-- Modal Sem grade --}}
                 <div class="modal fade" id="SemGrade{{ $produto->id }}" data-bs-backdrop="static"
                     data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -102,7 +124,8 @@
                                             </div>
                                         @else
                                             <input id="inputProdutoSemGrade<?php echo $produto->id; ?>" class="form-control"
-                                                type="number" min="0" max="100000" step=".01" placeholder="0.0">
+                                                type="number" min="0" max="100000" step=".01"
+                                                placeholder="0.0">
                                             <div class="input-group-text">
                                                 <span class="">{{ $produto->un }}</span>
                                             </div>
@@ -124,7 +147,8 @@
                 @if ($produto->grades)
                     {{-- Modal Caso Produtos tenham grade --}}
                     <div class="modal fade" id="Grade{{ $produto->id }}" data-bs-backdrop="static"
-                        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                        aria-hidden="true">
                         <div class="modal-dialog modal-dialog-scrollable">
                             <form id="formModalComGrade" name="addItemComGrade" method="POST" class="list">
                                 @csrf
@@ -150,8 +174,8 @@
                                                     </div>
 
                                                     <input disabled id="inputGradeqtdInteiro<?php echo $i; ?>"
-                                                        class="form-control valid_input" type="number" min="0" max="100000"
-                                                        step=".01"
+                                                        class="form-control valid_input" type="number" min="0"
+                                                        max="100000" step=".01"
                                                         placeholder="{{ $produtos_carrinho_quantidade['itemCarrinhoGrade'][$ig->id] }}">
                                                     <div class="input-group-text">
                                                         <span class="">{{ $produto->un }}</span>
@@ -173,8 +197,8 @@
                                                         <span class="">{{ $ig->tam }}</span>
                                                     </div>
                                                     <input disabled id="inputGradeqtdInteiro<?php echo $i; ?>"
-                                                        class="form-control valid_input" type="number" min="0" max="100000"
-                                                        step=".01" placeholder="Quantidade">
+                                                        class="form-control valid_input" type="number" min="0"
+                                                        max="100000" step=".01" placeholder="Quantidade">
 
 
                                                     <div class="input-group-text">
@@ -235,6 +259,5 @@
             Nenhuma Produto Encontrado !
         </div>
     @endif
-
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewhome.js') }}" defer></script>
