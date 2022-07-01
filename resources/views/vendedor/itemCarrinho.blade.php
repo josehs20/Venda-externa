@@ -61,7 +61,7 @@
                     data-bs-target="#salvarItensRetornados">
                     Salvar Itens
                 </button>
-
+             
                 {{-- finaliza venda com cliente  E salvar itens novamente para cliente --}}
                 @include('vendedor.inc.com-cliente')
             @else

@@ -9,7 +9,7 @@ use App\Models\Cliente;
 use App\Models\InfoCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 
 class ClienteController extends Controller
 {
@@ -174,7 +174,7 @@ class ClienteController extends Controller
             }
 
             $lojas = $cliente->loja->empresa->lojas;
-            
+
             //Atualiza cliente parar todas lojas
             foreach ($lojas as $key => $loja) {
 
@@ -231,12 +231,12 @@ class ClienteController extends Controller
         $dados['compto'] = $cliente->enderecos->compto;
         $dados['tipo_endereco'] = $cliente->enderecos->tipo;
 
-        $json = json_encode($dados);
+        $json =  json_encode($dados, JSON_PRETTY_PRINT);
 
         $dir = $cliente->loja->empresa->pasta;
 
         //Class de Jobs para exportação 
-        //ExportaClienteJob::dispatch($json, $dir);
+        ExportaClienteJob::dispatch($json, $dir);
         return;
     }
 
@@ -251,20 +251,26 @@ class ClienteController extends Controller
         //
     }
 
-    public function venda_salva()
+    public function venda_salva(Request $request)
     {
 
-        $carrinhos_Salvos = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Salvo')->get();
-        foreach ($carrinhos_Salvos as $key => $carrinho) {
-            $carrinho['somaItens'] = $carrinho->carItem()->selectRaw("sum(preco * quantidade) total")->get();
-        }
+        $busca = $request->nome_n_pedido;
+
+        $carrinhos = Carrinho::with('carItem', 'cliente')->where('user_id', auth()->user()->id)
+            ->where('status', 'like', 'Salvo')->where('n_pedido', 'like', '%' . $busca . '%')
+            ->orWhereHas('cliente', function (Builder $query) use ($busca) {
+               
+                $query->where('loja_id', auth()->user()->loja_id)->where('nome', 'like', '%' . $busca . '%');
+           
+            })->get()->reject(function ($c) {
+                return $c->user_id != auth()->user()->id;
+            });
+
+        $carrinhos = $carrinhos->count() ? $carrinhos->toQuery()->paginate(30) : [];
+
         $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
-        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->take(100)->get();
-
-        Session::flash('itens_salvo');
-
-        return view('cliente.vendaSalva', compact('carrinhos_Salvos', 'cliente_carrinho', 'clientes_user'));
+        return view('cliente.vendaSalva', compact('carrinhos', 'cliente_carrinho'));
     }
 
     public function substitui_carrinho(Request $request, $carrinho)

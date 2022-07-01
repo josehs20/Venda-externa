@@ -55,55 +55,103 @@ $(function () {
     }
 })
 
-function verificaDesconto(value, valorTotal, qtd_desconto_antigo) {
-    var input = document.getElementById("inputDesconto");
-    if (value == 'porcento') {
-        input.disabled = false;
+$(function () {
+    var valor_desconto_sobre_venda = document.getElementById('valor_desconto_sobre_venda')
+    var select_desconto_sb_venda = document.getElementById('select_desconto_sb_venda')
 
-    } else if (value == 'dinheiro') {
-        input.disabled = false;
+    if (valor_desconto_sobre_venda != null && valor_desconto_sobre_venda.value != '') {
+        var select = document.getElementById('tp_desconto_sobre_venda_modal')
+        select.value = select_desconto_sb_venda.value
 
-    } else if (value == 0) {
-        input.disabled = true;
-        input.value = "";
+        verificaSelectDescSobreVenda()
+
     }
 
-    calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, value)
+})
+function verificaSelectDescSobreVenda() {
+    var input = document.getElementById('inputDesconto')
+    var select = document.getElementById('tp_desconto_sobre_venda_modal')
+    var dadosDesconto = { input: '', select: '' }
+
+    if (select.value == 'porcento') {
+        input.disabled = false;
+        return dadosDesconto = { input: input.value, select: select.value }
+
+    } else if (select.value == 'dinheiro') {
+        input.disabled = false;
+        return dadosDesconto = { input: input.value, select: select.value }
+
+    } else if (select.value == 0) {
+        input.disabled = true;
+        input.value = "";
+
+        return dadosDesconto;
+
+    }
+
+}
+function verificaDesconto(valorTotal, qtd_desconto_antigo) {
+
+    var dadosDesconto = verificaSelectDescSobreVenda()
+
+    if (dadosDesconto.input != '' && dadosDesconto.select != '') {
+
+        calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, dadosDesconto.select)
+        return
+    } else {
+        dadosDesconto.input = 0
+
+        calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, dadosDesconto.select)
+    }
 }
 
 function calculoDescontoSobreVenda(valorTotal, qtd_desconto_antigo, tp_desconto) {
-    var qtd_desconto = document.getElementById("inputDesconto").value;
-    // console.log(valorTotal);
+    var valor_desconto_sobre_venda = document.getElementById('valor_desconto_sobre_venda')
+    var qtd_desconto = document.getElementById("inputDesconto");
+    var valorTotal = parseFloat(valorTotal)
+    var qtd_desconto_antigo = qtd_desconto_antigo == undefined ? 0 : parseFloat(qtd_desconto_antigo)
 
-    if (qtd_desconto) {
-        //caso valor seja undefined
-        !qtd_desconto_antigo ? qtd_desconto_antigo = 0 : false;
-        !valorDesconto ? valorDesconto = 0 : false;
-
-        var tp_desconto = $('#tp_desconto_sobre_venda_modal').val();
-        var valorDesconto = tp_desconto == 'porcento' ? ((parseFloat(valorTotal)) / 100) * qtd_desconto : qtd_desconto;
-
-        var novoValorTotalModal = parseFloat(valorTotal) - parseFloat(valorDesconto);
-
-        var novoValorDescontoModal = parseFloat(qtd_desconto_antigo) + parseFloat(valorDesconto);
-        console.log(valorTotal, valorDesconto, qtd_desconto_antigo);
-        atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto)
-
-    } else {
-
-        var novoValorTotalModal = parseFloat(valorTotal);
-        var novoValorDescontoModal = !qtd_desconto_antigo ? qtd_desconto_antigo = 0 : parseFloat(qtd_desconto_antigo);
-
-        atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto = null)
+    //caso exista valor no banco de dados sobre a venda obs: só existirá caso a venda seja rejeitada pelo cotroller finalizar_venda
+    if (valor_desconto_sobre_venda != null && valor_desconto_sobre_venda.value != '') {
+        valor_desconto_sobre_venda = parseFloat(valor_desconto_sobre_venda.value)
+        valorTotal += valor_desconto_sobre_venda
     }
 
+    //se valor de desconto no input for vazio tem qeu atribuir 0 para evitar NaN
+    qtd_desconto = qtd_desconto.value === '' ? 0 : parseFloat(qtd_desconto.value)
+
+    //caso tipo desconto seja undefined pelo retorno da função verificaSelectDescSobreVenda
+    if (tp_desconto == undefined) {
+        tp_desconto = document.getElementById('tp_desconto_sobre_venda_modal').value
+    }
+
+    var valorDesconto = tp_desconto == 'porcento' && qtd_desconto != 0 ? (valorTotal / 100) * qtd_desconto : qtd_desconto;
+
+    var novoValorTotalModal = valorTotal - valorDesconto;
+
+    var novoValorDescontoModal = qtd_desconto_antigo + valorDesconto;
+
+    novoValorTotalModal = novoValorTotalModal.toFixed(2);
+
+    novoValorDescontoModal = novoValorDescontoModal.toFixed(2);
+
+    atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto)
 }
 
 function atualizaViewModalFinalizaVendaItensCarrinho(novoValorTotalModal, novoValorDescontoModal, valorDesconto) {
 
-    // console.log(parseFloat(novoValorDescontoModal));
-    document.getElementById('valorTotalModal').textContent = novoValorTotalModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
-    document.getElementById('valorDescontoModal').textContent = novoValorDescontoModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
+    if (novoValorTotalModal < 0) {
+        document.getElementById('valorTotalModal').textContent = 'Valor negativo';
+        document.getElementById('valorDescontoModal').textContent = 'Valor negativo';
+        document.getElementById('valorDescontoModal').style.color = 'red'
+        document.getElementById('valorTotalModal').style.color = 'red'
+    } else {
+        document.getElementById('valorTotalModal').textContent = novoValorTotalModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
+        document.getElementById('valorDescontoModal').textContent = novoValorDescontoModal.toLocaleString('pt-br', { minimumFractionDigits: 2 });
+        document.getElementById('valorDescontoModal').style.color = 'black'
+        document.getElementById('valorTotalModal').style.color = 'black'
+
+    }
 
     $('#hiddenValorTotalModal').val(novoValorTotalModal);
     $('#hiddenValorDescontoModal').val(novoValorDescontoModal);
@@ -117,6 +165,17 @@ $(function () {
         var parcelas = document.getElementById("inputParcelas").value;
         var cod = $("#clienteCodigo").val();
         var nome = $("#clienteNomeVenda").val();
+        var valorTotal = document.getElementById('hiddenValorTotalModal')
+
+        if (valorTotal.value < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Valor de venda negativo valor: ' + valorTotal.value,
+                showConfirmButton: false,
+                timer: 2500
+            });
+            return
+        }
 
         $.ajax({
             url: "/busca_cliente",
@@ -129,7 +188,6 @@ $(function () {
             dataType: 'json',
         }).done(function (response) {
 
-            console.log(response);
             if (response.codigo.docto == null || response.codigo.enderecos.cep == null || response.codigo.enderecos.rua == null) {
                 Swal.fire({
                     icon: 'error',
@@ -271,8 +329,8 @@ $(function () {
             },
             dataType: 'json',
         }).done(function (response) {
-            console.log(response);
-            if (!response['codigo']) {
+            //console.log(response);
+            if (!response['codigo'] || !response['nome']) {
 
                 document.getElementById('nomeValid').innerHTML = "Cliente ou codigo não existem";
             } else {
@@ -545,7 +603,7 @@ function montaListaModalSalvaVendaCliente(array, objetosClientes) {
 
         var array = Object.keys(clientes)
             .map(function (key) {
-                monta_consulta += '<a onclick="submitFormularioSalvarVenda('+ clientes[key]['id'] +')">'
+                monta_consulta += '<a onclick="submitFormularioSalvarVenda(' + clientes[key]['id'] + ')">'
                 monta_consulta += '<li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;" class="list-group-item d-flex justify-content-between align-items-center">' + clientes[key]['nome']
                 monta_consulta += '<button type="submit" name="cliente_id" value="' + clientes[key]['id'] + '" class="lupa-list"><i class="bi bi-save2"></i></button>'
                 monta_consulta += '</li></a>'

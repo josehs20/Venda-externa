@@ -11,6 +11,7 @@ class Carrinho extends Model
         'id',
         'user_id',
         'data',
+        'n_pedido',
         'valor_desconto',
         'desconto_qtd',
         'tp_desconto',

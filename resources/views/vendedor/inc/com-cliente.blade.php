@@ -42,7 +42,7 @@
                 </div>
                 <div class="col-7">
                     <h6 class="">Desconto: R$
-                        <b id="valorDescontoModal">{{ reais($carrinho->valor_desconto) }}</b>
+                        <b id="valorDescontoModal">{{ reais($carrinho->valor_desconto + $carrinho->valor_desconto_sb_venda) }}</b>
                     </h6>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                 <input type="hidden" name="hiddenInputValorDescontoModal" id="hiddenValorDescontoModal"
                     value="<?php echo $carrinho->valor_desconto; ?>">
                 <input type="hidden" name="hiddenInputValorDescontoSobreVendaModal"
-                    id="hiddenValorDescontoSobreVendaModal" value="">
+                    id="hiddenValorDescontoSobreVendaModal" value="<?php echo $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : ''; ?>">
 
                 <span class="mx-3"><b>Cliente Já Mencionado</b></span>
                 <div class="modal-body">
@@ -95,16 +95,18 @@
                                 <input disabled
                                     onkeyup="calculoDescontoSobreVenda(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
                                     name="qtd_desconto_sobre_venda" type="number" required class="form-control"
-                                    min="0.01" step="0.01" value="{{ $carrinho->qtd_unificado }}" id="inputDesconto">
+                                    min="0.01" step="0.01" value="{{ $carrinho->desconto_qtd_sb_venda }}" id="inputDesconto">
                                 <label for="floatingInputGrid">Desconto</label>
                             </div>
                         </div>
                         <div class="col-4">
                             <span></span>
                             <div class="form-floating">
+                                <input type="hidden" id="valor_desconto_sobre_venda" value="<?php echo $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : ''; ?>" name="">
+                                <input type="hidden" id="select_desconto_sb_venda" value="<?php echo $carrinho->tp_desconto_sb_venda ? $carrinho->tp_desconto_sb_venda : ''; ?>" name="">
                                 <select name="tp_desconto_sb_venda" class="form-select"
                                     id="tp_desconto_sobre_venda_modal"
-                                    onchange="verificaDesconto(this.value, <?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
+                                    onchange="verificaDesconto(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
                                     aria-label="Floating label select example">
                                     <option selected value="0">selecione...</option>
                                     <option value="porcento">%</option>

@@ -73,11 +73,9 @@ trait AuthenticatesUsers
      */
     protected function validateLogin(Request $request)
     {
-        $verifica = User::where('email', $request->email)->first();
-     //   $funario =  Funario::where('user_id', $verifica->id)->first();
-        
-        //dd($verifica);
-        if (!$verifica or $verifica->perfil != 'vendedor') {
+        $verifica = User::where('email', $request->email)->where('perfil', 'vendedor')->first();
+
+        if (!$verifica) {
 
             return $this->sendFailedLoginResponse($request);
 

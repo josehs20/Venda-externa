@@ -29,20 +29,10 @@
     <div id="elemento_ajax_html" name="addItem" method="POST" class="list">
         @php
             $i = 0;
-            $p = 0;
         @endphp
-
-        @if (!$produtos->count())
-            <div class="alert alert-warning mt-5" role="alert">
-                Nenhuma Produto Encontrado !
-            </div>
-        @endif
 
         @foreach ($produtos as $produto)
             @if ($produto->estoque)
-                @php
-                    $p++;
-                @endphp
                 @if ($produto->grades)
                     <a class="listHome" data-bs-toggle="modal"
                         data-bs-target="#Grade{{ $produto->id }}
@@ -228,8 +218,11 @@
             @endif
         @endforeach
     </div>
-
-    @if ($p != 0)
+    @if (!$produtos->count())
+        <div class="alert alert-warning mt-5" role="alert">
+            Nenhuma Produto Encontrado !
+        </div>
+    @else
         {{-- paginação --}}
         <nav class="navegacao" aria-label="Navegação">
             <ul class="pagination" style="justify-content: center;">
@@ -254,10 +247,7 @@
                 </li>
             </ul>
         </nav>
-    @else
-        <div class="alert alert-warning mt-5" role="alert">
-            Nenhuma Produto Encontrado !
-        </div>
     @endif
+
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewhome.js') }}" defer></script>

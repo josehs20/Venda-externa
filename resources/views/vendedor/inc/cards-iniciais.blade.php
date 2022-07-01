@@ -27,9 +27,12 @@
                              <i class="bi bi-cash-stack">&ensp;{{reais($carrinho->valor_desconto + $carrinho->valor_desconto_sb_venda)}} </i>
                          </div>
                          <div class="inner">
-                             <p style="color:black;">
-                                 &ensp;{{ $carrinho->tp_desconto == 'porcento_unico' ? "Unificado em % $carrinho->desconto_qtd" : ($carrinho->tp_desconto == 'dinheiro_unico' ? "Unificado em R$ $carrinho->desconto_qtd" : (!$carrinho->tp_desconto ? 'Nenhum Desconto Aplicado' : 'Desconto Dado Parcialmente')) }}
-                             </p>
+                            @if ($carrinho->tp_desconto)
+                            <p style="color:black;">
+                                &ensp;{{ $carrinho->tp_desconto == 'porcento_unico' ? "Unificado em % $carrinho->desconto_qtd" : ($carrinho->tp_desconto == 'dinheiro_unico' ? "Unificado em R$ $carrinho->desconto_qtd" : 'Desconto Dado Parcialmente') }}
+                            </p>
+                            @endif
+                            
                              @if ($carrinho->valor_desconto_sb_venda)
                              <p style="color:black;">
                                 {{ $carrinho->tp_desconto_sb_venda == 'porcento' ? "Desconto dado sobre a venda em % $carrinho->desconto_qtd_sb_venda" : ($carrinho->tp_desconto_sb_venda == 'dinheiro' ? "Desconto dado sobre a venda em R$ $carrinho->desconto_qtd_sb_venda" : '') }}

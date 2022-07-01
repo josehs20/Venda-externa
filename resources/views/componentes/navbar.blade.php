@@ -491,7 +491,7 @@
                     <p><a href="{{ route('clientes.create') }}">Cadastro De Cliente</a></p>
                     <p><a href="{{ route('vendas_finalizadas') }}">Vendas Finalizadas</a></p>
                     <p><a href="{{ route('venda_salva') }}">Vendas Salvas</a></p>
-                    <p><a href="{{ route('vendas_invalidas') }}">Vendas Em Espera</a></p>
+                    <p><a href="{{ route('vendas_invalidas') }}">Vendas Em Análise</a></p>
                 </div>
             </li>
 
@@ -531,7 +531,7 @@
                 <p><a href="{{ route('clientes.create') }}">Cadastro De Cliente</a></p>
                 <p><a href="{{ route('vendas_finalizadas') }}">Vendas Finalizadas</a></p>
                 <p><a href="{{ route('venda_salva') }}">Vendas Salvas</a></p>
-                <p><a href="{{ route('vendas_invalidas') }}">Vendas Em Espera</a></p>
+                <p><a href="{{ route('vendas_invalidas') }}">Vendas Em Análise</a></p>
             </div>
         </li>
         <li class="main__navigations__div__li">

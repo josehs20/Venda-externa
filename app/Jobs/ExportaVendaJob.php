@@ -46,7 +46,6 @@ class ExportaVendaJob implements ShouldQueue
 
         $count = 1;
 
-
         //numeração de loja para nomear arquivo
         $num = "000";
         $num .= $this->carrinho->usuario->loja->alltech_id;

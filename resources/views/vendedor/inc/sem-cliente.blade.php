@@ -76,7 +76,7 @@
                                  sobre a
                                  venda?</u></span>
                          <br><br>
-
+                         
                          {{-- Desconto --}}
                          <div class="row g-2">
                              <div class="col-8">
@@ -92,8 +92,7 @@
                                  <div class="form-floating">
                                      <select name="tp_desconto_sb_venda" class="form-select"
                                          id="tp_desconto_sobre_venda_modal"
-                                         onchange="verificaDesconto(this.value, <?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
-                                         aria-label="Floating label select example">
+                                         onchange="verificaDesconto(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)">
                                          <option selected value="0">selecione...</option>
                                          <option value="porcento">%</option>
                                          <option value="dinheiro">R$</option>
@@ -248,14 +247,15 @@
                          <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>
                          <ul class="list-group">
                              @foreach ($clientes_user as $cliente)
-                             <a onclick="submitFormularioSalvarVenda(<?php echo $cliente->id ?>)">
-                                 <li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;"
-                                     class="list-group-item d-flex justify-content-between align-items-center">
-                                     {{ $cliente->nome }}
-                                     <button id="submitFormularioSalvarVenda<?php echo $cliente->id ?>" type="submit" name="cliente_id" value="{{ $cliente->id }}"
-                                         class="lupa-list"><i class="bi bi-save2"></i></button>
-                                 </li>
-                                </a>
+                                 <a onclick="submitFormularioSalvarVenda(<?php echo $cliente->id; ?>)">
+                                     <li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;"
+                                         class="list-group-item d-flex justify-content-between align-items-center">
+                                         {{ $cliente->nome }}
+                                         <button id="submitFormularioSalvarVenda<?php echo $cliente->id; ?>" type="submit"
+                                             name="cliente_id" value="{{ $cliente->id }}" class="lupa-list"><i
+                                                 class="bi bi-save2"></i></button>
+                                     </li>
+                                 </a>
                              @endforeach
 
                          </ul>
