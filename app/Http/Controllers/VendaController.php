@@ -55,13 +55,6 @@ class VendaController extends Controller
         $dados['produtos'] = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)
             ->where('situacao', 'A')->whereRaw("nome like '%{$_GET['busca']}%'")->orderBy('nome')
             ->take(30)->get();
-
-        // foreach ($dados['produtos'] as $p) {
-        //     if ($p['grades']) {
-        //         $p = $p['grades']['iGrades'];
-        //     }
-        //     // $dados['busca'];
-        // }
         echo  json_encode($dados);
     }
 

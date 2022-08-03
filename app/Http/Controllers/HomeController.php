@@ -26,14 +26,14 @@ class HomeController extends Controller
     public function index()
     {
 
-        $funario = Funario::where('user_id', auth()->user()->id)->first();
+        // $funario = Funario::where('user_id', auth()->user()->id)->first();
 
-        if (auth()->user()->perfil === 'vendedor' && $funario->status === 'Ativo') {
-            Session::flash('success', 'Bem vindo');
-            return redirect(route('venda.index'));
-        }
+        // if (auth()->user()->perfil === 'vendedor' && $funario->status === 'Ativo') {
+        //     Session::flash('success', 'Bem vindo');
+        //     return redirect(route('venda.index'));
+        // }
       
-        Session::flash('error', 'Sem permissão de acesso');
-        return redirect('/');
+        // Session::flash('error', 'Sem permissão de acesso');
+        // return redirect('/');
     }
 }
