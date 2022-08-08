@@ -10,8 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
-
+    use HasApiTokens, HasFactory, Notifiable; 
     /**
      * The attributes that are mass assignable.
      *
@@ -21,8 +20,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'loja',
+        'user_alltech',
     ];
 
+    public $incrementing = false;
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -42,17 +44,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function loja() {
+    public function loja()
+    {
         return $this->belongsTo('App\Models\Loja');
     }
 
-    public function vendedor() {
+    public function vendedor()
+    {
         return $this->perfil == 'vendedor';
     }
-   
+
     public function funcionario()
     {
         return $this->hasOne('App\Models\Funario');
     }
-
 }

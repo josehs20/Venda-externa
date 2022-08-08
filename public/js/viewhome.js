@@ -244,3 +244,134 @@ function solicitacaoDesconto() {
     })
 }
 
+async function modalAddProduto(nome, preco, grade, item_estoque_id) {
+
+    var grade = grade ? 'Grade: ' + grade : ''
+
+    const { value: formValue } = await Swal.fire({
+        title: nome,
+        html:
+            `<div class="d-flex justify-content-center">
+            <h5 class="card-title mx-5 text-primary">R$: ${preco}</h5>
+            <h5 class="card-title mx-5 text-info">${grade}</h5>
+            </div>
+          <input style="width:200px;" id="quantidadeProduto" placeholder="Quantidade" class="swal2-input">`,
+        focusConfirm: false,
+        confirmButtonText: 'Adicionar',
+        preConfirm: () => {
+            return [
+                document.getElementById('quantidadeProduto').value,
+            ]
+        }
+    })
+
+    if (formValue) {
+        addItemCarrinho(item_estoque_id, formValue)
+    }
+
+}
+
+function addItemCarrinho(item, quantidade) {
+    if (!quantidade || quantidade == 0) {
+        Swal.fire({
+            icon: 'error',
+            title: "Quantidade Inválida",
+            showConfirmButton: false,
+            timer: 1500
+        })
+        return
+    }
+    $.ajax({
+        url: "/venda",
+        type: "POST",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data: {
+            id: item,
+            quantidade: quantidade,
+        },
+        dataType: 'json',
+        success: function (response) {
+            console.log(response);
+        },
+        error: function (response){
+            console.log(response);
+        }
+    })
+}
+
+async function carrinhoFixedHome(params) {
+
+
+    const { value: formValues } = await Swal.fire({
+        title: 'ITENS ADICIONADOS',
+        html:
+            `<label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3">
+          <i class="input-group-text bg-white bi bi-dash-circle"></i>
+          <input type="text" class="form-control">
+          <i class="input-group-text bg-white bi bi-plus-circle mr-2"></i>
+        </div>
+        <label for="basic-url" class="form-label">Your vanity URL</label>
+        <div class="input-group mb-3">
+        <i class="input-group-text bg-white bi bi-dash-circle"></i>
+        <input type="text" class="form-control">
+        <i class="input-group-text bg-white bi bi-plus-circle mr-2"></i>
+      </div>
+      <label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3">
+          <i class="input-group-text bg-white bi bi-dash-circle"></i>
+          <input type="text" class="form-control">
+          <i class="input-group-text bg-white bi bi-plus-circle mr-2"></i>
+        </div>
+        <label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3">
+          <i class="input-group-text bg-white bi bi-dash-circle"></i>
+          <input type="text" class="form-control">
+          <i class="input-group-text bg-white bi bi-plus-circle mr-2"></i>
+        </div>
+        <label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3">
+          <i class="input-group-text bg-white bi bi-dash-circle"></i>
+          <input type="text" class="form-control">
+          <i class="input-group-text bg-white bi bi-plus-circle mr-2"></i>
+        </div>
+        <label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3">
+          <i class="input-group-text bg-white bi bi-dash-circle"></i>
+          <input type="text" class="form-control">
+          <i class="input-group-text bg-white bi bi-plus-circle mr-2"></i>
+        </div>
+        <label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3">
+          <i class="input-group-text bg-white bi bi-dash-circle"></i>
+          <input type="text" class="form-control">
+          <i class="input-group-text bg-white bi bi-plus-circle mr-2"></i>
+        </div>
+        <label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3">
+          <i class="input-group-text bg-white bi bi-dash-circle"></i>
+          <input type="text" class="form-control">
+          <i class="input-group-text bg-white bi bi-plus-circle mr-2"></i>
+        </div>`,
+
+        focusConfirm: false,
+        preConfirm: () => {
+            return [
+                document.getElementById('swal-input1').value,
+                document.getElementById('swal-input2').value
+            ]
+        },
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        }
+    })
+}
+
+function consultaCarrinho(id) {
+
+}

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddLojaToUsers extends Migration
+class AddLojaUserAlltechToUsers extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddLojaToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('loja')->nullable();
+            $table->integer('loja')->nullable();
+            $table->integer('user_alltech')->nullable();
         });
     }
 
@@ -27,6 +28,7 @@ class AddLojaToUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('loja');
+            $table->dropColumn('user_alltech');
         });
     }
 }

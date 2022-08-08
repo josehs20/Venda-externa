@@ -29,7 +29,7 @@ class Carrinho extends Model
 
     ];
 
-    public function carItem()
+    public function carItens()
     {
         return $this->hasMany('App\Models\CarrinhoItem');
     }

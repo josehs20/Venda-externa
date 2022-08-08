@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::middleware('api.alltech')->group(function () {
+    Route::post('/create/user/venda-externa', [\App\Http\Controllers\Api\AuthUsuarios::class, 'store_user']);
+    Route::put('/update/user/venda-externa/{id}', [\App\Http\Controllers\Api\AuthUsuarios::class, 'update_user']);
 });

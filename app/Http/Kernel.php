@@ -64,5 +64,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'vendedor' => \App\Http\Middleware\Vendedor::class,
+        'api.alltech' => \App\Http\Middleware\ApiAlltech::class,
     ];
 }

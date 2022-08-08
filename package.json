@@ -21,6 +21,7 @@
         "sass-loader": "^11.1.1"
     },
     "dependencies": {
+        "animate.css": "^4.1.1",
         "bootstrap-icons": "^1.8.0",
         "jquery": "^3.6.0",
         "jquery-confirm": "^3.3.4",

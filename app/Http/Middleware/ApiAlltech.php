@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class Vendedor
+class ApiAlltech
 {
     /**
      * Handle an incoming request.
@@ -14,12 +14,13 @@ class Vendedor
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        if (auth()->user()) {
+    
+        if ($request->header('api-key-alltech') == config('app.api_key_alltech')) { 
             return $next($request);
-        } else {
-            return redirect('/')->with('message', 'Sem premissão de acesso');
+        }else {
+            return response()->json(['error' => 'autenticação inválida'], 200);
         }
     }
 }

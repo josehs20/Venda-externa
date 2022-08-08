@@ -56,6 +56,7 @@
             }
         }
     </style>
+      
     <div class="limiter">
         <div class="container-login100">
             <div class="wrap-login100" style="margin-right: 20px;">
@@ -69,7 +70,7 @@
 
                     </div>
                     <div>
-                        <form class="fom1" method="POST" id="loginAuth">
+                        <form class="fom1" method="POST" id="loginAuth" action="{{ route('login') }}">
                             <h4>Entrar</h4>
                             @csrf
                             <!-- Campo de inserir Email -->
@@ -202,6 +203,7 @@
 
         </div>
     </div> --}}
+
     <script>
         $(function() {
             $('form[id="loginAuth"]').submit(function(event) {
@@ -222,7 +224,7 @@
                         Cookies.set('token_jwt', response.token.original.access_token, {
                             expires: 1
                         });
-                       set_redireciona(response.usuario)
+                        document.getElementById('loginAuth').submit()
                     },
                     error: function(response) {
                         if (response.statusText == 'Unauthorized') {
@@ -238,33 +240,6 @@
                 })
             })
         })
-
-        function set_redireciona(id) {
-            $.ajax({
-                url: "/get_usuario",
-                type: "GET",
-                data: {
-                   usuario: id,
-                },
-                dataType: 'json',
-                success: function(response) {
-                   console.log(response);
-                    //window.location.href = '/home';
-                },
-                error: function(response) {
-                    console.log(response);
-                    // if (response.statusText == 'Unauthorized') {
-                    //     Swal.fire({
-                    //         icon: 'error',
-                    //         title: 'Permissão negada',
-                    //         text: 'Usuário não cadastrado ou inativo.',
-                    //         showConfirmButton: false,
-                    //         timer: 3500
-                    //     });
-                    // }
-                }
-            })
-        }
 
         function typeWrite(e) {
             const textoArray = e.innerHTML.split('');

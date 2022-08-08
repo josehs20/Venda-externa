@@ -123,6 +123,7 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'api_key_alltech' => env('API_KEY_ALLTECH'),
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

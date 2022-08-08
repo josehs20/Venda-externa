@@ -15,6 +15,7 @@ use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Http;
 
 class VendaController extends Controller
 {
@@ -23,21 +24,27 @@ class VendaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $msg = false)
+    public function index(Request $request)
     {
-        $produtos_carrinho_quantidade['itemCarrinho'][0] = false;
-        $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = false;
 
-        $produtos = Produto::with('grades', 'estoque')->where('loja_id', auth()->user()->loja_id)
-            ->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->whereNotNull('preco')
-            ->whereNotNull('refcia')->whereHas('estoque', function (Builder $query) {
-                $query->whereNotNull('codbar');
-            })->orderBy('nome')->paginate(30);
+        $response = Http::withToken($_COOKIE['token_jwt'], 'Bearer')
+            ->get('http://localhost:8000/api/v1/produtos/estoques?atr_estoque=id,codbar,tam,loja_id,saldo,i_grade_id,produto_id&atr_produto=nome,preco
+        &filtro=id:=:4175');
 
-        $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
+        $produtos_carrinho_quantidade['itemCarrinho'][0] = null;
+        $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = null;
+
+        // $produtos = Produto::with('grades', 'estoque')->where('loja_id', auth()->user()->loja_id)
+        //     ->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->whereNotNull('preco')
+        //     ->whereNotNull('refcia')->whereHas('estoque', function (Builder $query) {
+        //         $query->whereNotNull('codbar');
+        //     })->orderBy('nome')->paginate(30);
+        $estoques = $response->object();
+
+        $carrinho = Carrinho::with('carItens')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
 
         if ($carrinho) {
-            foreach ($carrinho->carItem as $key => $item) {
+            foreach ($carrinho->carItens as $key => $item) {
                 if ($item->i_grade_id) {
                     $produtos_carrinho_quantidade['itemCarrinhoGrade'][$item->i_grade_id] = $item->quantidade;
                     $produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id'] = $item->produto_id;
@@ -47,16 +54,16 @@ class VendaController extends Controller
             }
         }
 
-        return view('home', compact('produtos', 'carrinho', 'produtos_carrinho_quantidade'));
+        return view('home', compact('estoques', 'carrinho', 'produtos_carrinho_quantidade'));
     }
 
-    public function busca_produto_ajax()
-    {
-        $dados['produtos'] = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)
-            ->where('situacao', 'A')->whereRaw("nome like '%{$_GET['busca']}%'")->orderBy('nome')
-            ->take(30)->get();
-        echo  json_encode($dados);
-    }
+    // public function busca_produto_ajax()
+    // {
+    //     $dados['produtos'] = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)
+    //         ->where('situacao', 'A')->whereRaw("nome like '%{$_GET['busca']}%'")->orderBy('nome')
+    //         ->take(30)->get();
+    //     echo  json_encode($dados);
+    // }
 
     public function itens_carrinho($user_id = null, $msg = null)
     {
@@ -77,7 +84,6 @@ class VendaController extends Controller
             ->orWhereHas('cliente', function (Builder $query) use ($busca) {
 
                 $query->where('loja_id', auth()->user()->loja_id)->where('nome', 'like', '%' . $busca . '%');
-                
             })->get()->reject(function ($c) {
                 return $c->user_id != auth()->user()->id;
             });
@@ -105,114 +111,136 @@ class VendaController extends Controller
      */
     public function store() //metodo usado pelo ajax //usada só em home
     {
-        $carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-        $produto = Produto::find($_POST['id']);
-        $item = $carrinho ? CarrinhoItem::where('carrinho_id', $carrinho->id)->where('produto_id', $produto->id)->first() : null;
+        // $carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+        // $produto = Produto::find($_POST['id']);
+        // $item = $carrinho ? CarrinhoItem::where('carrinho_id', $carrinho->id)->where('produto_id', $produto->id)->first() : null;
+        $item = $_POST['id'];
+        $item = $_POST['quantidade'];
+        $carrinho = $this->veririficaCarrinhoAberto();
 
+
+
+
+
+        return json_encode($carrinho);
         //variavel para verificar se o produto contém grade ou não via ajax
-        $i_grade_qtd = $_POST['i_grade_qtd'];
-        $qtd =  $_POST['qtd'];
+        // $i_grade_qtd = $_POST['i_grade_qtd'];
+        // $qtd =  $_POST['qtd'];
 
         //caso carrinho não tenha nenhum carrinho aberto já é aberto automaticamente
+        // if (!$carrinho) {
+
+        //     $carrinho = new Carrinho();
+        //     $carrinho->user_id = auth()->user()->id;
+        //     $carrinho->status = 'Aberto';
+        //     $carrinho->save();
+
+        //     if ($i_grade_qtd) {
+        //         $this->add_item_grade($i_grade_qtd, $produto, $carrinho);
+        //     } else {
+        //         $this->add_item($produto, $carrinho, $qtd);
+        //     }
+
+        //     $this->atualiza_carrinho_desconto_unico($carrinho);
+
+        //     $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+        //         ->where('status', 'Aberto')->first();
+
+        //     $dado['count_item'] = $count_item->carItem->count();
+        //     $dado['produto_adicionado'] = $produto->nome;
+        //     $dado['ok'] = true;
+        //     $dado['msg'] = 'produto novo e carrinho aberto';
+        //     echo json_encode($dado);
+        //     return;
+        // }
+        // if ($i_grade_qtd) {
+        //     //condição tem qeu ser sa
+        //     $dado['proditem'] =   $this->add_item_grade($i_grade_qtd, $produto, $carrinho);
+        //     // atualização de desconto unico ou sem desconto para itens diferentes que são inseridos no carrinho
+        //     $this->atualiza_carrinho_desconto_unico($carrinho);
+
+        //     //conta quantidade no carrinho ajax
+        //     $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+        //         ->where('status', 'Aberto')->first();
+
+        //     $dado['count_item'] = $count_item->carItem->count();
+        //     $dado['produto_adicionado'] = $produto->nome;
+        //     $dado['ok'] = true;
+        //     $dado['msg'] = 'produto com grade inserido';
+        //     echo json_encode($dado);
+
+        //     return;
+        // }
+        // if (!$item) {
+
+        //     $this->add_item($produto, $carrinho, $qtd);
+
+        //     $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+        //         ->where('status', 'Aberto')->first();
+        //     $this->atualiza_carrinho_desconto_unico($carrinho);
+        //     $dado['count_item'] = $count_item->carItem->count();
+        //     $dado['produto_adicionado'] = $produto->nome;
+        //     $dado['ok'] = true;
+        //     $dado['msg'] = "item novo sem grade";
+        //     echo json_encode($dado);
+        //     return;
+        // } else {
+        //     $quantidade = $qtd;
+
+        //     if ($item->tipo_desconto) {
+
+        //         $desconto_final = $item->tipo_desconto == 'porcento' ? ($item->qtd_desconto / 100) * ($quantidade * $item->preco) : $item->qtd_desconto;
+        //         $valor_final_item = ($quantidade * $item->preco) - $desconto_final;
+        //         //dd($desconto_final);
+        //         $item->update([
+        //             'quantidade' => $quantidade,
+        //             'qtd_desconto' => $item->qtd_desconto,
+        //             'valor_desconto' => $desconto_final,
+        //             'valor'          => $valor_final_item,
+        //         ]);
+        //         $this->atualiza_carrinho_desconto_parcial($item);
+
+        //         $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+        //             ->where('status', 'Aberto')->first();
+
+        //         $dado['count_item'] = $count_item->carItem->count();
+        //         $dado['produto_adicionado'] = $produto->nome;
+        //         $dado['ok'] = "add";
+        //         $dado['msg'] = "item atualizado sem grade";
+        //         echo json_encode($dado);
+        //         return;
+        //     } else {
+
+        //         $item->update([
+        //             'quantidade' => $quantidade,
+        //             'valor' => $item->preco * $quantidade,
+        //         ]);
+
+        //         $this->atualiza_carrinho_desconto_unico($carrinho);
+        //         $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
+        //             ->where('status', 'Aberto')->first();
+
+        //         $dado['count_item'] = $count_item->carItem->count();
+        //         $dado['produto_adicionado'] = $produto->nome;
+        //         $dado['ok'] = "add";
+        //         $dado['msg'] = "Quantidade Atualizada";
+        //         echo json_encode($dado);
+        //     }
+        // }
+    }
+
+    public function veririficaCarrinhoAberto()
+    {
+        $carrinho = Carrinho::with('carItens')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
+
         if (!$carrinho) {
-
-            $carrinho = new Carrinho();
-            $carrinho->user_id = auth()->user()->id;
-            $carrinho->status = 'Aberto';
-            $carrinho->save();
-
-            if ($i_grade_qtd) {
-                $this->add_item_grade($i_grade_qtd, $produto, $carrinho);
-            } else {
-                $this->add_item($produto, $carrinho, $qtd);
-            }
-
-            $this->atualiza_carrinho_desconto_unico($carrinho);
-
-            $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
-                ->where('status', 'Aberto')->first();
-
-            $dado['count_item'] = $count_item->carItem->count();
-            $dado['produto_adicionado'] = $produto->nome;
-            $dado['ok'] = true;
-            $dado['msg'] = 'produto novo e carrinho aberto';
-            echo json_encode($dado);
-            return;
+            $carrinho = Carrinho::create([
+                'status' => 'aberto',
+                'user_id' => auth()->user()->id,
+            ]);
         }
-        if ($i_grade_qtd) {
-            //condição tem qeu ser sa
-            $dado['proditem'] =   $this->add_item_grade($i_grade_qtd, $produto, $carrinho);
-            // atualização de desconto unico ou sem desconto para itens diferentes que são inseridos no carrinho
-            $this->atualiza_carrinho_desconto_unico($carrinho);
 
-            //conta quantidade no carrinho ajax
-            $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
-                ->where('status', 'Aberto')->first();
-
-            $dado['count_item'] = $count_item->carItem->count();
-            $dado['produto_adicionado'] = $produto->nome;
-            $dado['ok'] = true;
-            $dado['msg'] = 'produto com grade inserido';
-            echo json_encode($dado);
-
-            return;
-        }
-        if (!$item) {
-
-            $this->add_item($produto, $carrinho, $qtd);
-
-            $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
-                ->where('status', 'Aberto')->first();
-            $this->atualiza_carrinho_desconto_unico($carrinho);
-            $dado['count_item'] = $count_item->carItem->count();
-            $dado['produto_adicionado'] = $produto->nome;
-            $dado['ok'] = true;
-            $dado['msg'] = "item novo sem grade";
-            echo json_encode($dado);
-            return;
-        } else {
-            $quantidade = $qtd;
-
-            if ($item->tipo_desconto) {
-
-                $desconto_final = $item->tipo_desconto == 'porcento' ? ($item->qtd_desconto / 100) * ($quantidade * $item->preco) : $item->qtd_desconto;
-                $valor_final_item = ($quantidade * $item->preco) - $desconto_final;
-                //dd($desconto_final);
-                $item->update([
-                    'quantidade' => $quantidade,
-                    'qtd_desconto' => $item->qtd_desconto,
-                    'valor_desconto' => $desconto_final,
-                    'valor'          => $valor_final_item,
-                ]);
-                $this->atualiza_carrinho_desconto_parcial($item);
-
-                $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
-                    ->where('status', 'Aberto')->first();
-
-                $dado['count_item'] = $count_item->carItem->count();
-                $dado['produto_adicionado'] = $produto->nome;
-                $dado['ok'] = "add";
-                $dado['msg'] = "item atualizado sem grade";
-                echo json_encode($dado);
-                return;
-            } else {
-
-                $item->update([
-                    'quantidade' => $quantidade,
-                    'valor' => $item->preco * $quantidade,
-                ]);
-
-                $this->atualiza_carrinho_desconto_unico($carrinho);
-                $count_item = Carrinho::with('carItem')->where('user_id', auth()->user()->id)
-                    ->where('status', 'Aberto')->first();
-
-                $dado['count_item'] = $count_item->carItem->count();
-                $dado['produto_adicionado'] = $produto->nome;
-                $dado['ok'] = "add";
-                $dado['msg'] = "Quantidade Atualizada";
-                echo json_encode($dado);
-            }
-        }
+        return $carrinho;
     }
 
     public function add_item($produto, $carrinho, $qtd)
@@ -636,19 +664,18 @@ class VendaController extends Controller
 
     public function vendas_invalidas(Request $request)
     {
-      
+
         $busca = $request->nome_n_pedido;
 
         $carrinhos = Carrinho::with('carItem', 'cliente')->where('user_id', auth()->user()->id)
-        ->where('status', 'like', 'descInvalido')->where('n_pedido', 'like', '%'. $busca . '%')
-        ->orWhereHas('cliente', function (Builder $query) use ($busca) {
-          
-            $query->where('loja_id', auth()->user()->loja_id)->where('nome', 'like', '%'.$busca . '%');
-        
-        }) ->get()->reject(function ($c) {
-            return $c->status == 'Salvo' || $c->status == 'fechado' ||
-                $c->status == 'Aberto';
-        });
+            ->where('status', 'like', 'descInvalido')->where('n_pedido', 'like', '%' . $busca . '%')
+            ->orWhereHas('cliente', function (Builder $query) use ($busca) {
+
+                $query->where('loja_id', auth()->user()->loja_id)->where('nome', 'like', '%' . $busca . '%');
+            })->get()->reject(function ($c) {
+                return $c->status == 'Salvo' || $c->status == 'fechado' ||
+                    $c->status == 'Aberto';
+            });
 
         $carrinhos = $carrinhos->count() ? $carrinhos->toQuery()->paginate(30) : [];
 
