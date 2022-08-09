@@ -468,7 +468,7 @@
         </div>
         <a href="{{ route('itens_carrinho', ['user_id' => auth()->user()->id]) }}" class="cart__header__desktop">
             <i style="color: white;" class="fas fa-shopping-cart"></i>
-            <span id="countItensCar">{{ count_item(auth()->user()->id) }}</span>
+            <span id="countItensCar"></span>
         </a>
     </nav>
 </header>

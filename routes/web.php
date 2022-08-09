@@ -26,8 +26,10 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 //Venda
 Route::middleware('vendedor')->group(function () {
-
     Route::resource('venda', App\Http\Controllers\VendaController::class);
+    Route::get('/get_itens_carrinho', [App\Http\Controllers\VendaController::class, 'get_itens_carrinho']);
+    
+    
     Route::delete('/deleta_item_carrinho/{item?}', [App\Http\Controllers\VendaController::class, 'destroy_item'])->name('destroy_item');
     Route::get('/itens_carrinho', [App\Http\Controllers\VendaController::class, 'itens_carrinho'])->name('itens_carrinho');
     Route::get('/busca_produto', [App\Http\Controllers\VendaController::class, 'busca_produto_ajax'])->name('busca_produto_ajax');

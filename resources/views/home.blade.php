@@ -46,7 +46,12 @@
         <div class="row mt-3 d-flex justify-content-center">
 
             @foreach ($estoques as $e)
-                <div onclick="modalAddProduto('<?php echo $e->produto->nome; ?>', '<?php echo $e->i_grade && $e->i_grade->tam ? reais($e->produto->preco + $e->produto->preco * ($e->i_grade->fator / 100)) : reais($e->produto->preco); ?>', '<?php echo $e->i_grade && $e->i_grade->tam ? $e->i_grade->tam : ''; ?>', '<?php echo $e->id; ?>')" style="cursor: pointer"
+                <div onclick="modalAddProduto('<?php echo $e->produto->nome; ?>', 
+                '<?php echo $e->i_grade && $e->i_grade->tam ? reais($e->produto->preco + $e->produto->preco * ($e->i_grade->fator / 100)) : reais($e->produto->preco); ?>',
+                 '<?php echo $e->i_grade && $e->i_grade->tam ? $e->i_grade->tam : ''; ?>',
+                  '<?php echo $e->id; ?>', '<?php echo array_key_exists($e->id, $item_carrinho) ? $item_carrinho[$e->id]['quantidade'] : null; ?>', 
+                  '<?php echo $e->produto->un; ?>'
+                  )" style="cursor: pointer"
                     class="card col-md-5 mb-3 m-2 cardStyle">
                     <div
                         class="card-header bg-transparent border-primary card-title d-flex justify-content-between align-items-center">
@@ -72,8 +77,12 @@
                     {{-- <div class="card-footer bg-transparent border-primary">Footer</div> --}}
                 </div>
             @endforeach
-
         </div>
+    </div>
+   
+    <div id="paginate">
+
+        {{ $estoques->withQueryString()->links() }}
     </div>
     <!--botao whatsapp -->
     <a onclick="carrinhoFixedHome()" style="padding: 10px; !important; display: block !important""
@@ -82,3 +91,4 @@
     </a>
 @endsection
 <script type="text/javascript" src="{{ asset('js/viewhome.js') }}" defer></script>
+<script type="text/javascript" src="{{ asset('js/paginacao.js') }}" defer></script>

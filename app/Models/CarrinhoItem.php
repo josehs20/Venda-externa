@@ -17,7 +17,8 @@ class CarrinhoItem extends Model
         'valor',
         'produto_id',
         'carrinho_id',
-        'i_grade_id',
+        'estoque_id_alltech',
+        // 'i_grade_id',
     ];
 
     public function produto() {

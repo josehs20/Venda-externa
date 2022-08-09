@@ -15,6 +15,9 @@ use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
 class VendaController extends Controller
@@ -26,37 +29,40 @@ class VendaController extends Controller
      */
     public function index(Request $request)
     {
-
+        $response = [];
         $response = Http::withToken($_COOKIE['token_jwt'], 'Bearer')
-            ->get('http://localhost:8000/api/v1/produtos/estoques?atr_estoque=id,codbar,tam,loja_id,saldo,i_grade_id,produto_id&atr_produto=nome,preco
-        &filtro=id:=:4175');
+            ->get('http://localhost:8000/api/v1/estoques/produtos/?atr_estoque=id,codbar,tam,loja_id,saldo,i_grade_id,produto_id&atr_produto=nome,preco,un
+        &filtro_produto=nome:like:%'.$request->nome.'%');
 
-        $produtos_carrinho_quantidade['itemCarrinho'][0] = null;
-        $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = null;
+        $item_carrinho = [];
+        // $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = null;
 
         // $produtos = Produto::with('grades', 'estoque')->where('loja_id', auth()->user()->loja_id)
         //     ->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->whereNotNull('preco')
         //     ->whereNotNull('refcia')->whereHas('estoque', function (Builder $query) {
         //         $query->whereNotNull('codbar');
         //     })->orderBy('nome')->paginate(30);
-        $estoques = $response->object();
-
-        $carrinho = Carrinho::with('carItens')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
+        $estoques = $this->paginate($response->object());
+        $estoques->withPath('/venda?');
+     
+        // $carrinho = Carrinho::with('carItens')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
+        $carrinho = $this->veririfica_carrinho_aberto();
 
         if ($carrinho) {
             foreach ($carrinho->carItens as $key => $item) {
-                if ($item->i_grade_id) {
-                    $produtos_carrinho_quantidade['itemCarrinhoGrade'][$item->i_grade_id] = $item->quantidade;
-                    $produtos_carrinho_quantidade['itemCarrinhoGrade']['produto_id'] = $item->produto_id;
-                } else {
-                    $produtos_carrinho_quantidade['itemCarrinho'][$item->produto_id] = $item->quantidade;
-                }
+                $item_carrinho[$item->estoque_id_alltech]['quantidade'] = $item->quantidade;
             }
         }
-
-        return view('home', compact('estoques', 'carrinho', 'produtos_carrinho_quantidade'));
+      
+        return view('home', compact('estoques', 'carrinho', 'item_carrinho'));
     }
 
+    public function paginate($items, $perPage = 50, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
     // public function busca_produto_ajax()
     // {
     //     $dados['produtos'] = Produto::with('grades')->where('loja_id', auth()->user()->loja_id)
@@ -114,15 +120,19 @@ class VendaController extends Controller
         // $carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
         // $produto = Produto::find($_POST['id']);
         // $item = $carrinho ? CarrinhoItem::where('carrinho_id', $carrinho->id)->where('produto_id', $produto->id)->first() : null;
-        $item = $_POST['id'];
-        $item = $_POST['quantidade'];
-        $carrinho = $this->veririficaCarrinhoAberto();
+        $item_dados = [
+            'quantidade' => $_POST['quantidade'],
+            'preco' => $_POST['preco'],
+            'valor' => $_POST['preco'] * $_POST['quantidade'],
+            'estoque_id_alltech' =>  $_POST['id'],
+        ];
+
+        $carrinho = $this->veririfica_carrinho_aberto();
+
+        $response = $this->adiciona_item_carrinho($carrinho, $item_dados);
 
 
-
-
-
-        return json_encode($carrinho);
+        return json_encode($response);
         //variavel para verificar se o produto contém grade ou não via ajax
         // $i_grade_qtd = $_POST['i_grade_qtd'];
         // $qtd =  $_POST['qtd'];
@@ -229,7 +239,7 @@ class VendaController extends Controller
         // }
     }
 
-    public function veririficaCarrinhoAberto()
+    public function veririfica_carrinho_aberto()
     {
         $carrinho = Carrinho::with('carItens')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
 
@@ -241,6 +251,56 @@ class VendaController extends Controller
         }
 
         return $carrinho;
+    }
+
+    public function adiciona_item_carrinho($carrinho, $item_dados)
+    {
+        $item_carrinho = $carrinho->carItens()->where('estoque_id_alltech', $item_dados['estoque_id_alltech'])->first();
+
+        if (!$item_carrinho) {
+            $item_carrinho = $carrinho->carItens()->create($item_dados);
+            return ['itens' => $item_carrinho, 'dados' => $this->get_itens_carrinho(), 'msg' => 'Item adicionado com sucesso'];
+        } else {
+            $item_carrinho = $item_carrinho->update($item_dados);
+            return  ['itens' => $item_carrinho, 'dados' => $this->get_itens_carrinho(), 'msg' => 'Item atualizado com sucesso'];
+        }
+    }
+
+    public function get_itens_carrinho() //ajax
+    {
+        $carrinho = Carrinho::with('carItens')->where('status', 'aberto')->where('user_id', auth()->user()->id)->first();
+
+        $ids_estoque = [];
+
+        foreach ($carrinho->carItens as $key => $v) {
+            $ids_estoque[] = $v->estoque_id_alltech;
+        }
+
+        //prepara url, se busca for por algum identificador id ou codbar pode passar 
+        //um array separando por virgula
+        $ids_estoque = implode(',', $ids_estoque);
+
+        $response = Http::withToken($_COOKIE['token_jwt'], 'Bearer')
+            ->get('http://localhost:8000/api/v1/estoques/produtos/?atr_estoque=id,codbar,tam,loja_id,saldo,i_grade_id,produto_id&atr_produto=nome,preco,un
+            &filtro_estoque=id:=:' . $ids_estoque);
+
+        $response = $response->collect();
+        foreach ($carrinho->carItens as $key => $item) {
+            $produtos_api = $response->firstWhere('id', $item->estoque_id_alltech);
+            $item['nome'] = $produtos_api['produto']['nome'];
+            $item['tam'] = $produtos_api['i_grade'] ? $produtos_api['i_grade']['tam'] : null;
+        }
+   
+        //retorna carrinho com itens já com o nome de cada um 
+        return json_encode($carrinho);
+    }
+
+    //
+    public function get_produtos_alltech_api($atr_estoque, $atr_produto = null)
+    {
+        $response = Http::withToken($_COOKIE['token_jwt'], 'Bearer')
+            ->get('http://localhost:8000/api/v1/produtos/estoques?atr_estoque=id,codbar,tam,loja_id,saldo,i_grade_id,produto_id&atr_produto=nome,preco,un
+        &filtro=id:=:4175');
     }
 
     public function add_item($produto, $carrinho, $qtd)
@@ -269,7 +329,6 @@ class VendaController extends Controller
                 } else {
                     $produto_preco = $produto->preco;
                 }
-
                 //caso tenha o mesmo id  de produto e grade diferente entra no if "Cria item novo"
                 if (!$item) {
 
