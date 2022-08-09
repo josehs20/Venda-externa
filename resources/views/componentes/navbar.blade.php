@@ -466,7 +466,7 @@
                         style="color: black"></i></button>
             </form>
         </div>
-        <a href="{{ route('itens_carrinho', ['user_id' => auth()->user()->id]) }}" class="cart__header__desktop">
+        <a href="{{ route('carrinho.index') }}" class="cart__header__desktop">
             <i style="color: white;" class="fas fa-shopping-cart"></i>
             <span id="countItensCar"></span>
         </a>

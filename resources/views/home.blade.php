@@ -19,9 +19,11 @@
 
         .carFlutuante {
             position: fixed;
-            right: 45px;
-            bottom: 20px;
+            right: 50px;
+            bottom: 55px;
             z-index: 99;
+            padding: 10px !important; 
+            display: block !important;
         }
 
         */
@@ -42,9 +44,10 @@
     @include('componentes.navbar', ['titulo' => 'Produtos'])
 
 
-    <div class="col-md-12" style="border: 1px solid red; margin-top:110px;">
+    <div class="col-md-12" style="margin-top:110px;">
         <div class="row mt-3 d-flex justify-content-center">
-
+            @if (count($estoques))
+            
             @foreach ($estoques as $e)
                 <div onclick="modalAddProduto('<?php echo $e->produto->nome; ?>', 
                 '<?php echo $e->i_grade && $e->i_grade->tam ? reais($e->produto->preco + $e->produto->preco * ($e->i_grade->fator / 100)) : reais($e->produto->preco); ?>',
@@ -77,15 +80,22 @@
                     {{-- <div class="card-footer bg-transparent border-primary">Footer</div> --}}
                 </div>
             @endforeach
+      
+            <div class="d-flex justify-content-center" id="paginate">
+
+                {{ $estoques->withQueryString()->links() }}
+            </div>
+            @else
+            <div class="alert alert-primary" role="alert">
+                Neenhum produto encontrado!
+              </div>
+            @endif
+           
         </div>
     </div>
    
-    <div id="paginate">
-
-        {{ $estoques->withQueryString()->links() }}
-    </div>
     <!--botao whatsapp -->
-    <a onclick="carrinhoFixedHome()" style="padding: 10px; !important; display: block !important""
+    <a onclick="carrinhoFixedHome()"
         class="btn btn-lg btn-primary carFlutuante"> <i style="color: white;" class="fas fa-shopping-cart"></i>
 
     </a>

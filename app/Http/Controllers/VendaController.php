@@ -35,13 +35,7 @@ class VendaController extends Controller
         &filtro_produto=nome:like:%'.$request->nome.'%');
 
         $item_carrinho = [];
-        // $produtos_carrinho_quantidade['itemCarrinhoGrade'][0] = null;
 
-        // $produtos = Produto::with('grades', 'estoque')->where('loja_id', auth()->user()->loja_id)
-        //     ->where('situacao', 'A')->whereRaw("nome like '%{$request->nome}%'")->whereNotNull('preco')
-        //     ->whereNotNull('refcia')->whereHas('estoque', function (Builder $query) {
-        //         $query->whereNotNull('codbar');
-        //     })->orderBy('nome')->paginate(30);
         $estoques = $this->paginate($response->object());
         $estoques->withPath('/venda?');
      
@@ -70,15 +64,6 @@ class VendaController extends Controller
     //         ->take(30)->get();
     //     echo  json_encode($dados);
     // }
-
-    public function itens_carrinho($user_id = null, $msg = null)
-    {
-        $clientes_user = Cliente::where('loja_id', auth()->user()->loja_id)->orderBy('nome')->take(100)->get();
-
-        $carrinho = Carrinho::with('carItem')->where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
-
-        return view('vendedor.itemCarrinho', compact('carrinho', 'clientes_user', 'msg'));
-    }
 
     public function vendas_finalizadas(Request $request)
     {

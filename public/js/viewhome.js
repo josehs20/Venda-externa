@@ -352,9 +352,11 @@ async function carrinhoFixedHome() {
     const { value: formValues } = await Swal.fire({
         title: 'ITENS ADICIONADOS',
         showCancelButton: true,
-        showConfirmButton: false,
-        cancelButtonColor: 'blue',
-        cancelButtonText: 'Fechar',
+        showConfirmButton: true,
+        // cancelButtonColor: 'blue',
+        cancelButtonText: '<a href="/itens_carrinho" >Finalizar</a>',
+        // confirmButtonColor: 'info',
+        confirmButtonText:'Fechar',
         html: table,
         focusConfirm: false,
         preConfirm: () => {
