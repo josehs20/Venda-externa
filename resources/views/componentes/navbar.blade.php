@@ -43,7 +43,7 @@
         left: 0;
         top: 0;
         z-index: 447;
-        background-image: linear-gradient(to right, #300e4d 10%, #082997 400%);
+        background-image: linear-gradient(to right, #00a3ef 10%, #6c8be9 400%);
     }
 
     header nav {
@@ -146,7 +146,7 @@
     }
 
     header nav .cart__header__desktop span {
-        background-color: #f79831;
+        background-color: #000003;
         padding: 3px 6px;
         margin-left: 3px;
         border-radius: 5px;
@@ -186,7 +186,7 @@
         top: 59px;
         z-index: 447;
         padding: 8px 0 15px;
-        background-image: linear-gradient(to right, #443fa5 10%, #5d6b94 400%);
+        background-image: linear-gradient(to right, #002d48 10%, #4e73df 400%);
     }
 
     .main__navigations__div {
@@ -417,8 +417,8 @@
 
     .mobile__nav__fade__and__show__circle {
         width: 85%;
-        height: 455px;
-        background-image: linear-gradient(120deg, #c8f17da6 -30%, #000c92 100%);
+        height: 500px;
+        background-image: linear-gradient(120deg, #002d48 -30%, #002d48 100%);
         box-shadow: 0px 10px 10px rgb(0, 0, 0);
         position: fixed;
         top: 0;
@@ -459,13 +459,21 @@
         <div class="search__bar__header">
             {{-- <input type="text" />
             <div id="lupa"></div> --}}
-            <form class="search" action="{{ route('venda.index') }}" method="GET">
+            {{-- <form class="search" action="{{ route('venda.index') }}" method="GET">
                 @csrf
-                <input id="search" name="nome" type="search" class="form-control" placeholder="Buscar Produto">
+                <input id="search" name="nome" type="search" class="form-control" placeholder="Buscar Produtos">
                 <button id="preventBuscaProduto" class="lupa"><i class="bi-search"
                         style="color: black"></i></button>
-            </form>
-        </div>
+            </form> --}}
+            <form action="{{ route('venda.index') }}" method="GET" class="input-group">
+                <input name="nome" class="form-control border-end-0 border" type="search" placeholder="Buscar Produtos" id="example-search-input">
+               
+                    <button class="btn btn-outline-secondary bg-white border-start-0 border-bottom-0 border ms-n5" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+              
+            </div>
+        </form>
         <a href="{{ route('carrinho.index') }}" class="cart__header__desktop">
             <i style="color: white;" class="fas fa-shopping-cart"></i>
             <span id="countItensCar"></span>
@@ -490,7 +498,7 @@
                     <p><a href="{{ route('clientes.index') }}">Clientes</a></p>
                     <p><a href="{{ route('clientes.create') }}">Cadastro De Cliente</a></p>
                     <p><a href="{{ route('vendas_finalizadas') }}">Vendas Finalizadas</a></p>
-                    <p><a href="{{ route('venda_salva') }}">Vendas Salvas</a></p>
+                    <p><a href="{{ route('vendas_salvas') }}">Vendas Salvas</a></p>
                     <p><a href="{{ route('vendas_invalidas') }}">Vendas Em Análise</a></p>
                 </div>
             </li>
@@ -530,7 +538,7 @@
                 <p><a href="{{ route('clientes.index') }}">Clientes</a></p>
                 <p><a href="{{ route('clientes.create') }}">Cadastro De Cliente</a></p>
                 <p><a href="{{ route('vendas_finalizadas') }}">Vendas Finalizadas</a></p>
-                <p><a href="{{ route('venda_salva') }}">Vendas Salvas</a></p>
+                <p><a href="{{ route('vendas_salvas') }}">Vendas Salvas</a></p>
                 <p><a href="{{ route('vendas_invalidas') }}">Vendas Em Análise</a></p>
             </div>
         </li>

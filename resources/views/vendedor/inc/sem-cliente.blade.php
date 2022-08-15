@@ -55,10 +55,10 @@
                                      <datalist id="listaClientes">
 
 
-                                         @foreach ($clientes_user as $cliente)
+                                         {{-- @foreach ($clientes_user as $cliente)
                                              <option value="{{ $cliente->nome }}">{{ $cliente->alltech_id }}
                                              </option>
-                                         @endforeach
+                                         @endforeach --}}
 
                                      </datalist>
                                  </div>
@@ -193,7 +193,7 @@
                      <a id="MontaBuscaClienteFinaliza">
 
                          <ul class="list-group">
-                             @foreach ($clientes_user as $cliente)
+                             {{-- @foreach ($clientes_user as $cliente)
                                  <a name="cliente_id" type="button" onclick="buttonAlltech_id(<?php echo $cliente->alltech_id; ?>)">
                                      <li style="text-align:justify; overflow-x: auto; overflow-y: hidden; overflow-y: hidden; width: 93%;"
                                          class="list-group-item d-flex justify-content-between align-items-center mx-2">
@@ -203,7 +203,7 @@
                                                  class="bi bi-save2"></i></button>
                                      </li>
                                  </a>
-                             @endforeach
+                             @endforeach --}}
 
                          </ul>
                      </a>
@@ -230,13 +230,13 @@
                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                  </div>
 
-                 <form id="formSalvaItensCliente" method="GET" class="search-cliente">
+                 <form onsubmit="return false;" id="formSalvaItensCliente" method="GET" class="search-cliente">
                      @csrf
                      <input id="nomeClienteSalvarItens" type="text" class="form-control" placeholder="nome">
-                     <button id="botaoBuscaClienteAjax" class="lupa"><i class="bi-search"
+                     <button type="submit" class="lupa"><i class="bi-search"
                              style="color: black"></i></button>
                  </form>
-                 <form action="{{ route('salvar_venda') }}" method="POST" class="modal-body">
+                 <form onsubmit="return false;" id="fomrsalvarVenda" method="POST" class="modal-body">
                      @method('PUT')
                      @csrf
                      <div class="carregando">
@@ -245,14 +245,13 @@
                      </div>
                      <a id="lisClientesModal">
                          <h5 class="modal-title" id="exampleModalLabel">Clientes</h5>
-                         <ul class="list-group">
-                             @foreach ($clientes_user as $cliente)
+                         <ul id="ulClientesModal" class="list-group">
+                             @foreach ($clientes as $cliente)
                                  <a onclick="submitFormularioSalvarVenda(<?php echo $cliente->id; ?>)">
                                      <li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;"
                                          class="list-group-item d-flex justify-content-between align-items-center">
                                          {{ $cliente->nome }}
-                                         <button id="submitFormularioSalvarVenda<?php echo $cliente->id; ?>" type="submit"
-                                             name="cliente_id" value="{{ $cliente->id }}" class="lupa-list"><i
+                                         <button onclick="submitFormularioSalvarVenda(<?php echo $cliente->id; ?>)" class="lupa-list"><i
                                                  class="bi bi-save2"></i></button>
                                      </li>
                                  </a>

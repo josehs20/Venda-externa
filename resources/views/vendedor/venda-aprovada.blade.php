@@ -258,7 +258,7 @@
                                 <span>{{ !$carrinho->tp_desconto ? 'Não Aplicado' : 'Porcentagem Única' }}</span>
                             @else
                                 <span
-                                    class="badge bg-primary rounded-pill">{{ $carrinho->tp_desconto == 'porcento_unico' ? 'Porcentagem única' : ($carrinho->tp_desconto == 'dinheiro_unico' ? 'Unificado em dinheiro' : (!$item->qtd_desconto ? 'Não inserido' : ($item->tipo_desconto == 'porcento' ? '%' . $item->qtd_desconto : "R$" . $item->qtd_desconto))) }}</span>
+                                    class="badge bg-primary rounded-pill">{{ $carrinho->tp_desconto == 'porcento_unico' ? 'Porcentagem única' : ($carrinho->tp_desconto == 'dinheiro_unico' ? 'Unificado em dinheiro' : (!$item->qtd_desconto ? 'Não inserido' : ($item->tp_desconto == '%' ? '%' . $item->qtd_desconto : "R$" . $item->qtd_desconto))) }}</span>
                             @endif
                         </li>
                     </ul>

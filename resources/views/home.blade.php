@@ -29,9 +29,6 @@
         */
     </style>
 
-
-
-
     @if (Session::has('success'))
 
         <body onload="msgSuccess('<?php echo Session::get('success'); ?>')">
@@ -55,7 +52,7 @@
                   '<?php echo $e->id; ?>', '<?php echo array_key_exists($e->id, $item_carrinho) ? $item_carrinho[$e->id]['quantidade'] : null; ?>', 
                   '<?php echo $e->produto->un; ?>'
                   )" style="cursor: pointer"
-                    class="card col-md-5 mb-3 m-2 cardStyle">
+                    class="card col-md-5 mb-3 m-2 cardStyle animate__animated animate__fadeIn">
                     <div
                         class="card-header bg-transparent border-primary card-title d-flex justify-content-between align-items-center">
                         <h5 class="card-title text-primary">{{ $e->produto->nome }}</h5>
@@ -95,10 +92,12 @@
     </div>
    
     <!--botao whatsapp -->
-    <a onclick="carrinhoFixedHome()"
-        class="btn btn-lg btn-primary carFlutuante"> <i style="color: white;" class="fas fa-shopping-cart"></i>
+    <a style="background-color: #00a3ef" onclick="carrinhoFixedHome()"
+        class="btn btn-lg btn-primary carFlutuante animate__animated animate__shakeY animate__delay-3s"> <i style="color: white;" class="fas fa-shopping-cart"></i>
 
     </a>
 @endsection
+<script src="{{ asset('js/carrinho.js') }}" defer></script>
 <script type="text/javascript" src="{{ asset('js/viewhome.js') }}" defer></script>
-<script type="text/javascript" src="{{ asset('js/paginacao.js') }}" defer></script>
+
+

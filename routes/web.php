@@ -26,15 +26,25 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 //Venda
 Route::middleware('vendedor')->group(function () {
+    //venda
     Route::resource('venda', App\Http\Controllers\VendaController::class);
-    Route::get('/get_itens_carrinho', [App\Http\Controllers\VendaController::class, 'get_itens_carrinho']);
-    Route::get('/itens_carrinho', [App\Http\Controllers\CarrinhoController::class, 'index'])->name('carrinho.index');
+    Route::put('/unifica-desconto', [App\Http\Controllers\VendaController::class, 'unifica_desconto'])->name('unifica_desconto');
+    Route::put('/zerar-desconto', [App\Http\Controllers\VendaController::class, 'zerar_desconto'])->name('zerar_desconto');
+    Route::delete('/deleta_item/{item?}', [App\Http\Controllers\VendaController::class, 'deleta_item'])->name('deleta_item');
+    Route::put('/salvar_venda',  [App\Http\Controllers\VendaController::class, 'salvar_venda'])->name('salvar_venda');
+    Route::get('/vendas_salvas',  [App\Http\Controllers\CarrinhoController::class, 'vendas_salvas'])->name('vendas_salvas');
     
-    Route::delete('/deleta_item_carrinho/{item?}', [App\Http\Controllers\VendaController::class, 'destroy_item'])->name('destroy_item');
+    //carrinho
+    Route::put('/substitui_carrinho/{carrinho_id?}', [App\Http\Controllers\CarrinhoController::class, 'substitui_carrinho'])->name('substitui_carrinho');
+    Route::get('/home-carrinho', [App\Http\Controllers\CarrinhoController::class, 'index'])->name('carrinho.index');
+    Route::get('/itens-carrinho', [App\Http\Controllers\CarrinhoController::class, 'itens_carrinho'])->name('itens_carrinho');
+    
+    
+    // Route::delete('/deleta_item_carrinho/{item?}', [App\Http\Controllers\VendaController::class, 'destroy_item'])->name('destroy_item');
     // Route::get('/itens_carrinho', [App\Http\Controllers\VendaController::class, 'itens_carrinho'])->name('itens_carrinho');
     Route::get('/busca_produto', [App\Http\Controllers\VendaController::class, 'busca_produto_ajax'])->name('busca_produto_ajax');
-    Route::put('/salvar_venda',  [App\Http\Controllers\VendaController::class, 'salvar_venda'])->name('salvar_venda');
-    Route::put('/unifica_valor_Itens/{carrinho?}', [App\Http\Controllers\VendaController::class, 'unifica_valor_Itens'])->name('unifica_valor_Itens');
+    // Route::put('/salvar_venda',  [App\Http\Controllers\VendaController::class, 'salvar_venda'])->name('salvar_venda');
+    // Route::put('/unifica_valor_Itens/{carrinho?}', [App\Http\Controllers\VendaController::class, 'unifica_valor_Itens'])->name('unifica_valor_Itens');
     Route::put('/zera_desconto/{carrinho?}', [App\Http\Controllers\VendaController::class, 'zera_desconto'])->name('zera_desconto');
     Route::get('/venda_finalizada', [App\Http\Controllers\VendaController::class, 'venda_finalizada'])->name('venda_finalizada');
     Route::put('/finaliza_venda/{carrinho?}', [App\Http\Controllers\VendaController::class, 'finaliza_venda'])->name('finaliza_venda');
@@ -47,8 +57,8 @@ Route::middleware('vendedor')->group(function () {
     //Cliente
     Route::resource('clientes', App\Http\Controllers\ClienteController::class);
     Route::get('/busca_cliente', [App\Http\Controllers\ClienteController::class, 'busca_cliente_ajax'])->name('busca_cliente_ajax');
-    Route::get('/venda_salva',  [App\Http\Controllers\ClienteController::class, 'venda_salva'])->name('venda_salva');
-    Route::put('/substitui_carrinho/{carrinho_id?}', [App\Http\Controllers\ClienteController::class, 'substitui_carrinho'])->name('substitui_carrinho');
+    // Route::get('/venda_salva',  [App\Http\Controllers\ClienteController::class, 'venda_salva'])->name('venda_salva');
+    // Route::put('/substitui_carrinho/{carrinho_id?}', [App\Http\Controllers\ClienteController::class, 'substitui_carrinho'])->name('substitui_carrinho');
     Route::post('/add_observacao/{cliente?}', [App\Http\Controllers\ClienteController::class, 'add_observacao'])->name('add_observacao');
     Route::delete('/deleta_obs/{observacao}',  [App\Http\Controllers\ClienteController::class, 'deleta_obs_ajax'])->name('deleta_obs');
 

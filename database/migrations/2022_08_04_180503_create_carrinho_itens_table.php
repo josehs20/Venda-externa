@@ -17,7 +17,7 @@ class CreateCarrinhoItensTable extends Migration
             $table->id();
             $table->decimal('quantidade')->nullable();
             $table->decimal('preco')->nullable();
-            $table->string('tipo_desconto')->nullable();
+            $table->string('tp_desconto')->nullable();
             $table->decimal('qtd_desconto')->nullable();
             $table->decimal('valor_desconto')->nullable();
             $table->decimal('valor')->nullable();

@@ -251,27 +251,27 @@ class ClienteController extends Controller
         //
     }
 
-    public function venda_salva(Request $request)
-    {
+    // public function venda_salva(Request $request)
+    // {
 
-        $busca = $request->nome_n_pedido;
+    //     $busca = $request->nome_n_pedido;
 
-        $carrinhos = Carrinho::with('carItem', 'cliente')->where('user_id', auth()->user()->id)
-            ->where('status', 'like', 'Salvo')->where('n_pedido', 'like', '%' . $busca . '%')
-            ->orWhereHas('cliente', function (Builder $query) use ($busca) {
+    //     $carrinhos = Carrinho::with('carItem', 'cliente')->where('user_id', auth()->user()->id)
+    //         ->where('status', 'like', 'Salvo')->where('n_pedido', 'like', '%' . $busca . '%')
+    //         ->orWhereHas('cliente', function (Builder $query) use ($busca) {
                
-                $query->where('loja_id', auth()->user()->loja_id)->where('nome', 'like', '%' . $busca . '%');
+    //             $query->where('loja_id', auth()->user()->loja_id)->where('nome', 'like', '%' . $busca . '%');
            
-            })->get()->reject(function ($c) {
-                return $c->user_id != auth()->user()->id;
-            });
+    //         })->get()->reject(function ($c) {
+    //             return $c->user_id != auth()->user()->id;
+    //         });
 
-        $carrinhos = $carrinhos->count() ? $carrinhos->toQuery()->paginate(30) : [];
+    //     $carrinhos = $carrinhos->count() ? $carrinhos->toQuery()->paginate(30) : [];
 
-        $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
+    //     $cliente_carrinho = Carrinho::where('user_id', auth()->user()->id)->where('status', 'Aberto')->first();
 
-        return view('cliente.vendaSalva', compact('carrinhos', 'cliente_carrinho'));
-    }
+    //     return view('cliente.vendaSalva', compact('carrinhos', 'cliente_carrinho'));
+    // }
 
     public function substitui_carrinho(Request $request, $carrinho)
     {

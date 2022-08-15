@@ -11,7 +11,7 @@ class CarrinhoItem extends Model
     protected $fillable = [
         'quantidade',
         'preco',
-        'tipo_desconto',
+        'tp_desconto',
         'qtd_desconto',
         'valor_desconto',
         'valor',

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Http;
 
 class Carrinho extends Model
 {
@@ -13,13 +14,13 @@ class Carrinho extends Model
         'data',
         'n_pedido',
         'valor_desconto',
-        'desconto_qtd',
+        'qtd_desconto',
         'tp_desconto',
         'valor_bruto',
         'total',
         'tipo_pagamento',
         'forma_pagamento',
-        'cliente_id',
+        'cliente_id_alltech',
         'status',
         'parcelas',
         'tp_desconto_sb_venda',
@@ -51,5 +52,20 @@ class Carrinho extends Model
     public function cliente()
     {
         return $this->belongsTo('App\Models\Cliente');
+    }
+
+
+    static function veririfica_carrinho_aberto()
+    {
+        $carrinho = Carrinho::with('carItens')->where('user_id', auth()->user()->id)->where('status', 'aberto')->first();
+
+        if (!$carrinho) {
+            $carrinho = Carrinho::create([
+                'status' => 'aberto',
+                'user_id' => auth()->user()->id,
+            ]);
+        }
+
+        return $carrinho;
     }
 }

@@ -244,14 +244,6 @@
 //     })
 // }
 
-function buscaProdutos() {
-    
-
-    // $.ajax({
-    //     url: 
-    // })
-}
-
 async function modalAddProduto(nome, preco, grade, item_estoque_id, item_carrinho, unidade_de_medida) {
 
     var grade = grade ? 'Tam: ' + grade : '';
@@ -277,26 +269,28 @@ async function modalAddProduto(nome, preco, grade, item_estoque_id, item_carrinh
     })
 
     if (formValue) {
-        addItemCarrinho(item_estoque_id, formValue, preco)
+        addItemCarrinho(item_estoque_id, formValue[0], preco)
     }
 
 }
+//item é estoque id
+function addItemCarrinho(item, quantidade, preco, qtd_desconto, tp_desconto) {
 
-function addItemCarrinho(item, quantidade, preco) {
-
-    var quantidade = quantidade[0];
+    var quantidade = quantidade;
     var preco = preco.replace(',', '.');
     var carrinho = {};
+    var valores;
 
     if (!quantidade || quantidade == 0) {
         Swal.fire({
             icon: 'error',
-            title: "Quantidade Inválida",
+            text: "Quantidade Inválida",
             showConfirmButton: false,
             timer: 1500
         })
         return
     }
+
 
     $.ajax({
         url: "/venda",
@@ -304,143 +298,33 @@ function addItemCarrinho(item, quantidade, preco) {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
+        async: false,
         data: {
             id: item,
             preco: preco,
             quantidade: quantidade,
+            qtd_desconto: qtd_desconto ?? qtd_desconto ,
+            tp_desconto: tp_desconto ?? tp_desconto ,
         },
         dataType: 'json',
         success: function (response) {
-            var carrinho = JSON.parse(response.dados);
+            carrinho = JSON.parse(response.dados);
+
             set_itens_carrinho(carrinho.car_itens)
             var msg = response.msg;
             var icon = 'success';
             alertTopEnd(msg, icon);
+            valores = { valores: response.valores, itens: carrinho.car_itens }
+
         },
         error: function (response) {
+
             var msg = 'Não foi possível tente novamente';
             var icon = 'warning';
             alertTopEnd(msg, icon)
+            confirm = false
         }
     })
+    return valores
 }
 
-function alertTopEnd(msg, icon) {
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-    })
-
-    Toast.fire({
-        icon: icon,
-        title: msg
-    })
-}
-
-async function carrinhoFixedHome() {
-
-    var itens = this.itens
-    var table = monta_tabela_itens_modal(itens)
-
-    const { value: formValues } = await Swal.fire({
-        title: 'ITENS ADICIONADOS',
-        showCancelButton: true,
-        showConfirmButton: true,
-        // cancelButtonColor: 'blue',
-        cancelButtonText: '<a href="/itens_carrinho" >Finalizar</a>',
-        // confirmButtonColor: 'info',
-        confirmButtonText:'Fechar',
-        html: table,
-        focusConfirm: false,
-        preConfirm: () => {
-            return [
-                document.getElementById('swal-input1').value,
-                document.getElementById('swal-input2').value
-            ]
-        },
-        showClass: {
-            popup: 'animate__animated animate__fadeInDown'
-        },
-        hideClass: {
-            popup: 'animate__animated animate__fadeOutUp'
-        }
-    })
-}
-function monta_tabela_itens_modal(itens) {
-    //soma itens e converte para real
-    const sumTotal = itens.reduce((acumulador, valorAtual) => acumulador + parseFloat(valorAtual.valor), 0)
-        .toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
-
-    var table = `<div class="d-flex justify-content-center">
-    <h5 class="card-title mx-3 text-primary">Total :${sumTotal}</h5>
-    </div>
-    <div style="overflow-x:auto; width: 170%;">
-    <table class="table overflow-scroll">
-        <thead>
-            <tr>
-                <th scope="col">Nome</th>
-                <th scope="col">Qtd.</th>
-                <th scope="col">Preco</th>
-                <th scope="col">Valor</th>
-            </tr>
-        </thead>
-        <tbody>`;
-    itens.forEach(element => {
-        var tam = element.tam ? element.tam : ''
-        table += `<tr>
-            <td>${element.nome + ' / ' + tam}</td>
-            <td>${element.quantidade}</td>
-            <td>R$ ${element.preco.replace('.', ',')}</td>
-            <td>R$ ${element.valor.replace('.', ',')}</td>
-        </tr>`;
-    });
-    table += `</tbody>
-    </table>
-    </div>`;
-
-    return table;
-}
-
-function get_itens_carrinho() {
-
-    $.ajax({
-        url: "/get_itens_carrinho",
-        type: "GET",
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        dataType: 'json',
-        success: function (response) {
-
-            set_itens_carrinho(response.car_itens)
-
-        },
-        error: function (response) {
-            var msg = 'Não foi possível consultar itens';
-            var icon = 'warning';
-            alertTopEnd(msg, icon)
-        }
-    })
-}
-
-function set_itens_carrinho(itens) {
-    var count_itens_carrinho = document.getElementById('countItensCar');
-    count_itens_carrinho.innerText = itens ? itens.length : count_itens_carrinho.innerText
-
-    this.itens = typeof itens == 'object' ? itens : JSON.parse(itens)
-
-    return this.itens;
-}
-
-$(function () {
-    storageIten = get_itens_carrinho()
-    this.itens
-    //    console.log(storageIten);
-})
