@@ -110,7 +110,7 @@
 </div>
 <div class="col-md-1">
     <label for="inputCity" class="form-label">Numero</label>
-    <input type="number" onkeyup="removeCarcterEspecial(this.value, 'numero')" id="numero" class="form-control"
+    <input type="number" onkeyup="this.value=this.value.replace(/[^0-9]/g,'');" id="numero" class="form-control"
         value="{{ $cliente && $cliente->enderecos ? $cliente->enderecos->numero : '' }}" placeholder="S/N">
 </div>
 <div class="col-md-4">

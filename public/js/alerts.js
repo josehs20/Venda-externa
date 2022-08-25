@@ -22,16 +22,17 @@ function alertError(text) {
         icon: 'error',
         text: text,
         showConfirmButton: false,
-        timer: 1500
+        timer: 2500
     })
 }
-function alertPadrao(msg, icon) {
+function alertPadrao(msg, icon, text) {
     Swal.fire({
         position: 'top-end',
         icon: icon,
         title: msg,
+        text: text,
         showConfirmButton: false,
-        timer: 2000
+        timer: 3000
     })
 }
 
@@ -108,7 +109,7 @@ function confirm_substitui_carrinho(carrinho, texto) {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/substitui_carrinho/' + carrinho.id,
+                url: '/substitui-carrinho/' + carrinho.id,
                 method: 'PUT',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

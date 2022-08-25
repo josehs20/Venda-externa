@@ -56,7 +56,7 @@
             }
         }
     </style>
-      
+
     <div class="limiter">
         <div class="container-login100">
             <div class="wrap-login100" style="margin-right: 20px;">
@@ -227,11 +227,20 @@
                         document.getElementById('loginAuth').submit()
                     },
                     error: function(response) {
+
                         if (response.statusText == 'Unauthorized') {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Permissão negada',
                                 text: 'Usuário não cadastrado ou inativo.',
+                                showConfirmButton: false,
+                                timer: 3500
+                            });
+                        } else if (response.status == 500) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro na comunicação',
+                                text: 'Não foi possível se conectar a api, entre em contato com supoerte',
                                 showConfirmButton: false,
                                 timer: 3500
                             });

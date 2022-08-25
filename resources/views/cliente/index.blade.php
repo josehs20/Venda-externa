@@ -19,15 +19,15 @@
 </style>
 
 @section('content')
-
-    @if (Session::has('Add_Obs'))
-
-        <body onload="msgSuccess('Observação Adicionada Com Sucesso')">
+    @if (Session::has('success'))
+        <body onload="alertPadrao('<?php echo Session::get('success'); ?>', 'success')">
     @endif
+
     @include('componentes.navbar', ['titulo' => 'Clientes'])
+
     <br><br><br><br><br><br>
-    <div class="listCliente">
-        <div class="container">
+    <div style="margin: 2%;" class="listCliente">
+        {{-- <div class="container"> --}}
 
             <form action="{{ route('clientes.index', auth()->user()->id) }}" class="position-relative col-md-6">
 
@@ -42,7 +42,7 @@
                 @foreach ($clientes as $cliente)
                     <ul class="list-group mt-3">
                         <button class="collapsible"
-                            style="background-color: rgb(58, 36, 252); font-size:16px;border-radius:7px;cursor: pointer;white-space: nowrap; overflow: hidden">
+                            style="background-color: #00a3ef; font-size:16px;border-radius:7px;cursor: pointer;white-space: nowrap; overflow: hidden">
                             <div style="width:50%;">
                                 <h6 style="margin-top: -10px; margin-left:20px;"> {{ $cliente->nome }}</h6>
                             </div>
@@ -64,7 +64,7 @@
                                 <li class="list-group-item">
 
                                     <a style="font: italic bold 15px monospace"> Cidade : </a>
-                                    &nbsp;&nbsp;{{ $cliente->enderecos && $cliente->enderecos->cidadeIbge ? $cliente->enderecos->cidadeIbge->nome : 'Não Informado' }}&nbsp;&nbsp;{{ $cliente->enderecos && $cliente->enderecos->cidadeIbge ? '| UF : ' . $cliente->enderecos->cidadeIbge->uf : 'UF: Não Informado' }}
+                                    &nbsp;&nbsp;{{ $cliente->enderecos && $cliente->enderecos->cidade_ibge_id ? $cidades[$cliente->enderecos->cidade_ibge_id]->nome : 'Não Informado' }}&nbsp;&nbsp;{{ $cliente->enderecos && $cliente->enderecos->cidade_ibge_id ? '| UF : ' . $cidades[$cliente->enderecos->cidade_ibge_id]->uf : 'UF: Não Informado' }}
 
                                 </li>
                                 <li class="list-group-item">
@@ -188,75 +188,53 @@
                             @php
                                 $i = 1;
                             @endphp
+                            @if (array_key_exists($cliente->id, $infoCientes))
+                                @foreach ($infoCientes[$cliente->id] as $info)
+                                    <form name="csrf-token" action="{{ route('deleta_obs', $info->id) }}"
+                                        method="post">
+                                        @csrf
+                                        @method('DELETE')
 
-                            @foreach ($cliente->infoCliente as $info)
-                                <form name="csrf-token" action="{{ route('deleta_obs', $info->id) }}" method="post">
-                                    <meta name="csrf-token" content="{{ csrf_token() }}">
-                                    @csrf
-                                    @method('DELETE')
+                                        <div class="list-group" id="<?php echo $info->id; ?>">
+                                            <a style="background-color: rgb(172, 172, 172)"
+                                                class="list-group-item list-group-item-action flex-column align-items-start">
+                                                {{ $i++ }}º&emsp;Observaçao: <h6 style="word-break:break-all;">
+                                                </h6>
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h6 style="word-break:break-all;">{{ $info->observacao }}
+                                                    </h6> <br>
 
-                                    <div class="list-group" id="<?php echo $info->id; ?>">
-                                        <a style="background-color: rgb(172, 172, 172)"
-                                            class="list-group-item list-group-item-action flex-column align-items-start">
-                                            {{ $i++ }}º&emsp;Observaçao: <h6 style="word-break:break-all;">
-                                            </h6>
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h6 style="word-break:break-all;">{{ $info->observacao }}
-                                                </h6> <br>
+                                                </div>
 
-                                            </div>
-
-                                            <small class="text-muted"><b>Data:
-                                                </b>{{ $info->data ? $info->data : 'Não informado ' }}</small>
-                                            <button
-                                                style="float: right; border:none!important;
+                                                <small class="text-muted"><b>Data:
+                                                    </b>{{ $info->data ? $info->data : 'Não informado ' }}</small>
+                                                <button
+                                                    style="float: right; border:none!important;
                                                                                                                                                                                                                                                 background-color: rgb(172, 172, 172); "
-                                                type="submit" class="js-del" onclick="botaoInfo(<?php echo $info->id; ?>)">
+                                                    type="submit" class="js-del"
+                                                    onclick="botaoInfo(<?php echo $info->id; ?>)">
 
-                                                <i class="bi bi-x-square"></i>
-                                            </button>
-                                        </a>
-                                    </div>
-
-
-                                </form>
-                            @endforeach
+                                                    <i class="bi bi-x-square"></i>
+                                                </button>
+                                            </a>
+                                        </div>
+                                    </form>
+                                @endforeach
+                            @endif
                     </ul>
                 @endforeach
-                {{-- paginação --}}
-                <nav class="navegacao mt-3" aria-label="Navegação">
-                    <ul class="pagination" style="justify-content: center;">
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $clientes->previousPageUrl() }}" aria-label="Anterior">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="sr-only">voltar</span>
-                            </a>
-                        </li>
-
-                        @for ($i = 1; $i <= ($clientes->lastPage() >= 6 ? 6 : $clientes->lastPage()); $i++)
-                            <!-- a Tag for another page -->
-                            <li class="page-item"><a class="page-link"
-                                    href="{{ $clientes->url($i) }}">{{ $i }}</a></li>
-                        @endfor
-
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $clientes->url($clientes->lastPage()) }}"
-                                aria-label="Próximo">
-                                <span aria-hidden="true">... {{ $clientes->lastPage() }}</span>
-
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                <div class="d-flex justify-content-center mt-3" id="paginate">
+                    {{ $clientes->withQueryString()->links() }}
+                </div>
             @else
-                <div class="alert alert-warning" style="margin-top: 100px;" role="alert">
-                    Nenhum Cliente Encontrado !
+                <div class="alert alert-warning mt-3" role="alert">
+                    Nenhum cliente encontrado!
                 </div>
             @endif
-        </div>
+        {{-- </div> --}}
     </div>
 
-    {{-- evento conspllan --}}
+    {{-- evento conspllan manual, bug bootstrap 5 --}}
     <script>
         var coll = document.getElementsByClassName("collapsible");
         var i;
@@ -276,4 +254,6 @@
 
 
 @endsection
+
+<script src="{{ asset('js/carrinho.js') }}" defer></script>
 <script type="text/javascript" src="{{ asset('js/viewcliente.js') }}" defer></script>

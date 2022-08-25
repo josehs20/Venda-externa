@@ -457,14 +457,6 @@
             <img src="{{ asset('image/logo2.png') }}" alt="">
         </a>
         <div class="search__bar__header">
-            {{-- <input type="text" />
-            <div id="lupa"></div> --}}
-            {{-- <form class="search" action="{{ route('venda.index') }}" method="GET">
-                @csrf
-                <input id="search" name="nome" type="search" class="form-control" placeholder="Buscar Produtos">
-                <button id="preventBuscaProduto" class="lupa"><i class="bi-search"
-                        style="color: black"></i></button>
-            </form> --}}
             <form action="{{ route('venda.index') }}" method="GET" class="input-group">
                 <input name="nome" class="form-control border-end-0 border" type="search" placeholder="Buscar Produtos" id="example-search-input">
                

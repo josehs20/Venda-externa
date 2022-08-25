@@ -1,7 +1,8 @@
 async function carrinhoFixedHome() {
 
-    var itens = this.itens
-    var table = monta_tabela_itens_modal(itens)
+    var carrinho = JSON.parse(document.getElementById('carrinhoFixedHome').getAttribute('data-carrinho'))
+    var itens = carrinho.car_itens;
+    var table = monta_tabela_itens_modal(itens, carrinho)
 
     const { value: formValues } = await Swal.fire({
         title: 'ITENS ADICIONADOS',
@@ -20,7 +21,7 @@ async function carrinhoFixedHome() {
         }
     })
 }
-function monta_tabela_itens_modal(itens) {
+function monta_tabela_itens_modal(itens, carrinho) {
     //soma itens e converte para real
     if (!itens.length) {
 
@@ -31,11 +32,14 @@ function monta_tabela_itens_modal(itens) {
     </div>`
     } else {
 
-        const sumTotal = itens.reduce((acumulador, valorAtual) => acumulador + parseFloat(valorAtual.valor), 0)
-            .toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
+        // const sumTotal = itens.reduce((acumulador, valorAtual) => acumulador + parseFloat(valorAtual.valor), 0)
+        //     .toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
+        const total = parseFloat(carrinho.total).toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
+        const descontos = carrinho.valor_desconto == null ? 'R$ 00,00' : parseFloat(carrinho.valor_desconto).toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
 
         var table = `<div class="d-flex justify-content-center">
-        <h5 class="card-title mx-3 text-primary">Total :${sumTotal}</h5>
+        <h5 class="card-title mx-3 text-black">Total :${total}</h5>
+        <h5 class="card-title mx-3 text-black">Descontos :${descontos}</h5>
         </div>
         <div style="overflow-x:auto; width: 130%;">
         <table class="table overflow-scroll">
@@ -49,9 +53,9 @@ function monta_tabela_itens_modal(itens) {
         </thead>
         <tbody>`;
         itens.forEach(element => {
-            var tam = element.tam ? ' / ' +element.tam : ''
+            var tam = element.tam ? ' / ' + element.tam : ''
             table += `<tr>
-        <td>${element.nome  + tam}</td>
+        <td>${element.nome + tam}</td>
         <td>${element.quantidade}</td>
         <td>R$ ${element.preco.replace('.', ',')}</td>
         <td>R$ ${element.valor.replace('.', ',')}</td>
@@ -66,7 +70,7 @@ function monta_tabela_itens_modal(itens) {
 }
 
 function get_itens_carrinho() {
-    var carrinhoAtual;
+    var carrinho;
     $.ajax({
         url: "/itens-carrinho",
         type: "GET",
@@ -74,18 +78,25 @@ function get_itens_carrinho() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         dataType: 'json',
-        async:false,
+        async: false,
         success: function (response) {
-            carrinhoAtual = response
-            set_itens_carrinho(response.car_itens)
+
+            carrinho = response
+            var count_itens_carrinho = document.getElementById('countItensCar');
+            count_itens_carrinho.innerText = carrinho.car_itens.length
+
+            set_atributes(carrinho)
+            set_modal_finaliza_venda_atributos(carrinho);
+            //set_itens_carrinho(response.car_itens)
             if (!response.tp_desconto || response.tp_desconto == 'parcial') {
                 atualiza_lista_modais(true)
             } else {
                 atualiza_lista_modais(false)
             }
-            atualiza_lista_carrinho(response.car_itens);
-            
-            // console.log(response.tp_desconto);
+
+           
+            atualiza_lista_carrinho(response.car_itens)
+
         },
         error: function (response) {
             var msg = 'Não foi possível consultar itens';
@@ -93,16 +104,18 @@ function get_itens_carrinho() {
             alertTopEnd(msg, icon)
         }
     })
-    return carrinhoAtual
+    return carrinho
 }
 
-function set_itens_carrinho(itens) {
-    var count_itens_carrinho = document.getElementById('countItensCar');
-    count_itens_carrinho.innerText = itens ? itens.length : count_itens_carrinho.innerText
-
-    this.itens = typeof itens == 'object' ? itens : JSON.parse(itens)
-
-    return this.itens;
+function set_modal_finaliza_venda_atributos(carrinho) {
+    console.log(carrinho);
+    var inputDesconto = document.getElementById('inputDesconto')
+    var tp_desconto_sb_venda = document.getElementById('tp_desconto_sb_venda')
+    var tp_pagamento = document.getElementById('tp_pagamento')
+    var inputParcelas = document.getElementById('inputParcelas')
+    var inputParcelas = document.getElementById('inputParcelas')
+    var forma_pagamento = document.getElementById('forma_pagamento')
+    var valor_entrada = document.getElementById('valor_entrada')
 }
 
 $(function () {
@@ -146,6 +159,13 @@ function cards_carrinho(valores) {
     elementos.querySelector('.valor_desconto').innerText = 'V. Desconto: ' + valor_desconto
 
     document.getElementById('closemodalDesconto').click()
+
+    // valores = {valores : { valor_bruto : valor_bruto,  total: total, valor_desconto : valor_desconto, tp_desconto : tp_desconto}}
+
+    monta_valores_finaliza_venda(valores);
+    // calculoDescontoSobreVenda(valores)
+
+    return valores;
 }
 function atualiza_lista_carrinho(itens, id_div) {
 
@@ -163,7 +183,7 @@ function desconto_lista_item_carrinho(divItem, element) {
     if (element.qtd_desconto) {
         divItem.querySelector('#itemCarrinhoDesconto').classList.remove('d-none')
         divItem.querySelector('#itemCarrinhoDesconto').children[0].innerText = element.tp_desconto + ' ' + element.qtd_desconto
-        
+
     } else {
         divItem.querySelector('#itemCarrinhoDesconto').classList.add('d-none')
     }
@@ -180,12 +200,12 @@ function atualiza_lista_modais(autorizaDesconto) {
         });
     } else {
         //bloqueia
-   
+
         var listaModaisBloqueiaDesconto = document.querySelectorAll('.descontoListCarrinho');
         listaModaisBloqueiaDesconto.forEach(element => {
             element.classList.add('d-none')
         });
-      //  console.log(listaModaisBloqueiaDesconto);
+        //  console.log(listaModaisBloqueiaDesconto);
         var descontoListCarrinho = document.querySelectorAll('.descontoUnicoInserido')
         descontoListCarrinho.forEach(element => {
             element.classList.remove('d-none')
@@ -195,94 +215,79 @@ function atualiza_lista_modais(autorizaDesconto) {
     }
 }
 
-
-function habilitaDescontoEditarItem(value, inputId) {
-    var input = document.getElementById("inputDescontoEditarItem" + inputId);
+function habilitaDesconto(value, inputId) {
+    var input = document.getElementById(inputId);
 
     if (value == '%') {
         input.disabled = false;
     } else if (value == '$') {
         input.disabled = false;
-    } else if (value == 0) {
+    } else if (value == '') {
         input.disabled = true;
-        input.value = "";
+        input.value = '';
+    }
+
+    //input desconto no modal de finalizar venda
+    if (inputId == 'inputDesconto') {
+        calcula_valores_modal(value)
+    }
+
+}
+function habilitaVendaAP(value) {
+    var input = document.getElementById("inputParcelas");
+    var campoInserirEntrada = document.getElementById('campoInserirEntrada');
+
+    if (value == 'AP') {
+        input.disabled = false;
+        campoInserirEntrada.classList.remove('d-none');
+
+    } else {
+        input.disabled = true;
+        input.value = 1;
+        document.getElementById('valor_entrada').value = null;
+        campoInserirEntrada.classList.add('d-none');
     }
 }
-
 // ------------Consulta lista de clientes---------------------//
-$(function () {
-    $('form[id="formSalvaItensCliente"]').submit(function (event) {
-        event.preventDefault()
-        var nome = document.getElementById('nomeClienteSalvarItens').value
-        var token = Cookies.get('token_jwt');
+function get_cliente(nome) {
 
-        $.ajax({
-            url: `http://localhost:8000/api/v1/clientes/?relations=enderecos&filtro_cliente=nome:like:%${nome}%`,
-            type: "GET",
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            dataType: 'json',
-            success: function (response) {
-                var clientes = response
-                var lista = document.getElementById('lisClientesModal');
-                if (!clientes.length) {
-                    console.log(document.getElementById('ulClientesModal').remove());
-
-                    lista.innerHTML = ` <div class="row justify-content-center">
-                                <div class="alert alert-warning mt-5 col-md-8" role="alert">
-                                      Nenhum registro com esse nome encontrado !
-                                 </div>
-                             </div>`
-                    return;
-                }
-                var table = `<h5 class="modal-title" id="exampleModalLabel">Clientes</h5>
-                <ul class="list-group">`
-                clientes.forEach(element => {
-                    table += monta_lista_cliente(element)
-                });
-
-                table += `</ul>`
-                lista.innerHTML = table;
-            }
-        })
-    })
-})
-function monta_lista_cliente(cliente) {
-    var list = ` <a onclick="submitFormularioSalvarVenda(${cliente.id})">
-         <li style="text-align:justify; overflow-x: auto; overflow-y: hidden;overflow-y: hidden;"
-             class="list-group-item d-flex justify-content-between align-items-center">
-                ${cliente.nome}
-             <button onclick="submitFormularioSalvarVenda(${cliente.id})" class="lupa-list"><i
-                     class="bi bi-save2"></i></button>
-         </li>
-     </a>`
-
-    return list
-}
-function submitFormularioSalvarVenda(id) {
+    var token = Cookies.get('token_jwt');
+    var clientes = null;
 
     $.ajax({
-        url: "/salvar_venda",
-        type: "PUT",
+        url: 'http://localhost:8000/api/v1/clientes/?relations=enderecos&limit=100&filtro_cliente=nome:like:%' + nome + '%',
+        type: "GET",
         headers: {
+            'Authorization': 'Bearer ' + token,
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         dataType: 'json',
-        data:{
-            cliente_id: id,
-            salvaSubstitui: subs,
-        },
+        async: false,
         success: function (response) {
+            clientes = response
+        }
+    })
 
-          if (response === true) {
-            window.location.href = "/venda";
-          }else{
-            alertPadrao('não foi possível tente novamente', 'error')
-          }
-        },
-        error: function (response) {
+    return clientes;
+}
+
+
+
+function submitFormularioSalvarVenda(id, nome) {
+    var input = document.getElementById('clienteSalvaCarrinho');
+    input.value = id
+    Swal.fire({
+        title: 'Salvar itens',
+        text: 'Deseja realmente salvar esses itens para, ' + nome + '?',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim, salvar!',
+        concelButtonText: 'Não',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('fomrsalvarVenda').submit()
         }
     })
 

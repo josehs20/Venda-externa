@@ -2,11 +2,6 @@
 
 @section('content')
 
-    <style>
-        .carregando {
-            display: none;
-        }
-    </style>
     @include('componentes.navbar', ['titulo' => 'Itens'])
     <br><br><br><br>
 

@@ -1,5 +1,5 @@
 {{-- Modal Confirma Salvar itens para cliente já salvo cliente itens --}}
-<div class="modal fade" id="salvarItensRetornados" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+{{-- <div class="modal fade" id="salvarItensRetornados" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <form action="{{ route('salvar_venda') }}" method="POST" class="modal-content">
@@ -20,7 +20,7 @@
             </div>
         </form>
     </div>
-</div>
+</div> --}}
 
 
 {{-- Modal finaliza venda Com Cliente --}}
@@ -51,12 +51,12 @@
                 action="{{ route('finaliza_venda', ['carrinho' => $carrinho->id]) }}">
                 @method('PUT')
                 @csrf
-                <input type="hidden" name="hiddenInputValorTotalModal" id="hiddenValorTotalModal"
+                {{-- <input type="hidden" name="hiddenInputValorTotalModal" id="hiddenValorTotalModal"
                     value="<?php echo $carrinho->total; ?>">
                 <input type="hidden" name="hiddenInputValorDescontoModal" id="hiddenValorDescontoModal"
                     value="<?php echo $carrinho->valor_desconto; ?>">
                 <input type="hidden" name="hiddenInputValorDescontoSobreVendaModal"
-                    id="hiddenValorDescontoSobreVendaModal" value="<?php echo $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : ''; ?>">
+                    id="hiddenValorDescontoSobreVendaModal" value="<?php echo $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : ''; ?>"> --}}
 
                 <span class="mx-3"><b>Cliente Já Mencionado</b></span>
                 <div class="modal-body">
@@ -64,8 +64,8 @@
                     <div class="row g-2">
                         <div class="col-8">
                             <div class="form-floating">
-                                <input id="clienteNomeVenda" Readonly type="text" class="form-control" required
-                                    value="{{ $carrinho->cliente->nome }}" id="floatingInputGrid">
+                                <input id="clienteNomeVenda" Readonly type="text" class="form-control" required >
+                                    {{-- value="{{ $carrinho->cliente->nome }}" id="floatingInputGrid"> --}}
 
                                 <label for="floatingInputGrid">Cliente</label>
 
@@ -76,7 +76,7 @@
                             <div class="form-floating">
                                 <input required name="cliente_alltech_id" Readonly id="clienteCodigo" type="number"
                                     step="1" class="form-control"
-                                    value="{{ $carrinho->cliente_id ? $carrinho->cliente->alltech_id : null }}"
+                                    {{-- value="{{ $carrinho->cliente_id ? $carrinho->cliente->alltech_id : null }}" --}}
                                     name="codigoCliente" id="floatingInputGrid">
 
                                 <label for="floatingInputGrid">Cod.</label>
@@ -93,7 +93,8 @@
                         <div class="col-8">
                             <div class="form-floating">
                                 <input disabled
-                                    onkeyup="calculoDescontoSobreVenda(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
+                                    onkeyup="calcula_valores_modal()"
+                                    data-carrinho='<?php echo  json_encode($carrinho) ?>'
                                     name="qtd_desconto_sobre_venda" type="number" required class="form-control"
                                     min="0.01" step="0.01" value="{{ $carrinho->desconto_qtd_sb_venda }}" id="inputDesconto">
                                 <label for="floatingInputGrid">Desconto</label>
@@ -102,23 +103,20 @@
                         <div class="col-4">
                             <span></span>
                             <div class="form-floating">
-                                <input type="hidden" id="valor_desconto_sobre_venda" value="<?php echo $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : ''; ?>" name="">
-                                <input type="hidden" id="select_desconto_sb_venda" value="<?php echo $carrinho->tp_desconto_sb_venda ? $carrinho->tp_desconto_sb_venda : ''; ?>" name="">
+                                {{-- <input type="hidden" id="valor_desconto_sobre_venda" value="<?php echo $carrinho->valor_desconto_sb_venda ? $carrinho->valor_desconto_sb_venda : ''; ?>" name="">
+                                <input type="hidden" id="select_desconto_sb_venda" value="<?php echo $carrinho->tp_desconto_sb_venda ? $carrinho->tp_desconto_sb_venda : ''; ?>" name=""> --}}
                                 <select name="tp_desconto_sb_venda" class="form-select"
-                                    id="tp_desconto_sobre_venda_modal"
-                                    onchange="verificaDesconto(<?php echo $carrinho->total; ?>, <?php echo $carrinho->valor_desconto; ?>)"
+                                    id="tp_desconto_sb_venda"
+                                    onchange="habilitaDesconto(this.value, 'inputDesconto', )"
                                     aria-label="Floating label select example">
                                     <option selected value="0">selecione...</option>
-                                    <option value="porcento">%</option>
-                                    <option value="dinheiro">R$</option>
+                                    <option value="%">%</option>
+                                    <option value="$">R$</option>
                                 </select>
                                 <label for="floatingSelectGrid">Tipo</label>
                             </div>
                         </div>
                     </div>
-
-
-
                     <br>
                     <div class="row g-2">
                         <div class="col-6">
@@ -132,7 +130,7 @@
                             <div class="form-floating">
                                 <select name="tipo_pagamento" class="form-select" id="floatingSelectGrid"
                                     aria-label="Floating label select example"
-                                    onchange="verificaAvistaAprazo(this.value)">
+                                    onchange="habilitaVendaAP(this.value)">
                                     <option value="AV">À VISTA</option>
                                     <option value="AP">A PRAZO</option>
                                 </select>
@@ -144,9 +142,9 @@
 
                     {{-- Tipo pagamento --}}
                     <div class="row g-2">
-                        <div id="campoInserirEntrada" class="col-12">
+                        <div id="campoInserirEntrada" class="col-12 d-none">
                             <div class="form-floating">
-                                <input name="valor_entrada" type="number" class="form-control" min="0">
+                                <input id="valor_entrada" name="valor_entrada" type="number" class="form-control" min="0">
 
                                 <label for="floatingInputGrid">Aplicar algum valor de entrada ?</label>
                             </div>

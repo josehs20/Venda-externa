@@ -4,7 +4,7 @@
 $(function () {
     $('form[id="CadastroCliente"]').submit(function (event) {
         event.preventDefault();
-        console.log(documento());
+
         if (documento() && validaInputNome() &&
             validaInputNumeros('inputTel1') &&
             validaInputNumeros('inputTel2') &&
@@ -20,7 +20,7 @@ $(function () {
             var numero = $("#numero").val();
             var complemento = $("#compto").val();
             var codIbge = $("#cidIbge").val();
-            console.log(codIbge);
+
             $.ajax({
                 url: "/clientes",
                 type: "POST",
@@ -60,21 +60,20 @@ $(function () {
                     $("#compto").val("");
                     $("#cidIbge").val("");
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Cliente Cadastrado Com Sucesso',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                } else if(response['succes'] == false){
+                    alertPadrao('Cliente Cadastrado Com Sucesso', 'success')
 
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Documento já cadastrado para' + response.cliente.nome,
-                        showConfirmButton: false,
-                        timer: 2000
-                    })
+                } else if (response.success == false) {
+                    console.log(response.success);
+                    alertPadrao(response.msg, 'warning')
+
                 }
+            }).catch(function (response) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Não foi possível, entre em contato com o suporte',
+                    showConfirmButton: false,
+                    timer: 2000
+                })
             });
         } else {
             Swal.fire({
@@ -132,36 +131,38 @@ $(function () {
                     docto: docto,
                 },
                 dataType: 'json',
-            }).done(function (response) {
-                if (response['success'] == true) {
-      
+                success: function (response) {
+
+                    if (response['success'] == true) {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cliente Atualizado Com Sucesso',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+
+                    } else if (response['success'] == false) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Documento já existe para  ' + response.cliente.nome,
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                    }
+                },
+                error: function () {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Cliente Atualizado Com Sucesso',
+                        icon: 'warning',
+                        title: 'Não foi possível entre em contato com o suporte',
                         showConfirmButton: false,
                         timer: 1500
                     })
-
-                }else if(response['success'] == false){
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Documento já existe para  '+ response.cliente.nome,
-                        showConfirmButton: false,
-                        timer: 2000
-                    })
-                }
+                },
             });
-        } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Não foi possível entre em contato com o suporte',
-                showConfirmButton: false,
-                timer: 1500
-            })
         }
-    });
-});
-
+    })
+})
 
 //arruma inputes quando entra da página para update
 window.onload = function () {

@@ -35,4 +35,5 @@
         </div>
     </div>
     @endsection
+    <script src="{{ asset('js/carrinho.js') }}" defer></script>
     <script type="text/javascript" src="{{ asset('js/valida-documento.js') }}" defer></script>

@@ -130,7 +130,7 @@
              <div class="card l-bg-green-dark mx-3">
                  <div class="card-statistic-3 p-4">
 
-                     <div class="card-icon card-icon-large"><i class="fas fa-ticket-alt"></i></div>
+                     <div class="card-icon card-icon-large"><i style="font-size: 80px !important;" class="fas fa-ticket-alt"></i></div>
 
                      <div class="mb-4">
                          <h6 class="card-title mb-0 valorBruto"valorBruto">
@@ -151,20 +151,20 @@
                              <h3>10% <i class="fa fa-arrow-up"></i></h3>
                          </div> --}}
                      </div>
-                     <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                     {{-- <div class="progress mt-1 " data-height="8" style="height: 8px;">
                          <div class="progress-bar l-bg-orange" role="progressbar" data-width="25%" aria-valuenow="25"
                              aria-valuemin="0" aria-valuemax="100" style="width: 25%;"></div>
-                     </div>
+                     </div> --}}
                  </div>
              </div>
          </div>
          <div class="col-md-4 animate__animated animate__fadeIn animate__delay-0.5s">
              <div class="card l-bg-orange-dark mx-3">
                  <div class="card-statistic-3 p-4">
-                     <div class="card-icon card-icon-large"><i style="font-size: 18px !important;" class="fas fa-percent"></i></div>
+                     <div class="card-icon card-icon-large"><i style="font-size: 50px !important;" class="fas fa-percent"></i></div>
                      <div class="mb-4">
                          <h6 class="card-title mb-0 valor_desconto"> Desconto em valor:
-                             R$&ensp;{{ reais($carrinho->valor_desconto + $carrinho->valor_desconto_sb_venda) }} </h6>
+                             R$&ensp;{{ reais($carrinho->valor_desconto) }} </h6>
                      </div>
                      <div class="row align-items-center mb-2 d-flex">
                          <div class="col-8">
@@ -176,10 +176,10 @@
                              <span>2.5% <i class="fa fa-arrow-up"></i></span>
                          </div> --}}
                      </div>
-                     <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                     {{-- <div class="progress mt-1 " data-height="8" style="height: 8px;">
                          <div class="progress-bar l-bg-cyan" role="progressbar" data-width="25%" aria-valuenow="25"
                              aria-valuemin="0" aria-valuemax="100" style="width: 25%;"></div>
-                     </div>
+                     </div> --}}
                  </div>
              </div>
          </div>

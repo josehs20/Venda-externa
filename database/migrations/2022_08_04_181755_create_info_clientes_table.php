@@ -14,7 +14,11 @@ class CreateInfoClientesTable extends Migration
     public function up()
     {
         Schema::create('info_clientes', function (Blueprint $table) {
-            $table->id();
+            $table->id();   
+            $table->string('observacao')->nullable();
+            $table->string('data')->nullable();            
+            $table->integer('cliente_id');
+            
             $table->timestamps();
         });
     }

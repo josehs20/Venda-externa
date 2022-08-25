@@ -25,7 +25,7 @@
                                     <div class="form-floating">
                                         {{-- Verifica tipo de qauntidade --}}
 
-                                        <input name="quantidade" id="quantidadeEditItemCarrinho" value="{{ $item->quantidade }}" type="number" class="form-control" min="0"
+                                        <input onkeyup="this.value=this.value.replace(/[^0-9]/g,'');" name="quantidade" id="quantidadeEditItemCarrinho<?php echo $item->id; ?>" value="{{ $item->quantidade }}" type="number" class="form-control" min="1"
                                              id="floatingInputGrid"
                                             >
                                         <label id="quantidadeFloat" for="floatingInputGrid">Quantidade: {{ $item->quantidade }}</label>
@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="col-4">
                                     <div class="form-floating">
-                                        <select name="tipo_qtd" disabled class="form-select" id="floatingSelectGrid"
+                                        <select name="tipo_qtd" id="tipo_qtd<?php echo $item->id; ?>" disabled class="form-select" id="floatingSelectGrid"
                                             aria-label="Floating label select example">
                                             <option selected value="UN">UN</option>
                                             {{-- <option value="CX">CX</option> --}}
@@ -68,8 +68,8 @@
                                         <span></span>
                                         <div class="form-floating">
                                             <select
-                                                onchange="habilitaDescontoEditarItem(this.value, <?php echo $item->id; ?>)"
-                                                name="tp_desconto" class="form-select" id="selectTp_desconto"
+                                                onchange="habilitaDesconto(this.value, 'inputDescontoEditarItem<?php echo $item->id; ?>')"
+                                                name="tp_desconto" class="form-select" id="selectTp_desconto<?php echo $item->id; ?>"
                                                 aria-label="Floating label select example">
                                                 {{-- @if ($item->qtd_desconto) --}}
                                                     <option value="">selecione...</option>

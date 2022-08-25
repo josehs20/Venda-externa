@@ -1,4 +1,4 @@
-function modalItensVendaSalva(carrinho, produtos) {
+function modalItensVendaInvalida(carrinho, produtos) {
     var itens = adiciona_nome_tam_item(carrinho.car_itens, produtos)
     var table = monta_tabela_itens_modal(itens, carrinho)
     var carrinhoAtual = get_itens_carrinho()
@@ -9,7 +9,7 @@ function modalItensVendaSalva(carrinho, produtos) {
         showCancelButton: true,
         showConfirmButton: true,
         cancelButtonText: 'Fechar',
-        confirmButtonText: 'Finalizar',
+        confirmButtonText: 'Revisar',
         html: table,
         focusConfirm: false,
         showClass: {

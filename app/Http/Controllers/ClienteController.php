@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ExportaClienteJob;
+use App\Models\Alltech;
 use App\Models\Carrinho;
 use App\Models\CidadeIbge;
 use App\Models\Cliente;
@@ -18,51 +19,69 @@ class ClienteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $msg = null)
+    public function index(Request $request)
     {
-        $clientes = Cliente::with('infoCliente', 'enderecos')->where('loja_id', auth()->user()->loja_id)
-            ->whereRaw("nome like '%{$request->nome}%'")->orderBy('nome')->get();
+        $clientes = Alltech::get_cliente_nome($request->nome);
+        $cidades_ibge = [];
+        $clientesIds = [];
 
-        $clientes = $clientes->reject(function ($cliente) {
-            return $cliente->alltech_id == '999999';
-        });
-
-        //  dd(auth()->user()->loja_id);
-        $clientes = count($clientes) ? $clientes->toQuery()->paginate(30) : [];
-
-        return view('cliente.index', compact('clientes', 'msg'));
-    }
-    public function busca_cliente_ajax()
-    {
-        $nome = $_GET['nome'];
-        $codigo = $_GET['codigo'];
-
-        if ($nome || $nome === "") {
-
-            if ($nome === "") {
-                $clientes = Cliente::where('loja_id', auth()->user()->loja_id)->get();
-                //dd($clientes);
-            } else {
-                $clientes = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->get();
-            }
-
-            $dados['nome'] = $clientes->reject(function ($cliente) {
-                return $cliente->alltech_id == '999999';
-            });
-        }
-
-        if ($codigo) {
-            //$cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
-            $cliente = Cliente::with('enderecos')->where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
-            $dados['codigo'] = $cliente;
-            if ($cliente) {
-                $dados['cidade'] = $cliente->enderecos->cidadeIbge;
+        foreach ($clientes as $key => $c) {
+            $clientesIds[] = $c->id;
+            if ($c->enderecos->cidade_ibge_id) {
+                $cidades_ibge[] = $c->enderecos->cidade_ibge_id;
             }
         }
 
-        echo json_encode($dados);
-        return;
+        $infos = InfoCliente::whereIn('cliente_id', array_unique($clientesIds))->get();
+        $infoCientes = [];
+        foreach ($infos as $key => $i) {
+            $infoCientes[$i->cliente_id][] = $i;
+        }
+
+        $cidades_ibge = Alltech::get_cidades_ibge($cidades_ibge);
+        $cidades = [];
+
+        foreach ($cidades_ibge as $key => $c) {
+            $cidades[$c->id] = $c;
+        }
+
+        $clientes = Alltech::paginate($clientes);
+        $clientes->withPath('/clientes?');
+
+        return view('cliente.index', compact('clientes', 'cidades', 'infoCientes'));
     }
+
+    // public function busca_cliente_ajax()
+    // {
+    //     $nome = $_GET['nome'];
+    //     $codigo = $_GET['codigo'];
+
+    //     if ($nome || $nome === "") {
+
+    //         if ($nome === "") {
+    //             $clientes = Cliente::where('loja_id', auth()->user()->loja_id)->get();
+    //             //dd($clientes);
+    //         } else {
+    //             $clientes = Cliente::where('loja_id', auth()->user()->loja_id)->whereRaw("nome like '%{$_GET['nome']}%'")->get();
+    //         }
+
+    //         $dados['nome'] = $clientes->reject(function ($cliente) {
+    //             return $cliente->alltech_id == '999999';
+    //         });
+    //     }
+
+    //     if ($codigo) {
+    //         //$cliente = Cliente::where('loja_id', auth()->user()->loja_id)->where('alltech_id', $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
+    //         $cliente = Cliente::with('enderecos')->where('loja_id', auth()->user()->loja_id)->where("alltech_id", $_GET['codigo'])->orWhere('docto', $_GET['codigo'])->first();
+    //         $dados['codigo'] = $cliente;
+    //         if ($cliente) {
+    //             $dados['cidade'] = $cliente->enderecos->cidadeIbge;
+    //         }
+    //     }
+
+    //     echo json_encode($dados);
+    //     return;
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -84,17 +103,7 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        $codIbge = CidadeIbge::where('codigo', trim($_POST['codIbge']))->first();
-        $dado = Cliente::where('loja_id', auth()->user()->loja_id)->orWhere('docto', $_POST['documento'])->first();
-
-        if ($dado) {
-            $dados['success'] = false;
-            echo json_encode($dado);
-            return;
-        }
-
-        $cliente =  Cliente::create([
-            'loja_id' => auth()->user()->loja_id,
+        $dados['create_cliente'] = [
             'alltech_id' => $_POST['documento'],
             'nome' => $_POST['nome'],
             'docto' => $_POST['documento'],
@@ -102,21 +111,29 @@ class ClienteController extends Controller
             'email' => trim($_POST['email']) ? trim($_POST['email']) : null,
             'fone1' => strlen($_POST['telefones'][0]) > 7 ? $_POST['telefones'][0] : null,
             'fone2' => strlen($_POST['telefones'][1]) > 7 ? $_POST['telefones'][1] : null,
-            'celular' => strlen($_POST['telefones'][2]) > 7 ? $_POST['telefones'][2] : null,
-        ]);
-        $cliente->enderecos()->create([
-            'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
+            'celular' => strlen($_POST['telefones'][2]) > 7 ? $_POST['telefones'][2] : null
+        ];
+
+        $dados['endereco'] = [
+            'cidade_ibge_id' => trim($_POST['codIbge']) ? trim($_POST['codIbge']) : null,
             'cep' => preg_replace("/[^0-9]/", "", $_POST['cep']),
             'bairro' => $_POST['bairro'],
             'rua' => $_POST['rua']  ? $_POST['rua']  : null,
             'numero' => $_POST['numero'] ? intval($_POST['numero']) : null,
             'compto' => $_POST['complemento'] ? $_POST['complemento'] : null,
-        ]);
-        $dados['success'] = true;
-        echo json_encode($dados);
+            'tipo' => 'R',
+        ];
 
-        $this->jsonClienteStorageJob($cliente);
-        return;
+    
+        $response = Alltech::create_cliente($dados);
+
+        $cliente = $response->object();
+
+        if ($response->status() == 400) {
+
+            return response()->json(['msg' => 'Cliente com esse documento já existe ' . $cliente->verificaCliente->nome, 'success' => false]);
+        }
+        return response()->json(['msg' => 'Cliente cadastrado com sucesso ' . $cliente->nome, 'success' => true]);
     }
 
     /**
@@ -138,8 +155,10 @@ class ClienteController extends Controller
      */
     public function edit($id)
     {
-        $cliente = Cliente::find($id);
+        $cliente = Alltech::get_clientes_alltech([$id])[0];
+        $cidade = Alltech::get_cidades_ibge([$cliente->enderecos->cidade_ibge_id])[0];
 
+        $cliente->enderecos->cidadeIbge = $cidade;
 
         return view('cliente.edit', compact('cliente'));
     }
@@ -154,57 +173,81 @@ class ClienteController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!strcasecmp($_SERVER['REQUEST_METHOD'], 'PUT')) {
-            parse_str(file_get_contents('php://input'), $_PUT);
+        // if (!strcasecmp($_SERVER['REQUEST_METHOD'], 'PUT')) {
+        //     parse_str(file_get_contents('php://input'), $_PUT);
 
-            $codIbge = CidadeIbge::where('codigo', trim($_PUT['codIbge']))->first();
+        //     $codIbge = CidadeIbge::where('codigo', trim($_PUT['codIbge']))->first();
 
-            $cliente = Cliente::find($_PUT['id']);
+        //     $cliente = Cliente::find($_PUT['id']);
 
-            if (!$cliente->docto) {
+        //     if (!$cliente->docto) {
 
-                $dado['cliente'] = Cliente::where('loja_id', auth()->user()->loja_id)->where('docto', $_PUT['docto'])->first();
+        //         $dado['cliente'] = Cliente::where('loja_id', auth()->user()->loja_id)->where('docto', $_PUT['docto'])->first();
 
-                //return caso já exista client com o mesmo docto
-                if ($dado['cliente']) {
-                    $dado['success'] = false;
-                    echo json_encode($dado);
-                    return;
-                }
-            }
+        //         //return caso já exista client com o mesmo docto
+        //         if ($dado['cliente']) {
+        //             $dado['success'] = false;
+        //             echo json_encode($dado);
+        //             return;
+        //         }
+        //     }
 
-            $lojas = $cliente->loja->empresa->lojas;
+        //     $lojas = $cliente->loja->empresa->lojas;
 
-            //Atualiza cliente parar todas lojas
-            foreach ($lojas as $key => $loja) {
+        //     //Atualiza cliente parar todas lojas
+        //     foreach ($lojas as $key => $loja) {
 
-                $cliente =  $loja->clientes()->where('alltech_id', $cliente->alltech_id)->first();
+        //         $cliente =  $loja->clientes()->where('alltech_id', $cliente->alltech_id)->first();
 
-                $cliente->update([
-                    'docto' => $_PUT['docto'],
-                    'nome' => $_PUT['nome'],
-                    'email' => $_PUT['email'],
-                    'fone1' => strlen($_PUT['telefones'][0]) > 7 ? $_PUT['telefones'][0] : null,
-                    'fone2' => strlen($_PUT['telefones'][1]) > 7 ? $_PUT['telefones'][1] : null,
-                    'celular' => strlen($_PUT['telefones'][2]) > 7 ? $_PUT['telefones'][2] : null,
-                ]);
-                $cliente->enderecos()->update([
-                    'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
-                    'cep' => preg_replace("/[^0-9]/", "", $_PUT['cep']),
-                    'bairro' => $_PUT['bairro'],
-                    'rua' => $_PUT['rua']  ? $_PUT['rua']  : null,
-                    'numero' => $_PUT['numero'] ? intval($_PUT['numero']) : null,
-                    'compto' => $_PUT['complemento'] ? $_PUT['complemento'] : null,
-                ]);
-            }
+        //         $cliente->update([
+        //             'docto' => $_PUT['docto'],
+        //             'nome' => $_PUT['nome'],
+        //             'email' => $_PUT['email'],
+        //             'fone1' => strlen($_PUT['telefones'][0]) > 7 ? $_PUT['telefones'][0] : null,
+        //             'fone2' => strlen($_PUT['telefones'][1]) > 7 ? $_PUT['telefones'][1] : null,
+        //             'celular' => strlen($_PUT['telefones'][2]) > 7 ? $_PUT['telefones'][2] : null,
+        //         ]);
+        //         $cliente->enderecos()->update([
+        //             'cidade_ibge_id' => $codIbge->id ? $codIbge->id : null,
+        //             'cep' => preg_replace("/[^0-9]/", "", $_PUT['cep']),
+        //             'bairro' => $_PUT['bairro'],
+        //             'rua' => $_PUT['rua']  ? $_PUT['rua']  : null,
+        //             'numero' => $_PUT['numero'] ? intval($_PUT['numero']) : null,
+        //             'compto' => $_PUT['complemento'] ? $_PUT['complemento'] : null,
+        //         ]);
+        //     }
 
-            $dados['success'] = true;
-            echo json_encode($dados);
-            $cliente = Cliente::find($_PUT['id']);
+        //     $dados['success'] = true;
+        //     echo json_encode($dados);
+        //     $cliente = Cliente::find($_PUT['id']);
 
-            $this->jsonClienteStorageJob($cliente);
-        }
-        return;
+        //     $this->jsonClienteStorageJob($cliente);
+        // }
+        // return;
+
+        $dados['update_cliente'] = [
+            'docto' => $request->docto,
+            'email' => trim($request->email) ? trim($request->email) : null,
+            'fone1' => strlen($request->telefones[0]) > 7 ? $request->telefones[0] : null,
+            'fone2' => strlen($request->telefones[1]) > 7 ? $request->telefones[1] : null,
+            'celular' => strlen($request->telefones[2]) > 7 ? $request->telefones[2] : null
+        ];
+
+        $dados['endereco'] = [
+            'cidade_ibge_id' => trim($request->codIbge) ? trim($request->codIbge) : null,
+            'cep' => preg_replace("/[^0-9]/", "", $request->cep),
+            'uf' => $request->uf,
+            'bairro' => $request->bairro,
+            'rua' => $request->rua  ? $request->rua  : null,
+            'tipo' => "R",
+            'numero' => $request->numero ? $request->numero : null,
+            'compto' => $request->complemento ? $request->complemento : null,
+        ];
+
+        $response = Alltech::update_cliente($dados, $id);
+
+        $cliente = $response->object();
+        return response()->json(['msg' => 'Cliente atualizado com sucesso ' . $cliente->nome, 'success' => true]);
     }
 
     //Faz o json, envia para storage para assim ser enviado para o ftp
@@ -259,9 +302,9 @@ class ClienteController extends Controller
     //     $carrinhos = Carrinho::with('carItem', 'cliente')->where('user_id', auth()->user()->id)
     //         ->where('status', 'like', 'Salvo')->where('n_pedido', 'like', '%' . $busca . '%')
     //         ->orWhereHas('cliente', function (Builder $query) use ($busca) {
-               
+
     //             $query->where('loja_id', auth()->user()->loja_id)->where('nome', 'like', '%' . $busca . '%');
-           
+
     //         })->get()->reject(function ($c) {
     //             return $c->user_id != auth()->user()->id;
     //         });
@@ -302,8 +345,6 @@ class ClienteController extends Controller
     public function add_observacao(Request $request, $cliente)
     {
         $data = date('d-m-Y', strtotime($request->data_obs));
-        // dd($request->all());
-
         InfoCliente::create([
             'data' => $request->data_obs ?  $data : null,
             'observacao' => $request->observacao,

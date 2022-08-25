@@ -1,4 +1,4 @@
-function modalItensVendaSalva(carrinho, produtos) {
+function modalItensVendaFinalizada(carrinho, produtos) {
     var itens = adiciona_nome_tam_item(carrinho.car_itens, produtos)
     var table = monta_tabela_itens_modal(itens, carrinho)
     var carrinhoAtual = get_itens_carrinho()
@@ -7,25 +7,13 @@ function modalItensVendaSalva(carrinho, produtos) {
         title: 'ITENS',
         width: 800,
         showCancelButton: true,
-        showConfirmButton: true,
         cancelButtonText: 'Fechar',
-        confirmButtonText: 'Finalizar',
         html: table,
-        focusConfirm: false,
         showClass: {
             popup: 'animate__animated animate__fadeInDown'
         },
         hideClass: {
             popup: 'animate__animated animate__fadeOutUp'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            
-            if (carrinhoAtual.car_itens.length && !carrinhoAtual.cliente_id_alltech) {
-                confirm_substitui_carrinho(carrinho, 'Seu carrinho atual contém itens, caso continue ele sera substituído sem salvar')
-            } else{
-                confirm_substitui_carrinho(carrinho, 'Deseja realmente retornar essa venda?')
-            }
         }
     })
 }

@@ -258,7 +258,7 @@ async function modalAddProduto(nome, preco, grade, item_estoque_id, item_carrinh
             </div>
             <div class="input-group mb-3">
           <span class="input-group-text bg-white">${unidade_de_medida}</span>
-          <input placeholder="${item_carrinho}" type="text" id="quantidadeProduto" class="form-control">`,
+          <input onkeyup="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="${item_carrinho}" type="number" id="quantidadeProduto" class="form-control">`,
         focusConfirm: false,
         confirmButtonText: 'Adicionar',
         preConfirm: () => {
@@ -308,9 +308,15 @@ function addItemCarrinho(item, quantidade, preco, qtd_desconto, tp_desconto) {
         },
         dataType: 'json',
         success: function (response) {
-            carrinho = JSON.parse(response.dados);
+            carrinho = response.dados;
 
-            set_itens_carrinho(carrinho.car_itens)
+            var elementData = document.querySelector('[data-carrinho]')
+       
+            elementData.setAttribute('data-carrinho', JSON.stringify(carrinho))
+
+            var count_itens_carrinho = document.getElementById('countItensCar');
+            count_itens_carrinho.innerText = carrinho.car_itens.length
+
             var msg = response.msg;
             var icon = 'success';
             alertTopEnd(msg, icon);

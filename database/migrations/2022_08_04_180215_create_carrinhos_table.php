@@ -16,7 +16,7 @@ class CreateCarrinhosTable extends Migration
         Schema::create('carrinhos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->date('data')->nullable();
+            $table->dateTime('data')->nullable();
             $table->string('n_pedido')->nullable();
             $table->decimal('qtd_desconto')->nullable();
             $table->string('tp_desconto')->nullable();

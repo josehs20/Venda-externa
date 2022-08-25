@@ -36,7 +36,7 @@ class ExportaClienteJob implements ShouldQueue
     public function handle()
     {
         $empresa = Empresa::where('pasta', $this->dir)->first();
-
+        $this->dir = 'APPVENDA/'. $this->dir;
         Storage::disk('local')->makeDirectory($this->dir);
 
         $files = Storage::disk('local')->files($this->dir);

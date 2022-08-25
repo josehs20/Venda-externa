@@ -2,33 +2,26 @@
 
 @section('content')
     <style>
-        .carregando {
-            display: none;
-        }
-
-        #campoInserirEntrada {
-            display: none;
-        }
 
         /* .l-bg-cyanButton {
-                                background: linear-gradient(to right, #dacf3b, #a9b404) !important;
-                                color: #fff;
-                            }
+                                        background: linear-gradient(to right, #dacf3b, #a9b404) !important;
+                                        color: #fff;
+                                    }
 
-                            .l-bg-redButton {
-                                background: linear-gradient(to right, #ff2323, #b64949) !important;
-                                color: #fff;
-                            }
+                                    .l-bg-redButton {
+                                        background: linear-gradient(to right, #ff2323, #b64949) !important;
+                                        color: #fff;
+                                    }
 
-                            .l-bg-orangeButton {
-                                background: linear-gradient(to right, #6c6ee9, #4189f5) !important;
-                                color: #fff;
-                            }
+                                    .l-bg-orangeButton {
+                                        background: linear-gradient(to right, #6c6ee9, #4189f5) !important;
+                                        color: #fff;
+                                    }
 
-                            .l-bg-greenButton {
-                                background: linear-gradient(to right, #99e087 0%, #08fc82 100%) !important;
-                                color: #fff;
-                            } */
+                                    .l-bg-greenButton {
+                                        background: linear-gradient(to right, #99e087 0%, #08fc82 100%) !important;
+                                        color: #fff;
+                                    } */
     </style>
     @include('componentes.navbar', ['titulo' => 'Itens'])
     <br><br><br><br>
@@ -41,10 +34,6 @@
 
         <body onload="msgError('<?php echo Session::get('error'); ?>')">
     @endif
-    {{-- @if (Session::has('descInvalido'))
-
-        <body onload="descInvalido('<?php echo Session::get('descIvalido'); ?>')">
-    @endif --}}
 
     @if (!count($carrinho->car_itens))
         <div class="row justify-content-center">
@@ -71,49 +60,47 @@
                         onclick="salvarItensRetornados('<?php echo $cliente_carrinho[0]->nome; ?>', '<?php echo $cliente_carrinho[0]->id; ?>')">
                         Salvar Itens
                     </button>
-                    <button type="button"
-                        class="btn btn-outline-secondary col-md-2 mx-4 mt-3 animate__animated animate__fadeIn animate__delay-0.5s"
-                        data-bs-toggle="modal" data-bs-target="#modalDescontoCarrinho">
-                        Desconto
-                    </button>
-                    <button type="button" class="btn btn-outline-success col-md-2 mx-4 mt-3" data-bs-toggle="modal"
-                        data-bs-target="#modalFinalizaVendaComCLientSalvo">
-                        Finalizar
-                    </button>
-
-
-                    {{-- finaliza venda com cliente  E salvar itens novamente para cliente --}}
-                    {{-- @include('vendedor.inc.com-cliente') --}}
                 @else
                     <button type="button"
                         class="btn btn-outline-info col-md-2 mx-4 mt-3 animate__animated animate__fadeIn animate__delay-0.5s"
                         data-bs-toggle="modal" data-bs-target="#salvarItens">
                         Salvar Itens
                     </button>
-                    <button type="button"
+                    {{-- <button type="button"
                         class="btn btn-outline-secondary col-md-2 mx-4 mt-3 animate__animated animate__fadeIn animate__delay-0.5s"
                         data-bs-toggle="modal" data-bs-target="#modalDescontoCarrinho">
                         Desconto
                     </button>
-                    <button id="abrirModalFinalizaVendaSemCliente" type="button"
-                        class="btn btn-outline- col-md-2 mx-4 mt-3 btn-outline-success animate__animated animate__fadeIn animate__delay-0.5s"
-                        data-bs-toggle="modal" data-bs-target="#modalFinalizaVendaSemCliente">
+                    <button type="button" class="btn btn-outline-success col-md-2 mx-4 mt-3" data-bs-toggle="modal"
+                        data-bs-target="#modalFinalizaVenda">
                         Finalizar
-                    </button>
+                    </button> --}}
 
-                    {{-- Finaliza venda sem cliente E Salvar itens --}}
-                    @include('vendedor.inc.sem-cliente')
+                    {{-- finaliza venda com cliente  E salvar itens novamente para cliente --}}
+                    {{-- @include('vendedor.inc.modal-finaliza-venda') --}}
                 @endif
+                <button type="button"
+                class="btn btn-outline-secondary col-md-2 mx-4 mt-3 animate__animated animate__fadeIn animate__delay-0.5s"
+                data-bs-toggle="modal" data-bs-target="#modalDescontoCarrinho">
+                Desconto
+            </button>
+            <button id="abrirModalFinalizaVenda" type="button"
+                class="btn btn-outline- col-md-2 mx-4 mt-3 btn-outline-success animate__animated animate__fadeIn animate__delay-0.5s"
+                data-bs-toggle="modal" data-bs-target="#modalFinalizaVenda">
+                Finalizar
+            </button>
+
+            {{-- Finaliza venda sem cliente E Salvar itens --}}
+            @include('vendedor.inc.modal-finaliza-venda')
             </div>
         </div>
 
         <hr><br>
-        {{-- tabela de itens principal --}}
 
-        <form id="formDescInvalido" action="{{ route('descInvalido', $carrinho->id) }}" method="POST">
+        {{-- <form id="formDescInvalido" action="{{ route('descInvalido', $carrinho->id) }}" method="POST">
             @method('PUT')
             @csrf
-        </form>
+        </form> --}}
         <div class="row d-flex justify-content-center p-3">
 
             @foreach ($carrinho->car_itens as $item)
@@ -151,49 +138,6 @@
                         </li>
                     </ul>
                 </div>
-
-                {{-- <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center"
-                            style="border: none; background-color: rgb(193, 194, 201)">
-                            <a
-                                style="color: black; font-weight: 500; text-decoration:none; font-size:16px">{{ $item->nome }}&ensp;{{ $item->tam ? '/' . $item->tam : '' }}</a>
-                            <a class="badge  rounded-pill" data-bs-toggle="modal"
-                                data-bs-target="#deleteItemCarrinho{{ $item->id }}"><i class="bi bi-x-square"
-                                    style="font-size: 22px; cursor: pointer; color:black;"></i></a>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center"
-                            style="background-color: rgb(230, 227, 255)">
-                            <a href="" style="color: black; font-weight: 400; text-decoration:none;">Total: R$
-                                {{ reais($item->valor) }}</a><a class="badge  rounded-pill" data-bs-toggle="modal"
-                                data-bs-target="#editaItem{{ $item->id }}"><i class="bi bi-pencil-square"
-                                    style="font-size: 22px; cursor: pointer; color:black;"></i></a>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Preço:
-                            <span class="badge bg-primary rounded-pill">R$ {{ reais($item->preco) }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Quantidade:
-                            <span class="badge bg-primary rounded-pill">{{ $item->quantidade }}</span>
-                            {{-- <div class="input-group list-qtd" style="width: 50%;">
-                            <button class="btn btn-link" type="button"><i class="bi bi-dash-circle"></i></button>
-                            <input type="text" class="form-control" placeholder="" value="{{ $item->quantidade }}">
-                            <button class="btn btn-link" type="button"><i class="bi bi-plus-circle"></i></button>
-                        </div> --}}
-                {{-- </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Desconto:
-                            @if ($carrinho->tp_desconto == 'porcento_unico' or !$carrinho->tp_desconto)
-                                <span>{{ !$carrinho->tp_desconto ? 'Não Aplicado' : 'Porcentagem Única' }}</span>
-                            @else
-                                <span
-                                    class="badge bg-primary rounded-pill">{{ $carrinho->tp_desconto == 'porcento_unico' ? 'Porcentagem única' : ($carrinho->tp_desconto == 'dinheiro_unico' ? 'Unificado em dinheiro' : (!$item->qtd_desconto ? 'Não inserido' : ($item->tipo_desconto == 'porcento' ? '%' . $item->qtd_desconto : "R$" . $item->qtd_desconto))) }}</span>
-                            @endif
-                        </li>
-                    </ul>
-                    <br> --}}
-
-                {{-- Modais para editar itens da tabela de itens --}}
                 @include('vendedor.inc.modais-lista-carrinho')
             @endforeach
         </div>

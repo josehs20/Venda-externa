@@ -23,3 +23,4 @@
     
 @endsection
 <script type="text/javascript" src="{{ asset('js/valida-documento.js') }}" defer></script>
+<script src="{{ asset('js/carrinho.js') }}" defer></script>
